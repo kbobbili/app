@@ -25,6 +25,12 @@
       <artifactId>data</artifactId>
       <version>${parent.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.kalbob</groupId>
+      <artifactId>data</artifactId>
+      <version>${parent.version}</version>
+      <type>test-jar</type>
+    </dependency>
   </dependencies>
 
 </project>
