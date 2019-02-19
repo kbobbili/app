@@ -51,16 +51,18 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
       <version>${spring-boot.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.kalbob</groupId>
+      <artifactId>service</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.kalbob</groupId>
+      <artifactId>service</artifactId>
+      <version>${parent.version}</version>
+      <type>test-jar</type>
+    </dependency>
   </dependencies>
 
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
