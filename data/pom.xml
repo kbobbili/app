@@ -51,6 +51,11 @@
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.kalbob</groupId>
+      <artifactId>common</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

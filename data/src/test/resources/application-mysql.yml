@@ -6,12 +6,12 @@ spring:
     console:
       enabled: true
   datasource:
-    url: jdbc:h2:~/mock_DB;AUTO_SERVER=TRUE
-    username: sa
-    password:
+    url: jdbc:mysql://localhost:3306/dev_DB?useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: kpwd
   jpa:
     show-sql: true
     generate-ddl: true
     hibernate:
       ddl-auto: create
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect
