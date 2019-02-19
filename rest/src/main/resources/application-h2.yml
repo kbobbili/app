@@ -1,7 +1,4 @@
 spring:
-  flyway:
-    locations: classpath:db/migration
-    enabled: false
   h2:
     console:
       enabled: true
@@ -13,5 +10,5 @@ spring:
     show-sql: true
     generate-ddl: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     database-platform: org.hibernate.dialect.H2Dialect

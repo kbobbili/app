@@ -1,4 +1,4 @@
-package com.kalbob.app;
+package com.kalbob.app.rest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
