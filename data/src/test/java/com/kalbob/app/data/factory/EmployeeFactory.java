@@ -38,4 +38,18 @@ public class EmployeeFactory {
         }
         return employeeList;
     }
+
+    public Employee getEmployeeWithId(){
+        Employee employee = getEmployee();
+        employee.setId(Long.valueOf(dataFactory.getNumberBetween(1,1000)));
+        return employee;
+    }
+
+    public List<Employee> getListOfEmployeesWithIds(int n) {
+        List<Employee> employeeList = new ArrayList<>();
+        for (int i = 1; i <= n; i++) {
+            employeeList.add(getEmployeeWithId());
+        }
+        return employeeList;
+    }
 }

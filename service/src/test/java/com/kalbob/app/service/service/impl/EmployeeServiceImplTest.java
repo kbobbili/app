@@ -49,8 +49,7 @@ public class EmployeeServiceImplTest {
 
     @Test
     public void getAllEmployees() {
-
-        when(employeeRepository.findAll()).thenReturn(employeeFactory.getListOfEmployees(3));
+        when(employeeRepository.findAll()).thenReturn(employeeFactory.getListOfEmployeesWithIds(3));
         List<Employee> employeeList = employeeService.getAllEmployees();
         assertEquals(3, employeeList.size());
     }
