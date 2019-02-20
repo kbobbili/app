@@ -1,4 +1,4 @@
-package com.kalbob.app.common.utils;
+package com.kalbob.app.common.data;
 
 import org.springframework.context.annotation.Configuration;
 
@@ -6,5 +6,6 @@ import org.springframework.context.annotation.Configuration;
 //@PropertySource("classpath:if-you-need-some-other-file.yml")
 //@EnableAutoConfiguration(exclude = XyzConfiguration.class)
 //@ComponentScan(excludeFilters={@ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, value=XyzConfiguration.class)})
-public class BaseCommonConfiguration {
+public class BaseDataCommonConfiguration {
+
 }

@@ -54,13 +54,14 @@
         <dependency>
             <groupId>com.kalbob</groupId>
             <artifactId>common</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.kalbob</groupId>
             <artifactId>common</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
             <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

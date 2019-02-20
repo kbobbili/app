@@ -1,14 +1,10 @@
-package com.kalbob.app.data;
+package com.kalbob.app.common.utils;
 
-import com.kalbob.app.common.utils.BaseTestConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 @Configuration
 //@PropertySource("classpath:if-you-need-some-other-file.yml")
 //@EnableAutoConfiguration(exclude = XyzConfiguration.class)
 //@ComponentScan(excludeFilters={@ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, value=XyzConfiguration.class)})
-@Import({BaseTestConfiguration.class})
-public class BaseDataTestConfiguration {
-
+public class BaseCommonUtilsConfiguration {
 }

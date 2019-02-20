@@ -13,9 +13,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "employee")
-public class Employee extends BaseModel{
+@Table(name = "project")
+public class Project extends BaseModel{
     private String name;
-    private Double salary;
-    private Long departmentId;
 }

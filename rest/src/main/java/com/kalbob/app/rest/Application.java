@@ -1,10 +1,13 @@
 package com.kalbob.app.rest;
 
+import com.kalbob.app.common.rest.BaseRestCommonConfiguration;
+import com.kalbob.app.service.ServiceConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.context.annotation.Import;
 
-@SpringBootApplication(exclude={MongoAutoConfiguration.class})
+@SpringBootApplication
+@Import({ServiceConfiguration.class, BaseRestCommonConfiguration.class})
 public class Application {
 
 	public static void main(String[] args) {

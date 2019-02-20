@@ -1,6 +1,5 @@
 package com.kalbob.app.data.repository;
 
-import com.kalbob.app.data.BaseDataTestConfiguration;
 import com.kalbob.app.data.DataConfiguration;
 import com.kalbob.app.data.factory.EmployeeFactory;
 import org.junit.After;
@@ -9,14 +8,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataConfiguration.class})
-@Import({BaseDataTestConfiguration.class})
+//@Import({BaseDataTestConfiguration.class})
 public class EmployeeRepositoryTest {
 
     @Autowired
