@@ -1,6 +1,6 @@
 package com.kalbob.app.data.repository;
 
-import com.kalbob.app.data.DataConfiguration;
+import com.kalbob.app.data.config.DataConfiguration;
 import com.kalbob.app.data.model.Address;
 import com.kalbob.app.data.model.Department;
 import com.kalbob.app.data.model.Employee;

@@ -11,10 +11,12 @@
     <description>My Spring App</description>
 
     <modules>
-        <module>rest</module>
+        <!--<module>rest</module>
         <module>service</module>
         <module>data</module>
-        <module>common</module>
+        <module>common</module>-->
+        <module>app-api</module>
+        <!--<module>app-client</module>-->
     </modules>
 
     <properties>
@@ -63,13 +65,11 @@
             <groupId>org.fluttercode.datafactory</groupId>
             <artifactId>datafactory</artifactId>
             <version>${datafactory.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

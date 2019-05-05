@@ -1,13 +1,12 @@
-package com.kalbob.app.rest;
+package com.kalbob.app;
 
-import com.kalbob.app.common.rest.BaseRestCommonConfiguration;
-import com.kalbob.app.service.impl.ServiceConfiguration;
+import com.kalbob.app.rest.RestConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import({ServiceConfiguration.class, BaseRestCommonConfiguration.class})
+@Import({RestConfiguration.class})
 public class Application {
 
 	public static void main(String[] args) {
