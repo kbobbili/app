@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -25,7 +26,7 @@ public class Department extends BaseModel{
     private String name;
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "department")
     private Address address;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "department")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "department", fetch = FetchType.EAGER)
     @Builder.Default
     private List<Employee> employees = new ArrayList<>();
 

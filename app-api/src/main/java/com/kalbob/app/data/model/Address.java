@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -22,14 +23,7 @@ public class Address extends BaseModel{
     private String city;
     private String state;
     private String zipCode;
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "department_id")
-    /*@JoinTable(
-            name = "address_department",
-            joinColumns = @JoinColumn(
-                    name = "address_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "department_id", referencedColumnName = "id")
-    )*/
     private Department department;
 }

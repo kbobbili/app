@@ -24,20 +24,10 @@ import java.util.List;
 @Table(name = "project")
 public class Project extends BaseModel{
     private String name;
-    @ManyToMany(mappedBy = "projects",
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            }
-    )
+    @ManyToMany(cascade = {CascadeType.PERSIST})
     @Fetch(FetchMode.JOIN)
     @Builder.Default
     private List<Employee> employees = new ArrayList<>();
-
-    public void addEmployee(Employee employee){
-        this.employees.add(employee);
-        employee.getProjects().add(this);
-    }
 
     public void removeEmployee(Employee employee){
         this.employees.remove(employee);

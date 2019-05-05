@@ -26,21 +26,10 @@ import java.util.List;
 public class Employee extends BaseModel{
     private String name;
     private Double salary;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "department_id")
-   /* @JoinTable(
-            name = "department_employee",
-            joinColumns = @JoinColumn(
-                    name = "employee_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "department_id", referencedColumnName = "id")
-    )*/
     private Department department;
-    @ManyToMany(cascade = {CascadeType.PERSIST,
-            CascadeType.MERGE
-            //CascadeType.DETACH,
-            //CascadeType.REMOVE
-    })
+    @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(
             name = "employee_project",
             joinColumns = @JoinColumn(
@@ -51,11 +40,6 @@ public class Employee extends BaseModel{
     @Fetch(FetchMode.JOIN)
     @Builder.Default
     private List<Project> projects = new ArrayList<>();
-
-    public void addProject(Project project){
-        this.projects.add(project);
-        project.getEmployees().add(this);
-    }
 
     public void removeProject(Project project){
         this.projects.remove(project);
