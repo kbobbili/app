@@ -1,6 +1,6 @@
 package com.kalbob.app.data;
 
-import com.kalbob.app.common.utils.BaseTestConfiguration;
+import com.kalbob.app.common.test.BaseTestConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 

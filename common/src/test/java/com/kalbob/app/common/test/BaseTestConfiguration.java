@@ -1,4 +1,4 @@
-package com.kalbob.app.common.utils;
+package com.kalbob.app.common.test;
 
 import com.github.javafaker.Faker;
 import org.fluttercode.datafactory.impl.DataFactory;
