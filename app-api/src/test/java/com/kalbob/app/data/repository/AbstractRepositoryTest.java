@@ -2,6 +2,7 @@ package com.kalbob.app.data.repository;
 
 import com.kalbob.app.data.DataConfiguration;
 import com.kalbob.app.data.DatabaseTruncateService;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,34 +14,34 @@ import org.springframework.boot.test.context.SpringBootTest;
 //@Import({DataTestConfiguration.class})
 public class AbstractRepositoryTest {
 
-   /* @Autowired
-    private EntityManager entityManager;*/
+  @Autowired
+  private EntityManager entityManager;
 
-    @Autowired
-    private DatabaseTruncateService databaseTruncateService;
+  @Autowired
+  private DatabaseTruncateService databaseTruncateService;
 
-    @BeforeAll
-    public static void beforeAll() {
-    }
+  @BeforeAll
+  public static void beforeAll() {
+  }
 
-    @AfterAll
-    public static void afterAll() {
-    }
+  @AfterAll
+  public static void afterAll() {
+  }
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-    }
+  @BeforeEach
+  public void beforeEach() throws Exception {
+  }
 
-    @AfterEach
-    public void afterEach() throws Exception {
-    }
+  @AfterEach
+  public void afterEach() throws Exception {
+  }
 
-    public void clearDB(){
-        databaseTruncateService.truncate();
-    }
+  public void clearDB() {
+    databaseTruncateService.truncate();
+  }
 
-    /*public EntityManager getEntityManager(){
-        return entityManager;
-    }*/
+  public EntityManager getEntityManager() {
+    return entityManager;
+  }
 
 }

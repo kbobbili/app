@@ -10,10 +10,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
+  @Override
+  protected void configure(HttpSecurity httpSecurity) throws Exception {
 
-    }
+  }
 
 }
 
@@ -22,16 +22,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 @EnableWebSecurity
 class SecurityConfigurationDev extends WebSecurityConfigurerAdapter {
 
-    @Override
-    @Profile({"dev"})
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .headers().frameOptions().disable().and()
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .and()
-                .authorizeRequests().antMatchers("/h2-console/**").permitAll();//For h2, disable CSRF, X-Frame-Options
-    }
+  @Override
+  @Profile({"dev"})
+  protected void configure(HttpSecurity httpSecurity) throws Exception {
+    httpSecurity
+        .headers().frameOptions().disable().and()
+        .csrf().disable()
+        .authorizeRequests()
+        .antMatchers("/").permitAll()
+        .and()
+        .authorizeRequests().antMatchers("/h2-console/**")
+        .permitAll();//For h2, disable CSRF, X-Frame-Options
+  }
 
 }

@@ -11,4 +11,5 @@ import org.springframework.context.annotation.Import;
 @ComponentScan
 @Import({DataConfiguration.class})
 public class ServiceConfiguration {
+
 }

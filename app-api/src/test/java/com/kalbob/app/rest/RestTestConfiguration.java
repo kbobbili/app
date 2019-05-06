@@ -10,4 +10,5 @@ import org.springframework.context.annotation.Import;
 //@ComponentScan(excludeFilters={@ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, value=XyzConfiguration.class)})
 @Import({ServiceTestConfiguration.class})
 public class RestTestConfiguration {
+
 }

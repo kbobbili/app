@@ -6,7 +6,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableAutoConfiguration(exclude={MongoAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {MongoAutoConfiguration.class})
 @ComponentScan
 public class DataConfiguration {
+
 }
