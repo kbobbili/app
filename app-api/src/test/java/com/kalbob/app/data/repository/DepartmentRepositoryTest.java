@@ -20,10 +20,13 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest{
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    @Autowired
+    private AddressRepository addressRepository;
+
     @Test
     public void saveDepartment() {
         Department department = DepartmentMother.simple().build();
-        department.assignAddress(AddressMother.simple().build());
+        department.setAddress(AddressMother.simple().build());
         department.addEmployee(EmployeeMother.simple().build());
         department = departmentRepository.save(department);
         assertTrue(department.getId() != null);
@@ -34,7 +37,7 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest{
     @Test
     public void deleteDepartmentById() {
         Department department = DepartmentMother.simple().build();
-        department.assignAddress(AddressMother.simple().build());
+        department.setAddress(AddressMother.simple().build());
         department.addEmployee(EmployeeMother.simple().build());
         department = departmentRepository.saveAndFlush(department);
         assertTrue(departmentRepository.findById(department.getId()).isPresent());
@@ -44,18 +47,23 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest{
 
 
     @Test
+    @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    @Rollback(false)
     public void removeAddress() {//Department deletes record from address
         Department department = DepartmentMother.simple().build();
-        department.assignAddress(AddressMother.simple().build());
+        department.setAddress(AddressMother.simple().build());
         department.addEmployee(EmployeeMother.simple().build());
         department = departmentRepository.saveAndFlush(department);
         assertTrue(departmentRepository.findById(department.getId()).get().getAddress()!=null);
-        department.removeAddress();//with orphanRemoval = true. Note: department.setAddress(null) can also be used in case of OneToOne
+
+        //1 with orphanRemoval = true. Note: department.setAddress(null) can also be used in case of OneToOne
+        department.removeAddress();
         department = departmentRepository.saveAndFlush(department);
         assertTrue(departmentRepository.findById(department.getId()).get().getAddress()==null);
 
-        //or no other way except, you use addressRepository to delete the address.
-        //addressRepository.deleteById(departmentRepository.findById(department.getId()).get().getAddress().getId()); Finish!
+        //i'm not sure why this is not working in this transaction context.
+        //2 or else no other way except, you use addressRepository to delete the address. Finish!
+        //addressRepository.deleteById(departmentRepository.findById(department.getId()).get().getAddress().getId());
     }
 
     @Test
@@ -63,7 +71,7 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest{
     @Rollback(false)
     public void removeEmployee() {//Manual delete record from employee
         Department department = DepartmentMother.simple().build();
-        department.assignAddress(AddressMother.simple().build());
+        department.setAddress(AddressMother.simple().build());
         department.addEmployee(EmployeeMother.simple().build());
         department = departmentRepository.saveAndFlush(department);
         assertTrue(departmentRepository.findById(department.getId()).get().getEmployees().size()==1);//Use @Transactional to avoid -> org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
@@ -77,7 +85,8 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest{
         assertTrue(employeeRepository.findById(employee.getId()).get().getDepartment()==null);
 
         //i'm not sure why this is not working in this transaction context.
-        /*employeeRepository.deleteById(department.getEmployees().get(0).getId());
+        //2 or else no other way except, you use employeeRepository to delete the employee. Finish!
+       /* employeeRepository.deleteById(department.getEmployees().get(0).getId());
         assertTrue(!employeeRepository.findById(department.getEmployees().get(0).getId()).isPresent());*/
     }
 

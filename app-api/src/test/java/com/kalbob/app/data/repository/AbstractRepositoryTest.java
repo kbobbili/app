@@ -13,6 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 //@Import({DataTestConfiguration.class})
 public class AbstractRepositoryTest {
 
+   /* @Autowired
+    private EntityManager entityManager;*/
+
     @Autowired
     private DatabaseTruncateService databaseTruncateService;
 
@@ -35,5 +38,9 @@ public class AbstractRepositoryTest {
     public void clearDB(){
         databaseTruncateService.truncate();
     }
+
+    /*public EntityManager getEntityManager(){
+        return entityManager;
+    }*/
 
 }

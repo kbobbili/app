@@ -77,7 +77,7 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest{
 
 
     @Test
-    public void findByDepartment_Name(){
+    public void findByDepartment_NameIgnoreCase(){
 
         clearDB();
 
