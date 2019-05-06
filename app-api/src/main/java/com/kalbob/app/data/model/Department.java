@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"address","employees"})
+@ToString(exclude = {"address", "employees"})
 @Builder
 @Entity
 @Table(name = "department")

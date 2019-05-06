@@ -25,6 +25,13 @@ import java.util.List;
 public class Project extends BaseModel{
     private String name;
     @ManyToMany(cascade = {CascadeType.PERSIST})
+    /*@JoinTable(
+            name = "employee_project",
+            joinColumns = @JoinColumn(
+                    name = "project_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "employee_id", referencedColumnName = "id")
+    )*/
     @Fetch(FetchMode.JOIN)
     @Builder.Default
     private List<Employee> employees = new ArrayList<>();

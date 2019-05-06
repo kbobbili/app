@@ -11,10 +11,6 @@
     <description>My Spring App</description>
 
     <modules>
-        <!--<module>rest</module>
-        <module>service</module>
-        <module>data</module>
-        <module>common</module>-->
         <module>app-api</module>
         <!--<module>app-client</module>-->
     </modules>
@@ -60,6 +56,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.fluttercode.datafactory</groupId>
@@ -96,26 +103,6 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.1</version>
-                    <executions>
-                        <execution>
-                            <id>jar tests package</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>test-jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <includes>
-                            <include>**/*.class</include>
-                            <include>**/*.yml</include>
-                        </includes>
                     </configuration>
                 </plugin>
                 <plugin>

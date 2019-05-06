@@ -24,7 +24,8 @@ import java.util.List;
 @Entity
 @Table(name = "employee")
 public class Employee extends BaseModel{
-    private String name;
+    private String firstName;
+    private String lastName;
     private Double salary;
     @ManyToOne(cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "department_id")
