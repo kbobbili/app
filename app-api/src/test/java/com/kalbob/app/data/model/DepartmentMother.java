@@ -12,7 +12,7 @@ public class DepartmentMother extends ObjectMother{
 
     public static Department.DepartmentBuilder simpleRandom(){
         return Department.builder()
-                .name(dataFactory.getItem(Arrays.asList("Finance","Sales","Business","Marketing","IT")))
+                .name(dataFactory.getItem(Arrays.asList("Sales","Business","Marketing","IT")))
                 ;
     }
 

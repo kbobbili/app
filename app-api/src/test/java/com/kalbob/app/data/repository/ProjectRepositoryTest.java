@@ -1,31 +1,18 @@
 package com.kalbob.app.data.repository;
 
-import com.kalbob.app.data.DataConfiguration;
 import com.kalbob.app.data.model.Project;
 import com.kalbob.app.data.model.ProjectMother;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = {DataConfiguration.class})
-//@Import({DataTestConfiguration.class})
-public class ProjectRepositoryTest {
+public class ProjectRepositoryTest extends AbstractRepositoryTest{
 
     @Autowired
     private ProjectRepository projectRepository;
-
-    @BeforeAll
-    public static void beforeAll() {
-
-    }
-
-    @AfterAll
-    public static void afterAll() {
-    }
 
     @Test
     public void saveProject() {
@@ -35,6 +22,8 @@ public class ProjectRepositoryTest {
     }
 
     @Test
+    @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    @Rollback(false)
     public void deleteProjectById() {
         Project project = ProjectMother.complete().build();
         project = projectRepository.saveAndFlush(project);

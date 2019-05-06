@@ -1,6 +1,7 @@
 package com.kalbob.app.data.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class EmployeeMother extends ObjectMother{
 
@@ -14,7 +15,7 @@ public class EmployeeMother extends ObjectMother{
 
     public static Employee.EmployeeBuilder complete(){
         return simple()
-                .projects(Arrays.asList(ProjectMother.simple().build()))
+                .projects(new HashSet<>(Arrays.asList(ProjectMother.simple().build())))
                 .department(DepartmentMother.simple().build())
                 ;
     }
@@ -29,7 +30,7 @@ public class EmployeeMother extends ObjectMother{
 
     public static Employee.EmployeeBuilder completeRandom(){
         return simpleRandom()
-                .projects(Arrays.asList(ProjectMother.simpleRandom().build()))
+                .projects(new HashSet<>(Arrays.asList(ProjectMother.simpleRandom().build())))
                 .department(DepartmentMother.simpleRandom().build())
                 ;
     }

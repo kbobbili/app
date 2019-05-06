@@ -32,12 +32,7 @@ public class Department extends BaseModel{
 
     public void assignAddress(Address address){
         this.address = address;
-        address.setDepartment(this);
-    }
-
-    public void addEmployee(Employee employee){
-        this.employees.add(employee);
-        employee.setDepartment(this);
+        if(address != null) address.setDepartment(this);
     }
 
     public void removeAddress(){
@@ -45,9 +40,14 @@ public class Department extends BaseModel{
         this.address = null;
     }
 
+    public void addEmployee(Employee employee){
+        if(this.employees != null) this.employees.add(employee);
+        if(employee != null) employee.setDepartment(this);
+    }
+
     public void removeEmployee(Employee employee){
-        this.employees.remove(employee);
-        employee.setDepartment(null);
+        if(this.employees != null) this.employees.remove(employee);
+        if(employee != null) employee.setDepartment(null);
     }
 
 }

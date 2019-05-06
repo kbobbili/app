@@ -1,31 +1,18 @@
 package com.kalbob.app.data.repository;
 
-import com.kalbob.app.data.DataConfiguration;
 import com.kalbob.app.data.model.Address;
 import com.kalbob.app.data.model.AddressMother;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = {DataConfiguration.class})
-//@Import({DataTestConfiguration.class})
-public class AddressRepositoryTest {
+public class AddressRepositoryTest extends AbstractRepositoryTest{
 
     @Autowired
-    private static AddressRepository addressRepository;
-
-    @BeforeAll
-    public static void beforeAll() {
-
-    }
-
-    @AfterAll
-    public static void afterAll() {
-    }
+    private AddressRepository addressRepository;
 
     @Test
     public void saveAddress() {
@@ -36,6 +23,8 @@ public class AddressRepositoryTest {
 
 
     @Test
+    @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
+    @Rollback(false)
     public void deleteAddressById() {
         Address address = AddressMother.complete().build();
         address = addressRepository.saveAndFlush(address);
