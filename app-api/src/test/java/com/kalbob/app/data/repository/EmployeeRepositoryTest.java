@@ -9,7 +9,6 @@ import com.kalbob.app.data.model.Employee;
 import com.kalbob.app.data.model.EmployeeMother;
 import com.kalbob.app.data.model.Project;
 import com.kalbob.app.data.model.ProjectMother;
-import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DataConfiguration.class})
@@ -52,23 +53,23 @@ public class EmployeeRepositoryTest {
         department.assignAddress(AddressMother.simple().build());
         department.addEmployee(EmployeeMother.simple().build());
         department = departmentRepository.save(department);
-        Assertions.assertThat(department.getId() != null);
-        Assertions.assertThat(department.getAddress() != null);
-        Assertions.assertThat(department.getEmployees().size() == 1);
+        assertTrue(department.getId() != null);
+        assertTrue(department.getAddress() != null);
+        assertTrue(department.getEmployees().size() == 1);
     }
 
     @Test
     public void saveEmployee() {
         Employee employee = EmployeeMother.complete().build();
         employee = employeeRepository.saveAndFlush(employee);
-        Assertions.assertThat(employee.getId() != null);
+        assertTrue(employee.getId() != null);
     }
 
     @Test
     public void saveProject() {
         Project project = ProjectMother.complete().build();
         projectRepository.saveAndFlush(project);
-        Assertions.assertThat(project.getId() != null);
+        assertTrue(project.getId() != null);
     }
 
 
@@ -76,7 +77,7 @@ public class EmployeeRepositoryTest {
     public void saveAddress() {
         Address address = AddressMother.complete().build();
         addressRepository.saveAndFlush(address);
-        Assertions.assertThat(address.getId() != null);
+        assertTrue(address.getId() != null);
     }
 
     @Test
@@ -85,27 +86,27 @@ public class EmployeeRepositoryTest {
         department.assignAddress(AddressMother.simple().build());
         department.addEmployee(EmployeeMother.simple().build());
         department = departmentRepository.saveAndFlush(department);
-        Assertions.assertThat(departmentRepository.findById(department.getId()).isPresent());
+        assertTrue(departmentRepository.findById(department.getId()).isPresent());
         departmentRepository.deleteById(department.getId());
-        Assertions.assertThat(!departmentRepository.findById(department.getId()).isPresent());
+        assertTrue(!departmentRepository.findById(department.getId()).isPresent());
     }
 
     @Test
     public void deleteEmployeeById() {
         Employee employee = EmployeeMother.complete().build();
         employee = employeeRepository.saveAndFlush(employee);
-        Assertions.assertThat(employeeRepository.findById(employee.getId()).isPresent());
+        assertTrue(employeeRepository.findById(employee.getId()).isPresent());
         employeeRepository.deleteById(employee.getId());
-        Assertions.assertThat(!employeeRepository.findById(employee.getId()).isPresent());
+        assertTrue(!employeeRepository.findById(employee.getId()).isPresent());
     }
 
     @Test
     public void deleteProjectById() {
         Project project = ProjectMother.complete().build();
         project = projectRepository.saveAndFlush(project);
-        Assertions.assertThat(projectRepository.findById(project.getId()).isPresent());
+        assertTrue(projectRepository.findById(project.getId()).isPresent());
         projectRepository.deleteById(project.getId());
-        Assertions.assertThat(!projectRepository.findById(project.getId()).isPresent());
+        assertTrue(!projectRepository.findById(project.getId()).isPresent());
     }
     
 
@@ -113,9 +114,9 @@ public class EmployeeRepositoryTest {
     public void deleteAddressById() {
         Address address = AddressMother.complete().build();
         address = addressRepository.saveAndFlush(address);
-        Assertions.assertThat(addressRepository.findById(address.getId()).isPresent());
+        assertTrue(addressRepository.findById(address.getId()).isPresent());
         addressRepository.deleteById(address.getId());
-        Assertions.assertThat(!addressRepository.findById(address.getId()).isPresent());
+        assertTrue(!addressRepository.findById(address.getId()).isPresent());
     }
 
     @Test
@@ -124,10 +125,10 @@ public class EmployeeRepositoryTest {
         department.assignAddress(AddressMother.simple().build());
         department.addEmployee(EmployeeMother.simple().build());
         department = departmentRepository.saveAndFlush(department);
-        Assertions.assertThat(departmentRepository.findById(department.getId()).get().getAddress()!=null);
+        assertTrue(departmentRepository.findById(department.getId()).get().getAddress()!=null);
         department.removeAddress();//with orphanRemoval = true. Note: department.setAddress(null) can also be used in case of OneToOne
         department = departmentRepository.saveAndFlush(department);
-        Assertions.assertThat(departmentRepository.findById(department.getId()).get().getAddress()==null);
+        assertTrue(departmentRepository.findById(department.getId()).get().getAddress()==null);
 
         //or no other way except, you use addressRepository to delete the address.
         //addressRepository.deleteById(departmentRepository.findById(department.getId()).get().getAddress().getId()); Finish!
@@ -142,17 +143,17 @@ public class EmployeeRepositoryTest {
         Employee employee = EmployeeMother.simple().build();
         department.addEmployee(EmployeeMother.simple().build());
         department = departmentRepository.saveAndFlush(department);
-        Assertions.assertThat(departmentRepository.findById(department.getId()).get().getEmployees().size()==1);//Use @Transactional to avoid -> org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
+        assertTrue(departmentRepository.findById(department.getId()).get().getEmployees().size()==1);//Use @Transactional to avoid -> org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
         //department.removeEmployee(employee);//does not work because i don't have orphanRemoval enabled (remember, cascade doesn't work for setters)
         //department = departmentRepository.saveAndFlush(department);
-        //Assertions.assertThat(departmentRepository.findById(department.getId()).get().getEmployees().size()==0);
+        //assertTrue(departmentRepository.findById(department.getId()).get().getEmployees().size()==0);
 
         // so need to use employeeRepository to delete either the association (or) the complete employee record.
         employee.setDepartment(null);
         employee = employeeRepository.saveAndFlush(employee);
-        Assertions.assertThat(employeeRepository.findById(employee.getId()).get().getDepartment()==null);
+        assertTrue(employeeRepository.findById(employee.getId()).get().getDepartment()==null);
         employeeRepository.deleteById(departmentRepository.findById(department.getId()).get().getEmployees().get(0).getId());
-        Assertions.assertThat(!employeeRepository.findById(employee.getId()).isPresent());
+        assertTrue(!employeeRepository.findById(employee.getId()).isPresent());
     }
 
     //Rest all cases are straight-forward, because they are all owning sides.
@@ -164,31 +165,31 @@ public class EmployeeRepositoryTest {
     public void removeDepartment() {//Employee deletes its association with department by setting department_id to null
         Employee employee = EmployeeMother.complete().build();
         employee = employeeRepository.saveAndFlush(employee);
-        Assertions.assertThat(employeeRepository.findById(employee.getId()).get().getDepartment()!=null);
+        assertTrue(employeeRepository.findById(employee.getId()).get().getDepartment()!=null);
         employee.setDepartment(null);
         employee = employeeRepository.saveAndFlush(employee);
-        Assertions.assertThat(employeeRepository.findById(employee.getId()).get().getDepartment()==null);
+        assertTrue(employeeRepository.findById(employee.getId()).get().getDepartment()==null);
     }
 
     @Test
     public void removeProject() {//Employee deletes its association with department by setting department_id to null
         Employee employee = EmployeeMother.complete().build();
         employee = employeeRepository.saveAndFlush(employee);
-        Assertions.assertThat(employeeRepository.findById(employee.getId()).get().getProjects().size()!=0);
+        assertTrue(employeeRepository.findById(employee.getId()).get().getProjects().size()!=0);
         employee.removeProject(employeeRepository.findById(employee.getId()).get().getProjects().get(0));
         //employee.setProjects(null);//works without the concept of orphan removal, because both are owning sides
         employee = employeeRepository.saveAndFlush(employee);
-        Assertions.assertThat(employeeRepository.findById(employee.getId()).get().getProjects().size()==0);
+        assertTrue(employeeRepository.findById(employee.getId()).get().getProjects().size()==0);
     }
 
     @Test
     public void removeDepartmentFromAddress() {//Address deletes its association with department by setting department_id to null
         Address address = AddressMother.complete().build();
         address = addressRepository.saveAndFlush(address);
-        Assertions.assertThat(addressRepository.findById(address.getId()).get().getDepartment()!=null);
+        assertTrue(addressRepository.findById(address.getId()).get().getDepartment()!=null);
         address.setDepartment(null);
         address = addressRepository.saveAndFlush(address);
-        Assertions.assertThat(addressRepository.findById(address.getId()).get().getDepartment()==null);
+        assertTrue(addressRepository.findById(address.getId()).get().getDepartment()==null);
     }
 
 }
