@@ -1,11 +1,14 @@
 package com.kalbob.app.data.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
@@ -27,6 +30,12 @@ import lombok.experimental.Accessors;
 public class Project extends BaseModel {
 
   private String name;
+  private LocalDateTime startDate;
+  private LocalDateTime estimatedEndDate;
+  @Enumerated(EnumType.STRING)
+  private ProjectStatus status;
+  private LocalDateTime endDate;
+  private Boolean isCompleted;
   @ManyToMany(cascade = {CascadeType.PERSIST,
       CascadeType.MERGE}, mappedBy = "projects", fetch = FetchType.LAZY)
   private Set<Employee> employees = new HashSet<>();

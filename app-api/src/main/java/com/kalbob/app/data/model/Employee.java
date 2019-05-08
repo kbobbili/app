@@ -1,5 +1,6 @@
 package com.kalbob.app.data.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,6 +37,7 @@ public class Employee extends BaseModel {
   private String firstName;
   private String lastName;
   private Double salary;
+  private LocalDate joiningDate;
   @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
   @JoinColumn(name = "department_id")
   @Setter(AccessLevel.NONE)
@@ -57,6 +60,8 @@ public class Employee extends BaseModel {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager", fetch = FetchType.LAZY)
   @Setter(AccessLevel.NONE)
   private Set<Employee> employees = new HashSet<>();
+  @OneToOne
+  public Department departmentHeaded;
 
   public Employee setDepartment(Department department) {
     this.department = department;

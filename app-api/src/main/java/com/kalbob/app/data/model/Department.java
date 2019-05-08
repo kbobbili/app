@@ -1,11 +1,14 @@
 package com.kalbob.app.data.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -27,11 +30,15 @@ import lombok.experimental.Accessors;
 @Table(name = "department")
 public class Department extends BaseModel {
 
-  private String name;
+  @Enumerated(EnumType.STRING)
+  private String type;
+  private LocalDate startDate;
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "department", fetch = FetchType.EAGER)
   private Address address;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "department", fetch = FetchType.LAZY)
   private Set<Employee> employees = new HashSet<>();
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "department_headed", fetch = FetchType.EAGER)
+  public Employee departmentHead;
 
   public Department setAddress(Address address) {
     this.address = address;
