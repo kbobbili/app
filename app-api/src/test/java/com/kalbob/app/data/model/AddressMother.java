@@ -2,35 +2,35 @@ package com.kalbob.app.data.model;
 
 public class AddressMother extends ObjectMother {
 
-  public static Address.AddressBuilder simple() {
-    return Address.builder()
-        .aptNum("150")
-        .street("N Tatum")
-        .city("Scottsdale")
-        .state("Arizona")
-        .zipCode("85254")
+  public static Address simple() {
+    return new Address()
+        .setAptNum("150")
+        .setStreet("N Tatum")
+        .setCity("Scottsdale")
+        .setState("Arizona")
+        .setZipCode("85254")
         ;
   }
 
-  public static Address.AddressBuilder complete() {
+  public static Address complete() {
     return simple()
-        .department(DepartmentMother.simple().build())
+        .setDepartment(DepartmentMother.simple())
         ;
   }
 
-  public static Address.AddressBuilder simpleRandom() {
-    return Address.builder()
-        .aptNum(faker.number().digits(3))
-        .street(faker.address().streetName())
-        .city(faker.address().city())
-        .state(faker.address().state())
-        .zipCode(faker.address().zipCode())
+  public static Address simpleRandom() {
+    return new Address()
+        .setAptNum(faker.number().digits(3))
+        .setStreet(faker.address().streetName())
+        .setCity(faker.address().city())
+        .setStreet(faker.address().state())
+        .setZipCode(faker.address().zipCode())
         ;
   }
 
-  public static Address.AddressBuilder completeRandom() {
+  public static Address completeRandom() {
     return simpleRandom()
-        .department(DepartmentMother.simpleRandom().build())
+        .setDepartment(DepartmentMother.simpleRandom())
         ;
   }
 

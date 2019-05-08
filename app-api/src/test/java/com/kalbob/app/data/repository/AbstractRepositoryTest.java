@@ -12,6 +12,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = {DataConfiguration.class})
 //@Import({DataTestConfiguration.class})
+
+//Make it profile configurable
+/*@Transactional
+@Rollback(false)*/
 public class AbstractRepositoryTest {
 
   @Autowired

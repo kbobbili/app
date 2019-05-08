@@ -1,31 +1,30 @@
 package com.kalbob.app.data.model;
 
 import java.util.Arrays;
-import java.util.HashSet;
 
 public class ProjectMother extends ObjectMother {
 
-  public static Project.ProjectBuilder simple() {
-    return Project.builder()
-        .name("Project RED")
+  public static Project simple() {
+    return new Project()
+        .setName("Project RED")
         ;
   }
 
-  public static Project.ProjectBuilder complete() {
+  public static Project complete() {
     return simple()
-        .employees(new HashSet<>(Arrays.asList(EmployeeMother.simple().build())))
+        .setEmployees(Arrays.asList(EmployeeMother.simple()))
         ;
   }
 
-  public static Project.ProjectBuilder simpleRandom() {
-    return Project.builder()
-        .name(dataFactory.getItem(Arrays.asList("Project Blue", "Project Green")))
+  public static Project simpleRandom() {
+    return new Project()
+        .setName(dataFactory.getItem(Arrays.asList("Project Blue", "Project Green")))
         ;
   }
 
-  public static Project.ProjectBuilder completeRandom() {
+  public static Project completeRandom() {
     return simpleRandom()
-        .employees(new HashSet<>(Arrays.asList(EmployeeMother.simpleRandom().build())))
+        .setEmployees(Arrays.asList(EmployeeMother.simpleRandom()))
         ;
   }
 }

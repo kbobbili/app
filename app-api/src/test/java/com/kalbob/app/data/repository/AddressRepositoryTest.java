@@ -16,7 +16,7 @@ public class AddressRepositoryTest extends AbstractRepositoryTest {
 
   @Test
   public void saveAddress() {
-    Address address = AddressMother.complete().build();
+    Address address = AddressMother.complete();
     addressRepository.saveAndFlush(address);
     assertTrue(address.getId() != null);
   }
@@ -26,7 +26,7 @@ public class AddressRepositoryTest extends AbstractRepositoryTest {
   @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
   @Rollback(false)
   public void deleteAddressById() {
-    Address address = AddressMother.complete().build();
+    Address address = AddressMother.complete();
     address = addressRepository.saveAndFlush(address);
     assertTrue(addressRepository.findById(address.getId()).isPresent());
     addressRepository.deleteById(address.getId());
@@ -36,7 +36,7 @@ public class AddressRepositoryTest extends AbstractRepositoryTest {
 
   @Test
   public void removeDepartment() {//Address deletes its association with department by setting department_id to null
-    Address address = AddressMother.complete().build();
+    Address address = AddressMother.complete();
     address = addressRepository.saveAndFlush(address);
     assertTrue(addressRepository.findById(address.getId()).get().getDepartment() != null);
     address.setDepartment(null);

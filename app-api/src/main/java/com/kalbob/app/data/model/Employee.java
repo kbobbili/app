@@ -11,18 +11,23 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@AllArgsConstructor
+@Accessors(chain = true)
+@EqualsAndHashCode(exclude = {"manager", "employees"})
 @Entity
 @Table(name = "employee")
 public class Employee extends BaseModel {
@@ -32,6 +37,7 @@ public class Employee extends BaseModel {
   private Double salary;
   @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
   @JoinColumn(name = "department_id")
+  @Setter(AccessLevel.NONE)
   private Department department;
   @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
   @JoinTable(
@@ -42,8 +48,27 @@ public class Employee extends BaseModel {
           name = "project_id", referencedColumnName = "id")
   )
   @Fetch(FetchMode.JOIN)
-  @Builder.Default
+  @Setter(AccessLevel.NONE)
   private Set<Project> projects = new HashSet<>();
+  @ManyToOne(cascade = {CascadeType.PERSIST})
+  @JoinColumn(name = "manager_id")
+  @Setter(AccessLevel.NONE)
+  private Employee manager;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager", fetch = FetchType.LAZY)
+  @Setter(AccessLevel.NONE)
+  private List<Employee> employees = new ArrayList<>();
+
+  public Employee setDepartment(Department department) {
+    this.department = department;
+    return this;
+  }
+
+  public void removeDepartment() {
+    /*if (this.department != null) {
+      this.department.getEmployees().remove(this);
+    }*/
+    this.department = null;
+  }
 
   public List<Project> getProjects() {
     if (this.projects != null) {
@@ -53,10 +78,12 @@ public class Employee extends BaseModel {
     }
   }
 
-  public void setProjects(List<Project> projects) {
+  public Employee setProjects(List<Project> projects) {
     if (projects != null) {
+      projects.stream().forEach(p -> p.addEmployee(this));
       this.projects = new HashSet<>(projects);
     }
+    return this;
   }
 
   public void addProject(Project project) {
@@ -77,8 +104,61 @@ public class Employee extends BaseModel {
     }
   }
 
-  public void removeAllProjects() {
+  public void removeProjects() {
     this.projects = null;
+  }
+
+  public Employee setManager(Employee manager) {
+    this.manager = manager;
+    return this;
+  }
+
+  public void removeManager() {
+    /*if (this.manager != null) {
+      this.manager.getEmployees().remove(this);
+    }*/
+    this.manager = null;
+  }
+
+  public List<Employee> getEmployees() {
+    if (this.employees != null) {
+      return new ArrayList<>(this.employees);
+    } else {
+      return new ArrayList<>();
+    }
+  }
+
+  public Employee setEmployees(List<Employee> employees) {
+    if (employees != null) {
+      employees.stream().forEach(e -> e.setManager(this));
+      this.employees = new ArrayList<>(employees);
+    }
+    return this;
+  }
+
+  public void addEmployee(Employee employee) {
+    if (this.employees != null) {
+      this.employees.add(employee);
+    }
+    if (employee != null) {
+      employee.setManager(this);
+    }
+  }
+
+  public void removeEmployee(Employee employee) {
+    if (this.employees != null) {
+      this.employees.remove(employee);
+    }
+    if (employee != null) {
+      employee.setManager(null);
+    }
+  }
+
+  public void removeEmployees() {
+    /*if (this.employees != null) {
+      this.employees.stream().forEach(e -> e.setManager(null));
+    }*/
+    this.employees = null;
   }
 
 }

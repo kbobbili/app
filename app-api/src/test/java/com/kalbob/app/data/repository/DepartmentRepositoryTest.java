@@ -25,9 +25,9 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest {
 
   @Test
   public void saveDepartment() {
-    Department department = DepartmentMother.simple().build();
-    department.setAddress(AddressMother.simple().build());
-    department.addEmployee(EmployeeMother.simple().build());
+    Department department = DepartmentMother.simple();
+    department.setAddress(AddressMother.simple());
+    department.addEmployee(EmployeeMother.simple());
     department = departmentRepository.save(department);
     assertTrue(department.getId() != null);
     assertTrue(department.getAddress() != null);
@@ -36,9 +36,9 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest {
 
   @Test
   public void deleteDepartmentById() {
-    Department department = DepartmentMother.simple().build();
-    department.setAddress(AddressMother.simple().build());
-    department.addEmployee(EmployeeMother.simple().build());
+    Department department = DepartmentMother.simple();
+    department.setAddress(AddressMother.simple());
+    department.addEmployee(EmployeeMother.simple());
     department = departmentRepository.saveAndFlush(department);
     assertTrue(departmentRepository.findById(department.getId()).isPresent());
     departmentRepository.deleteById(department.getId());
@@ -50,9 +50,9 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest {
   @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
   @Rollback(false)
   public void removeAddress() {//Department deletes record from address
-    Department department = DepartmentMother.simple().build();
-    department.setAddress(AddressMother.simple().build());
-    department.addEmployee(EmployeeMother.simple().build());
+    Department department = DepartmentMother.simple();
+    department.setAddress(AddressMother.simple());
+    department.addEmployee(EmployeeMother.simple());
     department = departmentRepository.saveAndFlush(department);
     assertTrue(departmentRepository.findById(department.getId()).get().getAddress() != null);
 
@@ -70,9 +70,9 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest {
   @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
   @Rollback(false)
   public void removeEmployee() {//Manual delete record from employee
-    Department department = DepartmentMother.simple().build();
-    department.setAddress(AddressMother.simple().build());
-    department.addEmployee(EmployeeMother.simple().build());
+    Department department = DepartmentMother.simple();
+    department.setAddress(AddressMother.simple());
+    department.addEmployee(EmployeeMother.simple());
     department = departmentRepository.saveAndFlush(department);
     assertTrue(departmentRepository.findById(department.getId()).get().getEmployees().size()
         == 1);//Use @Transactional to avoid -> org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
@@ -87,8 +87,8 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest {
 
     //i'm not sure why this is not working in this transaction context.
     //2 or else no other way except, you use employeeRepository to delete the employee. Finish!
-       /* employeeRepository.deleteById(department.getEmployees().get(0).getId());
-        assertTrue(!employeeRepository.findById(department.getEmployees().get(0).getId()).isPresent());*/
+     /*employeeRepository.deleteById(department.getEmployees().get(0).getId());
+     assertTrue(!employeeRepository.findById(department.getEmployees().get(0).getId()).isPresent());*/
   }
 
 }

@@ -10,18 +10,18 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString(exclude = {"employees"})
 @EqualsAndHashCode(exclude = {"employees"})
-@Builder
+@Accessors(chain = true)
 @Entity
 @Table(name = "project")
 public class Project extends BaseModel {
@@ -29,7 +29,6 @@ public class Project extends BaseModel {
   private String name;
   @ManyToMany(cascade = {CascadeType.PERSIST,
       CascadeType.MERGE}, mappedBy = "projects", fetch = FetchType.LAZY)
-  @Builder.Default
   private Set<Employee> employees = new HashSet<>();
 
   public List<Employee> getEmployees() {
@@ -40,10 +39,12 @@ public class Project extends BaseModel {
     }
   }
 
-  public void setEmployees(List<Employee> employees) {
+  public Project setEmployees(List<Employee> employees) {
     if (employees != null) {
+      employees.stream().forEach(e -> e.addProject(this));
       this.employees = new HashSet<>(employees);
     }
+    return this;
   }
 
   public void addEmployee(Employee employee) {
@@ -64,7 +65,7 @@ public class Project extends BaseModel {
     }
   }
 
-  public void removeAllEmployees() {
+  public void removeEmployees() {
     this.employees = null;
   }
 }

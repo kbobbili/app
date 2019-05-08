@@ -1,37 +1,40 @@
 package com.kalbob.app.data.model;
 
 import java.util.Arrays;
-import java.util.HashSet;
 
 public class EmployeeMother extends ObjectMother {
 
-  public static Employee.EmployeeBuilder simple() {
-    return Employee.builder()
-        .firstName("kalyan")
-        .lastName("bobbili")
-        .salary(5000d)
+  public static Employee simple() {
+    return new Employee()
+        .setFirstName("kalyan")
+        .setLastName("bobbili")
+        .setSalary(5000d)
         ;
   }
 
-  public static Employee.EmployeeBuilder complete() {
+  public static Employee complete() {
     return simple()
-        .projects(new HashSet<>(Arrays.asList(ProjectMother.simple().build())))
-        .department(DepartmentMother.simple().build())
+        .setDepartment(DepartmentMother.simple())
+        .setProjects(Arrays.asList(ProjectMother.simple()))
+        .setManager(EmployeeMother.simple())
+        .setEmployees(Arrays.asList(EmployeeMother.simple(), EmployeeMother.simple()))
         ;
   }
 
-  public static Employee.EmployeeBuilder simpleRandom() {
-    return Employee.builder()
-        .firstName(faker.name().lastName())
-        .lastName(faker.name().lastName())
-        .salary(faker.number().randomDouble(0, 1000, 10000))
+  public static Employee simpleRandom() {
+    return new Employee()
+        .setFirstName(faker.name().lastName())
+        .setLastName(faker.name().lastName())
+        .setSalary(faker.number().randomDouble(0, 1000, 10000))
         ;
   }
 
-  public static Employee.EmployeeBuilder completeRandom() {
+  public static Employee completeRandom() {
     return simpleRandom()
-        .projects(new HashSet<>(Arrays.asList(ProjectMother.simpleRandom().build())))
-        .department(DepartmentMother.simpleRandom().build())
+        .setDepartment(DepartmentMother.simpleRandom())
+        .setProjects(Arrays.asList(ProjectMother.simpleRandom()))
+        .setManager(EmployeeMother.simpleRandom())
+        .setEmployees(Arrays.asList(EmployeeMother.simpleRandom(), EmployeeMother.simpleRandom()))
         ;
   }
 

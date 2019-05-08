@@ -11,18 +11,18 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString(exclude = {"address", "employees"})
 @EqualsAndHashCode(exclude = {"address", "employees"})
-@Builder
+@Accessors(chain = true)
 @Entity
 @Table(name = "department")
 public class Department extends BaseModel {
@@ -31,21 +31,34 @@ public class Department extends BaseModel {
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "department", fetch = FetchType.EAGER)
   private Address address;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "department", fetch = FetchType.LAZY)
-  @Builder.Default
   private Set<Employee> employees = new HashSet<>();
 
-  public void setAddress(Address address) {
+  public Department setAddress(Address address) {
     this.address = address;
-    if (address != null) {
-      address.setDepartment(this);
-    }
+    return this;
   }
 
   public void removeAddress() {
-    if (this.address != null) {
+    /*if (this.address != null) {
       this.address.setDepartment(null);
-    }
+    }*/
     this.address = null;
+  }
+
+  public List<Employee> getEmployees() {
+    if (this.employees != null) {
+      return new ArrayList<>(this.employees);
+    } else {
+      return new ArrayList<>();
+    }
+  }
+
+  public Department setEmployees(List<Employee> employees) {
+    if (employees != null) {
+      employees.stream().forEach(e -> e.setDepartment(this));
+      this.employees = new HashSet<>(employees);
+    }
+    return this;
   }
 
   public void addEmployee(Employee employee) {
@@ -66,18 +79,8 @@ public class Department extends BaseModel {
     }
   }
 
-  public List<Employee> getEmployees() {
-    if (this.employees != null) {
-      return new ArrayList<>(this.employees);
-    } else {
-      return new ArrayList<>();
-    }
-  }
-
-  public void setEmployees(List<Employee> employees) {
-    if (employees != null) {
-      this.employees = new HashSet<>(employees);
-    }
+  public void removeEmployees() {
+    this.employees = null;
   }
 
 }

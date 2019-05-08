@@ -23,7 +23,7 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
 
   @Test
   public void saveEmployee() {
-    Employee employee = EmployeeMother.complete().build();
+    Employee employee = EmployeeMother.complete();
     employee = employeeRepository.saveAndFlush(employee);
     assertTrue(employee.getId() != null);
   }
@@ -32,8 +32,8 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
   @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
   @Rollback(false)
   public void deleteEmployeeById() {
-    Employee employee = EmployeeMother.simple().build();
-    employee.setDepartment(DepartmentMother.simple().build());
+    Employee employee = EmployeeMother.simple();
+    employee.setDepartment(DepartmentMother.simple());
     employee = employeeRepository.saveAndFlush(employee);
     assertTrue(employeeRepository.findById(employee.getId()).isPresent());
     employeeRepository.deleteById(employee.getId());
@@ -49,7 +49,7 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
   @Transactional
   @Rollback(false)
   public void removeDepartment() {//Employee deletes its association with department by setting department_id to null
-    Employee employee = EmployeeMother.complete().build();
+    Employee employee = EmployeeMother.complete();
     employee = employeeRepository.saveAndFlush(employee);
     assertTrue(employeeRepository.findById(employee.getId()).get().getDepartment() != null);
     employee.setDepartment(null);
@@ -61,9 +61,9 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
   @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
   @Rollback(false)
   public void removeProject() {//Employee deletes its association with department by setting department_id to null
-    Employee employee = EmployeeMother.complete().build();
+    Employee employee = EmployeeMother.complete();
     employee.addProject(ProjectMother.simpleRandom()
-        .build());//if i use simple, then both projects will be equal so only 1 record will get stored.
+    );//if i use simple, then both projects will be equal so only 1 record will get stored.
     employee = employeeRepository.saveAndFlush(employee);
     assertTrue(employee.getProjects().size() != 0);
 
@@ -81,13 +81,13 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
 
     clearDB();
 
-    Employee employee1 = EmployeeMother.completeRandom().build();
-    Department department = DepartmentMother.simple().build();
+    Employee employee1 = EmployeeMother.completeRandom();
+    Department department = DepartmentMother.simple();
     employee1.setDepartment(department);
 
-    Employee employee2 = EmployeeMother.completeRandom().build();
+    Employee employee2 = EmployeeMother.completeRandom();
 
-    Employee employee3 = EmployeeMother.completeRandom().build();
+    Employee employee3 = EmployeeMother.completeRandom();
     employee3.setDepartment(department);
 
     List<Employee> employees = employeeRepository
