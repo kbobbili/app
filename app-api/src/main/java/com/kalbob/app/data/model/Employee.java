@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -36,7 +38,10 @@ public class Employee extends BaseModel {
 
   private String firstName;
   private String lastName;
+  @Enumerated(EnumType.STRING)
+  private JobType jobType;
   private Double salary;
+  private Double commission;
   private LocalDate joiningDate;
   @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
   @JoinColumn(name = "department_id")
