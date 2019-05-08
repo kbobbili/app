@@ -6,7 +6,7 @@ public class ProjectMother extends ObjectMother {
 
   public static Project simple() {
     return new Project()
-        .setName("Project RED")
+        .setName(ProjectName.RED)
         ;
   }
 
@@ -18,7 +18,7 @@ public class ProjectMother extends ObjectMother {
 
   public static Project simpleRandom() {
     return new Project()
-        .setName(dataFactory.getItem(Arrays.asList("Project Blue", "Project Green")))
+        .setName(dataFactory.getItem(Arrays.asList(ProjectName.BLUE, ProjectName.GREEN)))
         ;
   }
 

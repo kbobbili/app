@@ -29,7 +29,8 @@ import lombok.experimental.Accessors;
 @Table(name = "project")
 public class Project extends BaseModel {
 
-  private String name;
+  @Enumerated(EnumType.STRING)
+  private ProjectName name;
   private LocalDateTime startDate;
   private LocalDateTime estimatedEndDate;
   @Enumerated(EnumType.STRING)

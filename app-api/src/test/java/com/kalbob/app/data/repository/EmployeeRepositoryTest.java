@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.kalbob.app.data.model.Department;
 import com.kalbob.app.data.model.DepartmentMother;
+import com.kalbob.app.data.model.DepartmentType;
 import com.kalbob.app.data.model.Employee;
 import com.kalbob.app.data.model.EmployeeMother;
 import com.kalbob.app.data.model.Project;
@@ -93,7 +94,7 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
     List<Employee> employees = employeeRepository
         .saveAll(Arrays.asList(employee1, employee2, employee3));
     assertEquals(2,
-        employeeRepository.findByDepartment_NameIgnoreCase(department.getName()).size());
+        employeeRepository.findByDepartment_Type(DepartmentType.valueOf(department.getType())).size());
   }
 
 }

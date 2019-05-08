@@ -66,6 +66,7 @@ public class Employee extends BaseModel {
   @Setter(AccessLevel.NONE)
   private Set<Employee> employees = new HashSet<>();
   @OneToOne
+  @JoinColumn
   public Department departmentHeaded;
 
   public Employee setDepartment(Department department) {

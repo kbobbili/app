@@ -2,6 +2,7 @@ package com.kalbob.app.data.model;
 
 import java.io.Serializable;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Embeddable
 public class ProjectAssignmentKey implements Serializable {
+    @JoinColumn(name = "project_id")
     private Long projectId;
+    @JoinColumn(name = "employee_id")
     private Long employeeId;
 }

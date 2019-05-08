@@ -31,18 +31,22 @@ import lombok.experimental.Accessors;
 public class Department extends BaseModel {
 
   @Enumerated(EnumType.STRING)
-  private String type;
+  private DepartmentType type;
   private LocalDate startDate;
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "department", fetch = FetchType.EAGER)
   private Address address;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "department", fetch = FetchType.LAZY)
   private Set<Employee> employees = new HashSet<>();
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "department_headed", fetch = FetchType.EAGER)
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "departmentHeaded", fetch = FetchType.EAGER)
   public Employee departmentHead;
 
   public Department setAddress(Address address) {
     this.address = address;
     return this;
+  }
+
+  public String getType() {
+    return type.toString();
   }
 
   public void removeAddress() {

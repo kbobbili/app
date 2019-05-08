@@ -28,11 +28,11 @@ public class ProjectAssignment {
   ProjectAssignmentKey id;
   @ManyToOne
   @MapsId("project_id")
-  @JoinColumn(name = "project_id")
+  @JoinColumn(name = "id")
   private Project project;
   @ManyToOne
   @MapsId("employee_id")
-  @JoinColumn(name = "employee_id")
+  @JoinColumn(name = "id")
   private Employee employee;
   private LocalDateTime assignmentDate;
 }

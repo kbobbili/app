@@ -6,13 +6,13 @@ public class DepartmentMother extends ObjectMother {
 
   public static Department simple() {
     return new Department()
-        .setName("Finance")
+        .setType(DepartmentType.FINANCE)
         ;
   }
 
   public static Department simpleRandom() {
     return new Department()
-        .setName(dataFactory.getItem(Arrays.asList("Sales", "Business", "Marketing", "IT")))
+        .setType(dataFactory.getItem(Arrays.asList(DepartmentType.SALES, DepartmentType.IT, DepartmentType.HR, DepartmentType.MARKETING, DepartmentType.ADVERTISING)))
         ;
   }
 
