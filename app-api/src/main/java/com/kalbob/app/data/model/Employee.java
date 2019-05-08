@@ -56,7 +56,7 @@ public class Employee extends BaseModel {
   private Employee manager;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager", fetch = FetchType.LAZY)
   @Setter(AccessLevel.NONE)
-  private List<Employee> employees = new ArrayList<>();
+  private Set<Employee> employees = new HashSet<>();
 
   public Employee setDepartment(Department department) {
     this.department = department;
@@ -64,9 +64,6 @@ public class Employee extends BaseModel {
   }
 
   public void removeDepartment() {
-    /*if (this.department != null) {
-      this.department.getEmployees().remove(this);
-    }*/
     this.department = null;
   }
 
@@ -114,9 +111,6 @@ public class Employee extends BaseModel {
   }
 
   public void removeManager() {
-    /*if (this.manager != null) {
-      this.manager.getEmployees().remove(this);
-    }*/
     this.manager = null;
   }
 
@@ -131,7 +125,7 @@ public class Employee extends BaseModel {
   public Employee setEmployees(List<Employee> employees) {
     if (employees != null) {
       employees.stream().forEach(e -> e.setManager(this));
-      this.employees = new ArrayList<>(employees);
+      this.employees = new HashSet<>(employees);
     }
     return this;
   }
@@ -155,9 +149,6 @@ public class Employee extends BaseModel {
   }
 
   public void removeEmployees() {
-    /*if (this.employees != null) {
-      this.employees.stream().forEach(e -> e.setManager(null));
-    }*/
     this.employees = null;
   }
 

@@ -39,9 +39,6 @@ public class Department extends BaseModel {
   }
 
   public void removeAddress() {
-    /*if (this.address != null) {
-      this.address.setDepartment(null);
-    }*/
     this.address = null;
   }
 
