@@ -6,7 +6,7 @@ spring:
     console:
       enabled: true
   datasource:
-    url: jdbc:h2:~/mock_DB;AUTO_SERVER=TRUE
+    url: jdbc:h2:~/test_DB;AUTO_SERVER=TRUE
     username: sa
     password:
   jpa:

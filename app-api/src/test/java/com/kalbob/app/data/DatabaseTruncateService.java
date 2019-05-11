@@ -11,14 +11,14 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
+@Rollback(false)
 public class DatabaseTruncateService {
 
   @Autowired
   private EntityManager entityManager;
   private List<String> tableNames;
 
-  @Transactional
-  @Rollback(false)
   public void truncate() {
     Metamodel metamodel = entityManager.getMetamodel();
     tableNames = metamodel.getManagedTypes().stream()

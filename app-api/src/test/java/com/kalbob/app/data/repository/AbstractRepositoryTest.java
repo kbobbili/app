@@ -1,19 +1,17 @@
 package com.kalbob.app.data.repository;
 
-import com.kalbob.app.data.DataConfiguration;
 import com.kalbob.app.data.DatabaseTruncateService;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = {DataConfiguration.class})
-//@Import({DataTestConfiguration.class})
-
-//Make it profile configurable
+@SpringBootTest
 /*@Transactional
 @Rollback(false)*/
 public class AbstractRepositoryTest {
@@ -23,6 +21,9 @@ public class AbstractRepositoryTest {
 
   @Autowired
   private DatabaseTruncateService databaseTruncateService;
+
+  @Value("${spring.profiles.active:}")
+  private String profile;
 
   @BeforeAll
   public static void beforeAll() {
@@ -46,6 +47,11 @@ public class AbstractRepositoryTest {
 
   public EntityManager getEntityManager() {
     return entityManager;
+  }
+
+  @Test
+  public void test(){
+    System.out.println("Profile: "+profile);
   }
 
 }

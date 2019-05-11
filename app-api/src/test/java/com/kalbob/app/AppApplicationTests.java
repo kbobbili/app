@@ -17,10 +17,8 @@ public class AppApplicationTests {
   public void test() {
     List<String> l = Arrays.asList("a", "b");
     l = Collections.singletonList("a");
-    l.add("c");
     System.out.println(l);
   }
-
 
 }
 

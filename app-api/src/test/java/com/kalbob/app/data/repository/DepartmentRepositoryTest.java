@@ -23,6 +23,7 @@ public class DepartmentRepositoryTest extends AbstractRepositoryTest {
   @Autowired
   private AddressRepository addressRepository;
 
+
   @Test
   public void saveDepartment() {
     Department department = DepartmentMother.simple();
