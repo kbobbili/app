@@ -1,11 +1,14 @@
 package com.kalbob.app.config.service;
 
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-//@PropertySource("classpath:if-you-need-some-other-file.yml")
-//@EnableAutoConfiguration
-//@ComponentScan(excludeFilters={@ComponentScan.Filter(type= FilterType.ASSIGNABLE_TYPE, value=XyzConfiguration.class)})
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan
 public class ServiceTestConfiguration {
 
 }

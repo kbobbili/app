@@ -1,4 +1,4 @@
-package com.kalbob.app.config.data;
+package com.kalbob.app.config.data.util;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,11 +17,10 @@ public class DbTruncateService {
 
   @Autowired
   private EntityManager entityManager;
-  private List<String> tableNames;
 
   public void truncate() {
     Metamodel metamodel = entityManager.getMetamodel();
-    tableNames = metamodel.getManagedTypes().stream()
+    List<String> tableNames = metamodel.getManagedTypes().stream()
         .filter(m -> m.getJavaType().getAnnotation(Table.class) != null)
         .map(m -> m.getJavaType().getAnnotation(Table.class).name())
         .collect(Collectors.toList());
