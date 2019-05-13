@@ -1,12 +1,11 @@
 package com.kalbob.app.config.rest;
 
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-@Order(100)
+@Profile({"dev"})
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -17,13 +16,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 }
 
-@Order(90)
-@Profile({"dev"})
+@Profile({"local"})
 @EnableWebSecurity
 class SecurityConfigurationDev extends WebSecurityConfigurerAdapter {
 
   @Override
-  @Profile({"dev"})
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
         .headers().frameOptions().disable().and()

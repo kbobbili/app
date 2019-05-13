@@ -1,5 +1,7 @@
 package com.kalbob.app.project.repository;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.kalbob.app.config.data.AbstractRepositoryTest;
@@ -19,7 +21,7 @@ public class ProjectRepositoryTest extends AbstractRepositoryTest {
   public void saveProject() {
     Project project = ProjectMother.complete();
     projectRepository.saveAndFlush(project);
-    assertTrue(project.getId() != null);
+    assertNotNull(project.getId());
   }
 
   @Test
@@ -30,7 +32,7 @@ public class ProjectRepositoryTest extends AbstractRepositoryTest {
     project = projectRepository.saveAndFlush(project);
     assertTrue(projectRepository.findById(project.getId()).isPresent());
     projectRepository.deleteById(project.getId());
-    assertTrue(!projectRepository.findById(project.getId()).isPresent());
+    assertFalse(projectRepository.findById(project.getId()).isPresent());
   }
 
 }

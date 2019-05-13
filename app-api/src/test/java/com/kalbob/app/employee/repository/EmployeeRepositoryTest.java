@@ -1,6 +1,9 @@
 package com.kalbob.app.employee.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.kalbob.app.config.data.AbstractRepositoryTest;
@@ -27,7 +30,7 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
   public void saveEmployee() {
     Employee employee = EmployeeMother.complete();
     employee = employeeRepository.saveAndFlush(employee);
-    assertTrue(employee.getId() != null);
+    assertNotNull(employee.getId());
   }
 
   @Test
@@ -39,7 +42,7 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
     employee = employeeRepository.saveAndFlush(employee);
     assertTrue(employeeRepository.findById(employee.getId()).isPresent());
     employeeRepository.deleteById(employee.getId());
-    assertTrue(!employeeRepository.findById(employee.getId()).isPresent());
+    assertFalse(employeeRepository.findById(employee.getId()).isPresent());
   }
 
   //Rest all cases are straight-forward, because they are all owning sides.
@@ -53,10 +56,10 @@ public class EmployeeRepositoryTest extends AbstractRepositoryTest {
   public void removeDepartment() {//Employee deletes its association with department by setting department_id to null
     Employee employee = EmployeeMother.complete();
     employee = employeeRepository.saveAndFlush(employee);
-    assertTrue(employeeRepository.findById(employee.getId()).get().getDepartment() != null);
+    assertNotNull(employeeRepository.findById(employee.getId()).get().getDepartment());
     employee.setDepartment(null);
     employee = employeeRepository.saveAndFlush(employee);
-    assertTrue(employeeRepository.findById(employee.getId()).get().getDepartment() == null);
+    assertNull(employeeRepository.findById(employee.getId()).get().getDepartment());
   }
 
   @Test

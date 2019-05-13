@@ -1,12 +1,12 @@
 spring:
   profiles:
-    active:
-    include: local, hibernate
-
+    active: local
+    include: base, flyway
+a:
+  local
 ---
 spring:
-  profiles:
-    active: local
+  profiles: base
   devtools:
     restart:
       enabled: false
@@ -27,11 +27,11 @@ management:
     web:
       exposure:
         include: "*"
-
+a:
+  base
 ---
 spring:
-  profiles:
-    active: flyway
+  profiles: flyway
   flyway:
     locations: classpath:db/migration
     enabled: true
@@ -39,15 +39,15 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
   datasource:
-    url: jdbc:mysql://localhost:3306/fly_DB?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/local_DB?useSSL=false&allowPublicKeyRetrieval=true
   jpa:
     hibernate:
-      ddl-auto: validate
-
+      ddl-auto: update
+a:
+  flyway
 ---
 spring:
-  profiles:
-    active: hibernate
+  profiles: hibernate
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
@@ -58,5 +58,7 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
-
-
+a:
+  hibernate
+b:
+  banana
