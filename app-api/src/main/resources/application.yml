@@ -1,7 +1,7 @@
 spring:
   profiles:
     active: local
-    include: base, flap
+    include: base, flyway
 a:
   local
 ---
