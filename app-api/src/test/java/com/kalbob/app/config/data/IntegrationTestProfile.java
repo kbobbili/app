@@ -15,6 +15,6 @@ import org.springframework.test.annotation.Rollback;
 @Inherited
 @Profile("it")
 @Rollback(false)
-public @interface IntegrationTest {
+public @interface IntegrationTestProfile {
 
 }

@@ -18,7 +18,8 @@ import org.springframework.test.context.ContextConfiguration;
 @DataJpaTest
 @Import(ApplicationTestConfiguration.class)
 @ContextConfiguration(classes = DataTestConfiguration.class)
-@IntegrationTest
+@UnitTestProfile
+@IntegrationTestProfile
 public @interface DataTestProfile {
 
 }
