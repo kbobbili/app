@@ -1,7 +1,6 @@
 spring:
   profiles:
-    active: local
-    include: base, flyway
+    include: base, local_db
 a:
   local
 ---
@@ -15,6 +14,9 @@ spring:
   datasource:
     username: root
     password: kpwd
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
   jpa:
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
@@ -31,7 +33,7 @@ a:
   base
 ---
 spring:
-  profiles: flyway
+  profiles: local_db
   flyway:
     locations: classpath:db/migration
     enabled: true
@@ -39,26 +41,24 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
   datasource:
-    url: jdbc:mysql://localhost:3306/local_DB?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/local_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
   jpa:
     hibernate:
       ddl-auto: update
 a:
-  flyway
+  local_db
 ---
 spring:
-  profiles: hibernate
+  profiles: mem_db
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
       - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
   datasource:
-    url: jdbc:mysql://localhost:3306/local_DB?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/mem_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
   jpa:
     generate-ddl: true
     hibernate:
       ddl-auto: update
 a:
-  hibernate
-b:
-  banana
+  mem_db
