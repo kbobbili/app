@@ -1,4 +1,4 @@
-package com.kalbob.app.config.data.util;
+package com.kalbob.app.config.data;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @Rollback(false)
-public class DbTruncateService {
+public class DataTruncateService {
 
   @Autowired
   private EntityManager entityManager;

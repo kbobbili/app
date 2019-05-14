@@ -3,7 +3,7 @@ package com.kalbob.app.employee.service.impl;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.kalbob.app.config.service.ServiceConfiguration;
+import com.kalbob.app.config.service.BaseServiceUT;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.employee.EmployeeMother;
 import com.kalbob.app.employee.repository.EmployeeRepository;
@@ -14,12 +14,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@SpringBootTest(classes = {ServiceConfiguration.class})
-//@Import({ServiceTestConfiguration.class})
-public class EmployeeServiceImplTest {
+public class EmployeeServiceImplUT extends BaseServiceUT {
 
   @Autowired
   private EmployeeService employeeService;
