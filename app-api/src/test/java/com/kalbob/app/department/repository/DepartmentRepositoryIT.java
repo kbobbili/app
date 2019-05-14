@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.kalbob.app.config.data.AbstractRepositoryTest;
+import com.kalbob.app.config.data.AbstractRepositoryIT;
 import com.kalbob.app.department.AddressMother;
 import com.kalbob.app.department.Department;
 import com.kalbob.app.department.DepartmentMother;
@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-public class DepartmentRepositoryTest extends AbstractRepositoryTest {
+public class DepartmentRepositoryIT extends AbstractRepositoryIT {
 
   @Autowired
   private DepartmentRepository departmentRepository;

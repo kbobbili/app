@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    include: local
   flyway:
     enabled: false
 a:

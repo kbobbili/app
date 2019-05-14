@@ -1,7 +1,7 @@
-package com.kalbob.app.config.data;
+package com.kalbob.app.config.service;
 
 import com.kalbob.app.ApplicationITConfiguration;
-import com.kalbob.app.config.IntegrationTestProfile;
+import com.kalbob.app.config.UnitTestProfile;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import;
 @Inherited
 @DataJpaTest
 @Import(ApplicationITConfiguration.class)
-@IntegrationTestProfile
-public @interface DataTestProfile {
+@UnitTestProfile
+public @interface ServiceUnitTestProfile {
 
 }

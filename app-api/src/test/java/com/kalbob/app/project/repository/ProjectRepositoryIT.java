@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.kalbob.app.config.data.AbstractRepositoryTest;
+import com.kalbob.app.config.data.AbstractRepositoryIT;
 import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectMother;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-public class ProjectRepositoryTest extends AbstractRepositoryTest {
+public class ProjectRepositoryIT extends AbstractRepositoryIT {
 
   @Autowired
   private ProjectRepository projectRepository;

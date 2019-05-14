@@ -1,4 +1,4 @@
-package com.kalbob.app.config.data;
+package com.kalbob.app.config.service;
 
 import com.kalbob.app.ApplicationITConfiguration;
 import com.kalbob.app.config.IntegrationTestProfile;
@@ -18,6 +18,6 @@ import org.springframework.context.annotation.Import;
 @DataJpaTest
 @Import(ApplicationITConfiguration.class)
 @IntegrationTestProfile
-public @interface DataTestProfile {
+public @interface ServiceIntegrationTestProfile {
 
 }

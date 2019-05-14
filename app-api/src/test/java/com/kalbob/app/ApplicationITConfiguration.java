@@ -11,5 +11,5 @@ import org.springframework.context.annotation.Import;
 //@TestPropertySource(properties= {"spring.autoconfigure.exclude=com.kalbob.app.xyz.XyzAutoConfiguration"}, locations = {"classpath:if-you-need-some-other-file.yml"})
 //@Import({XyzConfiguration.class})
 @Import(ApplicationConfiguration.class)
-public class ApplicationTestConfiguration {
+public class ApplicationITConfiguration {
 }
