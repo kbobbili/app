@@ -12,7 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-//@Import(Application.class)
 @ActiveProfiles("ut")
 public @interface UnitTestProfile {
 
