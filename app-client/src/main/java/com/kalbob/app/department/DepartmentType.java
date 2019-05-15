@@ -9,7 +9,7 @@ public enum DepartmentType {
   MARKETING("Marketing"),
   ADVERTISING("Advertising");
 
-  private String type; 
+  private String type;
 
   DepartmentType(String type) {
     this.type = type;

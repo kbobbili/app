@@ -1,7 +1,11 @@
 package com.kalbob.app.config.data;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
+import javax.persistence.Table;
+import javax.persistence.metamodel.Metamodel;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,9 +31,6 @@ public class BaseRepositoryIT {
   @Autowired
   private EntityManager entityManager;
 
-  @Autowired
-  private DataTruncateService dataTruncateService;
-
   @BeforeAll
   public static void beforeAll() {
   }
@@ -47,7 +48,16 @@ public class BaseRepositoryIT {
   }
 
   public void clearDB() {
-    dataTruncateService.truncate();
+    Metamodel metamodel = entityManager.getMetamodel();
+    List<String> tableNames = metamodel.getManagedTypes().stream()
+        .filter(m -> m.getJavaType().getAnnotation(Table.class) != null)
+        .map(m -> m.getJavaType().getAnnotation(Table.class).name())
+        .collect(Collectors.toList());
+    entityManager.flush();
+    entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
+    tableNames.forEach(tableName ->
+        entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate());
+    entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1").executeUpdate();
   }
 
   public EntityManager getEntityManager() {
@@ -55,16 +65,18 @@ public class BaseRepositoryIT {
   }
 
   @Test
-  public void test(){
+  public void test() {
     logger.info("[::::::BaseRepositoryIT::::::");
     logger.info("spring.cloud.config.uri: {}", environment.getProperty("spring.cloud.config.uri"));
     logger.info("spring.profiles.active: {}", environment.getProperty("spring.profiles.active"));
     logger.info("spring.profiles.include: {}", environment.getProperty("spring.profiles.include"));
     logger.info("spring.datasource.url: {}", environment.getProperty("spring.datasource.url"));
-    logger.info("spring.autoconfigure.exclude: {}", environment.getProperty("spring.autoconfigure.exclude"));
+    logger.info("spring.autoconfigure.exclude: {}",
+        environment.getProperty("spring.autoconfigure.exclude"));
     logger.info("a: {}", environment.getProperty("a"));
     String[] beans = applicationContext.getBeanDefinitionNames();
-    logger.info("Total bean count: " + Arrays.stream(beans).count());//108 DataJpaTest beans vs 517 SpringBootTest beans.
+    logger.info("Total bean count: " + Arrays.stream(beans)
+        .count());//108 DataJpaTest beans vs 517 SpringBootTest beans.
     logger.info("::::::BaseRepositoryIT::::::]");
   }
 

@@ -40,16 +40,18 @@ public class BaseRestIT {
   }
 
   @Test
-  public void test(){
+  public void test() {
     logger.info("[::::::BaseRestIT::::::");
     logger.info("spring.cloud.config.uri: {}", environment.getProperty("spring.cloud.config.uri"));
     logger.info("spring.profiles.active: {}", environment.getProperty("spring.profiles.active"));
     logger.info("spring.profiles.include: {}", environment.getProperty("spring.profiles.include"));
     logger.info("spring.datasource.url: {}", environment.getProperty("spring.datasource.url"));
-    logger.info("spring.autoconfigure.exclude: {}", environment.getProperty("spring.autoconfigure.exclude"));
+    logger.info("spring.autoconfigure.exclude: {}",
+        environment.getProperty("spring.autoconfigure.exclude"));
     logger.info("a: {}", environment.getProperty("a"));
     String[] beans = applicationContext.getBeanDefinitionNames();
-    logger.info("Total bean count: " + Arrays.stream(beans).count());//108 DataJpaTest beans vs 517 SpringBootTest beans.
+    logger.info("Total bean count: " + Arrays.stream(beans)
+        .count());//108 DataJpaTest beans vs 517 SpringBootTest beans.
     logger.info("::::::BaseRestIT::::::]");
   }
 

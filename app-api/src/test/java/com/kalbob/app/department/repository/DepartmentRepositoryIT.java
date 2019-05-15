@@ -81,7 +81,8 @@ public class DepartmentRepositoryIT extends BaseRepositoryIT {
     department.setAddress(AddressMother.simple());
     department.addEmployee(EmployeeMother.simple());
     department = departmentRepository.saveAndFlush(department);
-    assertEquals(1, departmentRepository.findById(department.getId()).get().getEmployees().size());//Use @Transactional to avoid -> org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
+    assertEquals(1, departmentRepository.findById(department.getId()).get().getEmployees()
+        .size());//Use @Transactional to avoid -> org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
     //department.removeEmployee(employee);//does not work because i don't have orphanRemoval enabled (remember, cascade doesn't work for setters)
     //department = departmentRepository.saveAndFlush(department);
     //assertTrue(departmentRepository.findById(department.getId()).get().getEmployees().size()==0);

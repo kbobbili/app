@@ -12,8 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Embeddable
 public class ProjectAssignmentKey implements Serializable {
-    @JoinColumn(name = "project_id")
-    private Long projectId;
-    @JoinColumn(name = "employee_id")
-    private Long employeeId;
+
+  @JoinColumn(name = "project_id")
+  private Long projectId;
+  @JoinColumn(name = "employee_id")
+  private Long employeeId;
 }

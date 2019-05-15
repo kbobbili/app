@@ -39,6 +39,9 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "employee")
 public class Employee extends BaseModel {
 
+  @OneToOne
+  @JoinColumn
+  public Department departmentHeaded;
   private String firstName;
   private String lastName;
   @Enumerated(EnumType.STRING)
@@ -68,9 +71,6 @@ public class Employee extends BaseModel {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager", fetch = FetchType.LAZY)
   @Setter(AccessLevel.NONE)
   private Set<Employee> employees = new HashSet<>();
-  @OneToOne
-  @JoinColumn
-  public Department departmentHeaded;
 
   public Employee setDepartment(Department department) {
     this.department = department;

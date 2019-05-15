@@ -34,11 +34,14 @@ public class Application {
   public CommandLineRunner run(ApplicationContext appContext) {
     return args -> {
       logger.info("[::::::Application::::::");
-      logger.info("spring.cloud.config.uri: {}", environment.getProperty("spring.cloud.config.uri"));
+      logger
+          .info("spring.cloud.config.uri: {}", environment.getProperty("spring.cloud.config.uri"));
       logger.info("spring.profiles.active: {}", environment.getProperty("spring.profiles.active"));
-      logger.info("spring.profiles.include: {}", environment.getProperty("spring.profiles.include"));
+      logger
+          .info("spring.profiles.include: {}", environment.getProperty("spring.profiles.include"));
       logger.info("spring.datasource.url: {}", environment.getProperty("spring.datasource.url"));
-      logger.info("spring.autoconfigure.exclude: {}", environment.getProperty("spring.autoconfigure.exclude"));
+      logger.info("spring.autoconfigure.exclude: {}",
+          environment.getProperty("spring.autoconfigure.exclude"));
       logger.info("a: {}", environment.getProperty("a"));
       logger.info("b: {}", environment.getProperty("b"));
       String[] beans = applicationContext.getBeanDefinitionNames();

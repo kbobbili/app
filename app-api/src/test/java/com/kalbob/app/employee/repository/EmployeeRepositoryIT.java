@@ -98,7 +98,8 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
     List<Employee> employees = employeeRepository
         .saveAll(Arrays.asList(employee1, employee2, employee3));
     assertEquals(2,
-        employeeRepository.findByDepartment_Type(DepartmentType.valueOf(department.getType())).size());
+        employeeRepository.findByDepartment_Type(DepartmentType.valueOf(department.getType()))
+            .size());
   }
 
 }

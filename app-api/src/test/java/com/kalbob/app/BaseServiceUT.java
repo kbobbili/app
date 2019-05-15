@@ -1,21 +1,20 @@
 package com.kalbob.app;
 
-import com.kalbob.app.config.IntegrationTestProfile;
+import com.kalbob.app.config.service.ServiceUnitTestProfile;
 import java.util.Arrays;
-import java.util.Iterator;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
 
-@SpringBootTest
-@IntegrationTestProfile
-public class ApplicationIT {
+@ServiceUnitTestProfile
+public class BaseServiceUT {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -25,20 +24,25 @@ public class ApplicationIT {
   @Autowired
   private ConfigurableEnvironment environment;
 
-  @Test
-  public void contextLoads() {
+  @BeforeAll
+  public static void beforeAll() {
+  }
+
+  @AfterAll
+  public static void afterAll() {
+  }
+
+  @BeforeEach
+  public void beforeEach() throws Exception {
+  }
+
+  @AfterEach
+  public void afterEach() throws Exception {
   }
 
   @Test
   public void test() {
-    logger.info("[::::::ApplicationIT::::::");
-    MutablePropertySources sources = environment.getPropertySources();
-    Iterator<PropertySource<?>> iterator = sources
-        .iterator();
-    int i = 0;
-    while (iterator.hasNext()) {
-      logger.info("{} {}", i++, iterator.next().getName());
-    }
+    logger.info("[::::::BaseServiceUT::::::");
     logger.info("spring.cloud.config.uri: {}", environment.getProperty("spring.cloud.config.uri"));
     logger.info("spring.profiles.active: {}", environment.getProperty("spring.profiles.active"));
     logger.info("spring.profiles.include: {}", environment.getProperty("spring.profiles.include"));
@@ -47,9 +51,9 @@ public class ApplicationIT {
         environment.getProperty("spring.autoconfigure.exclude"));
     logger.info("a: {}", environment.getProperty("a"));
     String[] beans = applicationContext.getBeanDefinitionNames();
-    logger.info("Total bean count: " + Arrays.stream(beans).count());//517 beans.
-    logger.info("::::::ApplicationIT::::::]");
+    logger.info("Total bean count: " + Arrays.stream(beans)
+        .count());//108 DataJpaTest beans vs 517 SpringBootTest beans.
+    logger.info("::::::BaseServiceUT::::::]");
   }
 
 }
-

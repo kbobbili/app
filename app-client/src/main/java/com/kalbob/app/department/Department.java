@@ -32,6 +32,8 @@ import lombok.experimental.Accessors;
 @Table(name = "department")
 public class Department extends BaseModel {
 
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "departmentHeaded", fetch = FetchType.EAGER)
+  public Employee departmentHead;
   @Enumerated(EnumType.STRING)
   private DepartmentType type;
   private LocalDate startDate;
@@ -39,8 +41,6 @@ public class Department extends BaseModel {
   private Address address;
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "department", fetch = FetchType.LAZY)
   private Set<Employee> employees = new HashSet<>();
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "departmentHeaded", fetch = FetchType.EAGER)
-  public Employee departmentHead;
 
   public Department setAddress(Address address) {
     this.address = address;

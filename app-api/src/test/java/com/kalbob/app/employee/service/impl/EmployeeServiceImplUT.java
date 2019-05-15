@@ -1,43 +1,38 @@
 package com.kalbob.app.employee.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.kalbob.app.config.service.BaseServiceUT;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.employee.EmployeeMother;
 import com.kalbob.app.employee.repository.EmployeeRepository;
-import com.kalbob.app.employee.service.EmployeeService;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 public class EmployeeServiceImplUT extends BaseServiceUT {
 
-  @Autowired
-  private EmployeeService employeeService;
+  @InjectMocks
+  private EmployeeServiceImpl employeeServiceImpl;
 
-  @MockBean
+  @Mock
   private EmployeeRepository employeeRepository;
 
-  @BeforeAll
-  public static void beforeAll() {
-  }
-
-  @AfterAll
-  public static void afterAll() {
+  @BeforeEach
+  public void beforeEach() {
+    employeeServiceImpl = new EmployeeServiceImpl(employeeRepository);
   }
 
   @Test
   public void getAllEmployees() {
     when(employeeRepository.findAll()).thenReturn(
         Arrays.asList(EmployeeMother.simple(), EmployeeMother.complete()));
-    List<Employee> employeeList = employeeService.getAllEmployees();
-    assertTrue(employeeList.size() == 2);
+    List<Employee> employeeList = employeeServiceImpl.getAllEmployees();
+    assertEquals(2, employeeList.size());
   }
 
 }

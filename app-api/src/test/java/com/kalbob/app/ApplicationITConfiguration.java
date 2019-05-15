@@ -12,4 +12,5 @@ import org.springframework.context.annotation.Import;
 //@Import({XyzConfiguration.class})
 @Import(ApplicationConfiguration.class)
 public class ApplicationITConfiguration {
+
 }
