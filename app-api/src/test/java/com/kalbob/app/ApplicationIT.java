@@ -1,5 +1,6 @@
 package com.kalbob.app;
 
+import com.kalbob.app.config.IntegrationTestProfile;
 import java.util.Arrays;
 import java.util.Iterator;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 
-@SpringBootTest(properties = {
-    //As by default (without any profile), flyway & h2 are active coming from AutoConfiguration.
-    // So its not booting. I need to either disable flyway or exclude h2 (use local_db) or use a .sql script that's db agnostic.
-    "spring.flyway.enabled = false"
-})
+@SpringBootTest //It does bring in all of application context; 517 beans but boots up with default class path i.e. flyway & in-mem h2.
+@IntegrationTestProfile //flyway with local_db
 public class ApplicationIT {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
