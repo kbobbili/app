@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @Documented
 @Inherited
 @ExtendWith({MockitoExtension.class})
-//@MockitoSettings(strictness = Strictness.LENIENT)
 @UnitTestProfile
 public @interface ServiceUnitTestProfile {
 

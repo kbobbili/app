@@ -1,6 +1,6 @@
 package com.kalbob.app.config;
 
-import com.kalbob.app.ApplicationITConfiguration;
+import com.kalbob.app.Application;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import(ApplicationITConfiguration.class)
+@Import(Application.class)
 @ActiveProfiles("it")
 @Rollback(false)
 public @interface IntegrationTestProfile {

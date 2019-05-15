@@ -1,6 +1,6 @@
 package com.kalbob.app.config.rest;
 
-import com.kalbob.app.ApplicationITConfiguration;
+import com.kalbob.app.Application;
 import com.kalbob.app.config.IntegrationTestProfile;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Import;
 @Documented
 @Inherited
 @WebMvcTest
-@Import(ApplicationITConfiguration.class)
+@Import(Application.class)
 @IntegrationTestProfile
 public @interface RestTestProfile {
 
