@@ -50,15 +50,22 @@ a:
 ---
 spring:
   profiles: mem_db
+  h2:
+    console:
+      enabled: true
+  flyway:
+    enabled: false
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
       - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
   datasource:
-    url: jdbc:mysql://localhost:3307/mem_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:h2:~/mem_db;AUTO_SERVER=TRUE
+    username: sa
+    password:
   jpa:
-    generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
 a:
   mem_db
