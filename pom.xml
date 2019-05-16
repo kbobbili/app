@@ -21,6 +21,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
+    <maven-failsafe-plugin.version>2.22.1</maven-failsafe-plugin.version>
+    <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
     <!-- spring -->
     <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
     <spring-boot-admin.version>2.1.1</spring-boot-admin.version>
@@ -131,6 +133,24 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+    <profile>
+      <id>ut</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <skipITs>true</skipITs>
+      </properties>
+    </profile>
+    <profile>
+      <id>it</id>
+      <properties>
+        <skipITs>false</skipITs>
+      </properties>
+    </profile>
+  </profiles>
+
   <build>
     <pluginManagement>
       <plugins>
@@ -158,6 +178,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven-failsafe-plugin.version}</version>
           <configuration>
             <includes>
               <include>**/*IT.java</include>
@@ -166,6 +187,7 @@
           </configuration>
           <executions>
             <execution>
+              <id>integration-test</id>
               <goals>
                 <goal>integration-test</goal>
                 <goal>verify</goal>
@@ -176,6 +198,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
           <executions>
             <execution>
               <goals>
@@ -209,12 +232,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <groupId>org.apache.maven.plugins</groupId>
-      </plugin>
-    </plugins>
   </build>
 
 </project>

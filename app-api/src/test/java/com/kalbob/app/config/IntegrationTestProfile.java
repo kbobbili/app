@@ -8,7 +8,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 
 @Target({ElementType.TYPE})
@@ -17,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 @Inherited
 @Import(Application.class)
 @ActiveProfiles("it")
-@Rollback(false)
 public @interface IntegrationTestProfile {
 
 }

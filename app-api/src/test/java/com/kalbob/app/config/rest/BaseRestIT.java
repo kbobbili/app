@@ -51,7 +51,7 @@ public class BaseRestIT {
     logger.info("a: {}", environment.getProperty("a"));
     String[] beans = applicationContext.getBeanDefinitionNames();
     logger.info("Total bean count: " + Arrays.stream(beans)
-        .count());//108 DataJpaTest beans vs 517 SpringBootTest beans.
+        .count());//164 DataJpaTest beans vs 517 SpringBootTest beans.
     logger.info("::::::BaseRestIT::::::]");
   }
 
