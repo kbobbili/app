@@ -22,8 +22,9 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
 logging:
   level:
-    org:
-      springframework: INFO
+    root: WARN
+    spring: INFO
+    app: DEBUG
 management:
   endpoints:
     web:

@@ -25,6 +25,7 @@
     <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
     <spring-boot-admin.version>2.1.1</spring-boot-admin.version>
     <!-- utils -->
+    <logback.contrib.version>0.1.5</logback.contrib.version>
     <datafactory.version>0.8</datafactory.version>
     <javafaker.version>0.17.2</javafaker.version>
 
@@ -94,6 +95,16 @@
       <artifactId>mockito-core</artifactId>
       <version>2.27.0</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback.contrib</groupId>
+      <artifactId>logback-jackson</artifactId>
+      <version>${logback.contrib.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback.contrib</groupId>
+      <artifactId>logback-json-classic</artifactId>
+      <version>${logback.contrib.version}</version>
     </dependency>
     <dependency>
       <groupId>org.fluttercode.datafactory</groupId>
