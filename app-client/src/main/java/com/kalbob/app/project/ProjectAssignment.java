@@ -18,8 +18,8 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"employees"})
-@EqualsAndHashCode(exclude = {"employees"})
+@ToString(exclude = {"employee"})
+@EqualsAndHashCode(exclude = {"employee"})
 @Accessors(chain = true)
 @Entity
 @Table(name = "project_assignment")

@@ -1,6 +1,6 @@
 package com.kalbob.app.employee;
 
-import com.kalbob.app.BaseModel;
+import com.kalbob.app.BaseEntity;
 import com.kalbob.app.department.Department;
 import com.kalbob.app.project.Project;
 import java.time.LocalDate;
@@ -34,10 +34,10 @@ import org.hibernate.annotations.FetchMode;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@EqualsAndHashCode(exclude = {"manager", "employees"})
+@EqualsAndHashCode(exclude = {"manager", "employees"}, callSuper = true)
 @Entity
 @Table(name = "employee")
-public class Employee extends BaseModel {
+public class Employee extends BaseEntity {
 
   @OneToOne
   @JoinColumn
@@ -91,7 +91,7 @@ public class Employee extends BaseModel {
 
   public Employee setProjects(List<Project> projects) {
     if (projects != null) {
-      projects.stream().forEach(p -> p.addEmployee(this));
+      projects.forEach(p -> p.addEmployee(this));
       this.projects = new HashSet<>(projects);
     }
     return this;
@@ -138,7 +138,7 @@ public class Employee extends BaseModel {
 
   public Employee setEmployees(List<Employee> employees) {
     if (employees != null) {
-      employees.stream().forEach(e -> e.setManager(this));
+      employees.forEach(e -> e.setManager(this));
       this.employees = new HashSet<>(employees);
     }
     return this;

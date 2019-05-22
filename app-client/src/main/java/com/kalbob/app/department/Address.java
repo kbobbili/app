@@ -1,6 +1,6 @@
 package com.kalbob.app.department;
 
-import com.kalbob.app.BaseModel;
+import com.kalbob.app.BaseEntity;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Entity
 @Table(name = "address")
-public class Address extends BaseModel {
+public class Address extends BaseEntity {
 
   private String aptNum;
   private String street;

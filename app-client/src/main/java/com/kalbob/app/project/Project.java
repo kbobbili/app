@@ -1,6 +1,6 @@
 package com.kalbob.app.project;
 
-import com.kalbob.app.BaseModel;
+import com.kalbob.app.BaseEntity;
 import com.kalbob.app.employee.Employee;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,11 +25,11 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"employees"})
-@EqualsAndHashCode(exclude = {"employees"})
+@EqualsAndHashCode(exclude = {"employees"}, callSuper = true)
 @Accessors(chain = true)
 @Entity
 @Table(name = "project")
-public class Project extends BaseModel {
+public class Project extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   private ProjectName name;
@@ -53,7 +53,7 @@ public class Project extends BaseModel {
 
   public Project setEmployees(List<Employee> employees) {
     if (employees != null) {
-      employees.stream().forEach(e -> e.addProject(this));
+      employees.forEach(e -> e.addProject(this));
       this.employees = new HashSet<>(employees);
     }
     return this;

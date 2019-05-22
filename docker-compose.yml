@@ -1,11 +1,14 @@
-version: '3.3'
+version: '3.2'
 
 services:
-  db:
+  app-local-db:
+    container_name: app_local_db
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 'kpwd'
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_ROOT_PASSWORD=kpwd
+      - MYSQL_DATABASE=app_local_db
     ports:
       # <Port exposed> : <MySQL Port running inside container>
       - '3307:3306'
@@ -13,7 +16,19 @@ services:
       # Opens port 3307 on the container
       - '3307'
     volumes:
-      - local_db:/var/lib/mysql
+      - app_local_db:/var/lib/mysql
+  app-it-db:
+    container_name: app_it_db
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_ROOT_PASSWORD=kpwd
+      - MYSQL_DATABASE=app_it_db
+    ports:
+      - '3308:3306'
+    expose:
+      - '3308'
 
 volumes:
-  local_db:
+  app_local_db:

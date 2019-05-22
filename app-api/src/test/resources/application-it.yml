@@ -16,10 +16,10 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
   datasource:
-    url: jdbc:mysql://localhost:3307/it_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3308/app_it_db?useSSL=false&allowPublicKeyRetrieval=true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 a:
   it_db
 

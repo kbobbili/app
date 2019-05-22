@@ -1,6 +1,6 @@
 package com.kalbob.app.department;
 
-import com.kalbob.app.BaseModel;
+import com.kalbob.app.BaseEntity;
 import com.kalbob.app.employee.Employee;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,11 +26,11 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"address", "employees"})
-@EqualsAndHashCode(exclude = {"address", "employees"})
+@EqualsAndHashCode(exclude = {"address", "employees"}, callSuper = true)
 @Accessors(chain = true)
 @Entity
 @Table(name = "department")
-public class Department extends BaseModel {
+public class Department extends BaseEntity {
 
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "departmentHeaded", fetch = FetchType.EAGER)
   public Employee departmentHead;
@@ -65,7 +65,7 @@ public class Department extends BaseModel {
 
   public Department setEmployees(List<Employee> employees) {
     if (employees != null) {
-      employees.stream().forEach(e -> e.setDepartment(this));
+      employees.forEach(e -> e.setDepartment(this));
       this.employees = new HashSet<>(employees);
     }
     return this;
