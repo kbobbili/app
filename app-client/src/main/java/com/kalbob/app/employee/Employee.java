@@ -2,17 +2,12 @@ package com.kalbob.app.employee;
 
 import com.kalbob.app.BaseEntity;
 import com.kalbob.app.department.Department;
-import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectAssignment;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -66,7 +61,7 @@ public class Employee extends BaseEntity {
   @Setter(AccessLevel.NONE)
   private Department department;
 
-  //@Setter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
   @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "employee", fetch = FetchType.LAZY)
   private Set<ProjectAssignment> projectAssignments = new HashSet<>();
 
@@ -104,50 +99,8 @@ public class Employee extends BaseEntity {
     return this;
   }
 
-  public List<Project> getProjects() {
-    if (this.projectAssignments != null) {
-      return this.projectAssignments.stream()
-          .map(ProjectAssignment::getProject)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
-    } else {
-      return new ArrayList<>();
-    }
-  }
-
-  public void joinProject(Project project) {
-    ProjectAssignment projectAssignment = new ProjectAssignment()
-        .setEmployee(this)
-        .setProject(project)
-        .setJoinedDate(LocalDateTime.now())
-        .setIsCurrent(true)
-        ;
-    if (this.projectAssignments != null) {
-      this.projectAssignments.add(projectAssignment);
-      if (project.getProjectAssignments() != null) {
-        project.getProjectAssignments().add(projectAssignment);
-      }
-    }
-  }
-
-  public void leaveProject(Project project) {
-    if (this.projectAssignments != null) {
-      Optional<ProjectAssignment> projectAssignment = this.projectAssignments.stream()
-          .filter(pa -> pa.getProject() == project && pa.getIsCurrent())
-          .findAny();
-      projectAssignment.ifPresent(this::leaveProjectAssignment);
-    }
-  }
-
   public void removeProjectAssignments() {
     this.projectAssignments = null;
-  }
-
-  private void leaveProjectAssignment(ProjectAssignment pa) {
-    this.projectAssignments.remove(pa);
-    pa.setLeftDate(LocalDateTime.now());
-    pa.setIsCurrent(false);
-    this.projectAssignments.add(pa);
   }
 
   public Employee setManager(Employee manager) {

@@ -2,27 +2,26 @@ package com.kalbob.app.employee.service.impl;
 
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.employee.repository.EmployeeRepository;
-import com.kalbob.app.employee.service.EmployeeService;
 import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectAssignment;
+import com.kalbob.app.project.service.EmployeeService;
+import com.kalbob.app.project.service.ProjectService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
   public final EmployeeRepository employeeRepository;
-
-  public EmployeeServiceImpl(
-      EmployeeRepository employeeRepository) {
-    this.employeeRepository = employeeRepository;
-  }
+  public final ProjectService projectService;
 
   public Employee findById(Long id) {
     Optional<Employee> employee = employeeRepository.findById(id);
@@ -41,8 +40,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
   }
 
-  public void joinProject(Long id, Project project) {
+  public Employee joinProject(Long id, Long projectId) {
     Employee employee = findById(id);
+    Project project = projectService.findById(projectId);
     ProjectAssignment projectAssignment = new ProjectAssignment()
         .setEmployee(employee)
         .setProject(project)
@@ -55,24 +55,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         project.getProjectAssignments().add(projectAssignment);
       }
     }
-    employeeRepository.saveAndFlush(employee);
+    return employeeRepository.saveAndFlush(employee);
   }
 
-  public void leaveProject(Long id, Project project) {
+  public Employee joinProjects(Long id, List<Long> projectIds) {
+    projectIds.forEach(projectId -> joinProject(id, projectId));
+    return findById(id);
+  }
+
+  public Employee leaveProject(Long id, Long projectId) {
     Employee employee = findById(id);
+    Project project = projectService.findById(projectId);
     if (employee.getProjectAssignments() != null) {
-      Optional<ProjectAssignment> projectAssignment = employee.getProjectAssignments().stream()
-          .filter(pa -> pa.getProject() == project && pa.getIsCurrent())
-          .findAny();
-      projectAssignment.map(pa -> {
-        employee.getProjectAssignments().remove(pa);
-        pa.setLeftDate(LocalDateTime.now());
-        pa.setIsCurrent(false);
-        employee.getProjectAssignments().add(pa);
-        return employee;
-      }).orElseThrow(ResourceNotFoundException::new);
+      ProjectAssignment projectAssignment = project.getProjectAssignments().stream()
+          .filter(pa -> pa.getEmployee() == employee && pa.getIsCurrent())
+          .findAny().orElseThrow(ResourceNotFoundException::new);
+      employee.getProjectAssignments().remove(projectAssignment);
+      projectAssignment.setLeftDate(LocalDateTime.now());
+      projectAssignment.setIsCurrent(false);
+      employee.getProjectAssignments().add(projectAssignment);
     }
-    employeeRepository.saveAndFlush(employee);
+    return employeeRepository.saveAndFlush(employee);
+  }
+
+  public Employee leaveProjects(Long id, List<Long> projectIds) {
+    projectIds.forEach(projectId -> leaveProject(id, projectId));
+    return findById(id);
   }
 
   @Override
