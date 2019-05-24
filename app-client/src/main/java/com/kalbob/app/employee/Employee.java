@@ -3,19 +3,22 @@ package com.kalbob.app.employee;
 import com.kalbob.app.BaseEntity;
 import com.kalbob.app.department.Department;
 import com.kalbob.app.project.Project;
+import com.kalbob.app.project.ProjectAssignment;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -26,15 +29,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@EqualsAndHashCode(exclude = {"manager", "employees"}, callSuper = true)
+@ToString(exclude = {"manager", "employees", "projectAssignments"})
+@EqualsAndHashCode(exclude = {"manager", "employees", "projectAssignments"}, callSuper = true)
 @Entity
 @Table(name = "employee")
 public class Employee extends BaseEntity {
@@ -42,33 +45,36 @@ public class Employee extends BaseEntity {
   @OneToOne
   @JoinColumn
   public Department departmentHeaded;
+
   private String firstName;
+
   private String lastName;
+
   @Enumerated(EnumType.STRING)
   private JobType jobType;
+
   private Double salary;
+
   private Double commission;
+
   private LocalDate hireDate;
+
   private LocalDate relievingDate;
+
   @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
   @JoinColumn(name = "department_id")
   @Setter(AccessLevel.NONE)
   private Department department;
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-  @JoinTable(
-      name = "employee_project",
-      joinColumns = @JoinColumn(
-          name = "employee_id", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(
-          name = "project_id", referencedColumnName = "id")
-  )
-  @Fetch(FetchMode.JOIN)
-  @Setter(AccessLevel.NONE)
-  private Set<Project> projects = new HashSet<>();
+
+  //@Setter(AccessLevel.NONE)
+  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "employee", fetch = FetchType.LAZY)
+  private Set<ProjectAssignment> projectAssignments = new HashSet<>();
+
   @ManyToOne(cascade = {CascadeType.PERSIST})
   @JoinColumn(name = "manager_id")
   @Setter(AccessLevel.NONE)
   private Employee manager;
+
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager", fetch = FetchType.LAZY)
   @Setter(AccessLevel.NONE)
   private Set<Employee> employees = new HashSet<>();
@@ -82,42 +88,66 @@ public class Employee extends BaseEntity {
     this.department = null;
   }
 
-  public List<Project> getProjects() {
-    if (this.projects != null) {
-      return new ArrayList<>(this.projects);
+  public List<ProjectAssignment> getProjectAssignments() {
+    if (this.projectAssignments != null) {
+      return new ArrayList<>(this.projectAssignments);
     } else {
       return new ArrayList<>();
     }
   }
 
-  public Employee setProjects(List<Project> projects) {
-    if (projects != null) {
-      projects.forEach(p -> p.addEmployee(this));
-      this.projects = new HashSet<>(projects);
+  public Employee setProjectAssignments(List<ProjectAssignment> projectAssignments) {
+    if (projectAssignments != null) {
+      projectAssignments.forEach(p -> p.setEmployee(this));
+      this.projectAssignments = new HashSet<>(projectAssignments);
     }
     return this;
   }
 
-  public void addProject(Project project) {
-    if (this.projects != null) {
-      this.projects.add(project);
-    }
-    if (project.getEmployees() != null) {
-      project.getEmployees().add(this);
-    }
-  }
-
-  public void removeProject(Project project) {
-    if (this.projects != null) {
-      this.projects.remove(project);
-    }
-    if (project.getEmployees() != null) {
-      project.getEmployees().remove(this);
+  public List<Project> getProjects() {
+    if (this.projectAssignments != null) {
+      return this.projectAssignments.stream()
+          .map(ProjectAssignment::getProject)
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList());
+    } else {
+      return new ArrayList<>();
     }
   }
 
-  public void removeProjects() {
-    this.projects = null;
+  public void joinProject(Project project) {
+    ProjectAssignment projectAssignment = new ProjectAssignment()
+        .setEmployee(this)
+        .setProject(project)
+        .setJoinedDate(LocalDateTime.now())
+        .setIsCurrent(true)
+        ;
+    if (this.projectAssignments != null) {
+      this.projectAssignments.add(projectAssignment);
+      if (project.getProjectAssignments() != null) {
+        project.getProjectAssignments().add(projectAssignment);
+      }
+    }
+  }
+
+  public void leaveProject(Project project) {
+    if (this.projectAssignments != null) {
+      Optional<ProjectAssignment> projectAssignment = this.projectAssignments.stream()
+          .filter(pa -> pa.getProject() == project && pa.getIsCurrent())
+          .findAny();
+      projectAssignment.ifPresent(this::leaveProjectAssignment);
+    }
+  }
+
+  public void removeProjectAssignments() {
+    this.projectAssignments = null;
+  }
+
+  private void leaveProjectAssignment(ProjectAssignment pa) {
+    this.projectAssignments.remove(pa);
+    pa.setLeftDate(LocalDateTime.now());
+    pa.setIsCurrent(false);
+    this.projectAssignments.add(pa);
   }
 
   public Employee setManager(Employee manager) {
