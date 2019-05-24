@@ -48,7 +48,8 @@ public class Employee extends BaseEntity {
   private JobType jobType;
   private Double salary;
   private Double commission;
-  private LocalDate joiningDate;
+  private LocalDate hireDate;
+  private LocalDate relievingDate;
   @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
   @JoinColumn(name = "department_id")
   @Setter(AccessLevel.NONE)

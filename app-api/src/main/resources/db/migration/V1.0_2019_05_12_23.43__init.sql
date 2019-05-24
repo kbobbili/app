@@ -1,7 +1,7 @@
 CREATE TABLE `department` (
                               `id` bigint(20) NOT NULL,
-                              `created_at` datetime(6) DEFAULT NULL,
-                              `updated_at` datetime(6) DEFAULT NULL,
+                              `create_date` datetime(6) DEFAULT NULL,
+                              `update_date` datetime(6) DEFAULT NULL,
                               `start_date` date DEFAULT NULL,
                               `type` varchar(255) DEFAULT NULL,
                               PRIMARY KEY (`id`)
@@ -9,8 +9,8 @@ CREATE TABLE `department` (
 
 CREATE TABLE `address` (
                            `id` bigint(20) NOT NULL,
-                           `created_at` datetime(6) DEFAULT NULL,
-                           `updated_at` datetime(6) DEFAULT NULL,
+                           `create_date` datetime(6) DEFAULT NULL,
+                           `update_date` datetime(6) DEFAULT NULL,
                            `apt_num` varchar(255) DEFAULT NULL,
                            `city` varchar(255) DEFAULT NULL,
                            `state` varchar(255) DEFAULT NULL,
@@ -24,12 +24,13 @@ CREATE TABLE `address` (
 
 CREATE TABLE `employee` (
                             `id` bigint(20) NOT NULL,
-                            `created_at` datetime(6) DEFAULT NULL,
-                            `updated_at` datetime(6) DEFAULT NULL,
+                            `create_date` datetime(6) DEFAULT NULL,
+                            `update_date` datetime(6) DEFAULT NULL,
                             `commission` double DEFAULT NULL,
                             `first_name` varchar(255) DEFAULT NULL,
                             `job_type` varchar(255) DEFAULT NULL,
-                            `joining_date` date DEFAULT NULL,
+                            `hire_date` date DEFAULT NULL,
+                            `relieving_date` date DEFAULT NULL,
                             `last_name` varchar(255) DEFAULT NULL,
                             `salary` double DEFAULT NULL,
                             `department_id` bigint(20) DEFAULT NULL,
@@ -46,8 +47,8 @@ CREATE TABLE `employee` (
 
 CREATE TABLE `project` (
                            `id` bigint(20) NOT NULL,
-                           `created_at` datetime(6) DEFAULT NULL,
-                           `updated_at` datetime(6) DEFAULT NULL,
+                           `create_date` datetime(6) DEFAULT NULL,
+                           `update_date` datetime(6) DEFAULT NULL,
                            `end_date` datetime(6) DEFAULT NULL,
                            `estimated_end_date` datetime(6) DEFAULT NULL,
                            `is_completed` bit(1) DEFAULT NULL,

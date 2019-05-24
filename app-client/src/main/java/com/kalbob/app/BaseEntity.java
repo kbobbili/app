@@ -28,8 +28,8 @@ public class BaseEntity implements Serializable {
   private Long id;
   @CreatedDate
   @Column(nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+  private LocalDateTime createDate;
   @LastModifiedDate
-  private LocalDateTime updatedAt;
+  private LocalDateTime updateDate;
 
 }
