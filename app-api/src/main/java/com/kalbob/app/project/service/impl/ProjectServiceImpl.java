@@ -78,12 +78,13 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   public Project removeEmployee(Long id, Long employeeId) {
+    //REPLACE with methods from projectAssignmentService
     Project project = findById(id);
     Employee employee = employeeService.findById(employeeId);
     if (project.getProjectAssignments() != null) {
       ProjectAssignment projectAssignment = project.getProjectAssignments().stream()
           .filter(pa -> pa.getEmployee() == employee && pa.getIsCurrent())
-          .findAny().orElseThrow(ResourceNotFoundException::new);
+          .findAny().orElseThrow(ResourceNotFoundException::new);//message customize
       project.getProjectAssignments().remove(projectAssignment);
       projectAssignment.setLeftDate(LocalDateTime.now());
       projectAssignment.setIsCurrent(false);

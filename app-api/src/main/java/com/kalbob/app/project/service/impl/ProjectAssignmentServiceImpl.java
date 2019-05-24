@@ -27,6 +27,11 @@ public class ProjectAssignmentServiceImpl implements ProjectAssignmentService {
     return projectAssignment.orElseThrow(ResourceNotFoundException::new);
   }
 
+  public ProjectAssignment findByQuery(Long id) {//
+    Optional<ProjectAssignment> projectAssignment = projectAssignmentRepository.findById(id);
+    return projectAssignment.orElseThrow(ResourceNotFoundException::new);
+  }
+
   public ProjectAssignment update(Long id, ProjectAssignment projectAssignment){
     ProjectAssignment existingProjectAssignment = findById(id);
     //merge, business validate, invoke other services, bundle transactions
