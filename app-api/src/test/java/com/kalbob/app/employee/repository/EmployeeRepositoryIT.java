@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +60,7 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
     assertNotNull(employeeRepository.findById(employee.getId()).get().getDepartment());
     employee.setDepartment(null);
     employee = employeeRepository.saveAndFlush(employee);
-    assertNull(employeeRepository.findById(employee.getId()).get().getDepartment());
+    assertNull(employeeRepository.findById(employee.getId()).orElseThrow(ResourceNotFoundException::new).getDepartment());
   }
 
   @Test
@@ -77,7 +78,7 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
     //employee.setProjects(null);//works without the concept of orphan removal, because both are owning sides
 
     employee = employeeRepository.saveAndFlush(employee);
-    assertTrue(employeeRepository.findById(employee.getId()).get().getProjects().size() == 1);
+    assertTrue(employeeRepository.findById(employee.getId()).orElseThrow(ResourceNotFoundException::new).getProjects().size() == 1);
   }
 
 

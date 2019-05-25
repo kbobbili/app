@@ -2,7 +2,6 @@ package com.kalbob.app.department.repository;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.kalbob.app.config.data.BaseRepositoryIT;
@@ -42,10 +41,10 @@ public class AddressRepositoryIT extends BaseRepositoryIT {
   public void removeDepartment() {//Address deletes its association with department by setting department_id to null
     Address address = AddressMother.complete();
     address = addressRepository.saveAndFlush(address);
-    assertNotNull(addressRepository.findById(address.getId()).get().getDepartment());
+    assertTrue(addressRepository.findById(address.getId()).map(Address::getDepartment).isPresent());
     address.setDepartment(null);
     address = addressRepository.saveAndFlush(address);
-    assertNull(addressRepository.findById(address.getId()).get().getDepartment());
+    assertFalse(addressRepository.findById(address.getId()).map(Address::getDepartment).isPresent());
   }
 
 }

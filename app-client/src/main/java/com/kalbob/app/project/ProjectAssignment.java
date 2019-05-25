@@ -3,6 +3,7 @@ package com.kalbob.app.project;
 import com.kalbob.app.BaseEntity;
 import com.kalbob.app.employee.Employee;
 import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -23,10 +24,10 @@ import lombok.experimental.Accessors;
 @Table(name = "project_assignment")
 public class ProjectAssignment extends BaseEntity {
 
-  @ManyToOne
+  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "project_id")
   private Project project;
-  @ManyToOne
+  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "employee_id")
   private Employee employee;
   private LocalDateTime joinedDate;
