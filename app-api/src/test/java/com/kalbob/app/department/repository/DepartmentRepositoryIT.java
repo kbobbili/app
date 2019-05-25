@@ -85,7 +85,7 @@ public class DepartmentRepositoryIT extends BaseRepositoryIT {
         .size());//Use @Transactional to avoid -> org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
     //department.removeEmployee(employee);//does not work because i don't have orphanRemoval enabled (remember, cascade doesn't work for setters)
     //department = departmentRepository.saveAndFlush(department);
-    //assertTrue(departmentRepository.findById(department.getId()).get().getEmployees().size()==0);
+    //assertTrue(departmentRepository.findById(department.getId()).get().getReportees().size()==0);
 
     // so need to use employeeRepository to delete either the association (or) the complete employee record.
     department.getEmployees().get(0).setDepartment(null);
@@ -94,8 +94,8 @@ public class DepartmentRepositoryIT extends BaseRepositoryIT {
 
     //i'm not sure why this is not working in this transaction context.
     //2 or else no other way except, you use employeeRepository to delete the employee. Finish!
-     /*employeeRepository.deleteById(department.getEmployees().get(0).getId());
-     assertTrue(!employeeRepository.findById(department.getEmployees().get(0).getId()).isPresent());*/
+     /*employeeRepository.deleteById(department.getReportees().get(0).getId());
+     assertTrue(!employeeRepository.findById(department.getReportees().get(0).getId()).isPresent());*/
   }
 
 }

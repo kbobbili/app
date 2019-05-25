@@ -43,16 +43,64 @@ public class Department extends BaseEntity {
   private Set<Employee> employees = new HashSet<>();
 
   public Department setAddress(Address address) {
+    if(address != null) {
+      address.setDepartment(this);
+    }else{
+      if(this.address != null){
+        this.address.setDepartment(null);
+      }
+    }
     this.address = address;
     return this;
   }
 
-  public String getType() {
-    return type.toString();
+  public Department setAddressUnidirectional(Address address) {
+    this.address = address;
+    return this;
   }
 
   public void removeAddress() {
+    if(this.address != null){
+      this.address.setDepartment(null);
+    }
     this.address = null;
+  }
+
+  public Department setEmployees(List<Employee> employees) {
+    if (employees != null) {
+      employees.forEach(e -> e.setDepartment(this));
+      this.employees = new HashSet<>(employees);
+    }else{
+      if (this.employees != null) {
+        this.employees.forEach(e -> e.setDepartment(null));
+        this.employees = null;
+      }
+    }
+    return this;
+  }
+
+  public Department addEmployee(Employee employee) {
+    if (this.employees != null && employee != null) {
+      employee.setDepartment(this);
+      this.employees.add(employee);
+    }
+    return this;
+  }
+
+  public Department removeEmployee(Employee employee) {
+    if (this.employees != null && employee != null) {
+      this.employees.remove(employee);
+      employee.setDepartment(null);
+    }
+    return this;
+  }
+
+  public Department removeEmployees() {
+    if (this.employees != null) {
+      this.employees.forEach(e -> e.setDepartment(null));
+      this.employees = null;
+    }
+    return this;
   }
 
   public List<Employee> getEmployees() {
@@ -63,34 +111,23 @@ public class Department extends BaseEntity {
     }
   }
 
-  public Department setEmployees(List<Employee> employees) {
-    if (employees != null) {
-      employees.forEach(e -> e.setDepartment(this));
-      this.employees = new HashSet<>(employees);
+  public Department setDepartmentHead(Employee employee) {
+    if(employee != null) {
+      employee.setDepartment(this);
+    }else{
+      if(this.departmentHead != null){
+        this.departmentHead.setDepartment(null);
+      }
     }
+    this.departmentHead = employee;
     return this;
   }
 
-  public void addEmployee(Employee employee) {
-    if (this.employees != null) {
-      this.employees.add(employee);
+  public void removeDepartmentHead() {
+    if(this.departmentHead != null){
+      this.departmentHead.setDepartment(null);
     }
-    if (employee != null) {
-      employee.setDepartment(this);
-    }
-  }
-
-  public void removeEmployee(Employee employee) {
-    if (this.employees != null) {
-      this.employees.remove(employee);
-    }
-    if (employee != null) {
-      employee.setDepartment(null);
-    }
-  }
-
-  public void removeEmployees() {
-    this.employees = null;
+    this.departmentHead = null;
   }
 
 }

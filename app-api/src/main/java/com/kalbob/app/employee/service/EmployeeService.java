@@ -1,4 +1,4 @@
-package com.kalbob.app.project.service;
+package com.kalbob.app.employee.service;
 
 import com.kalbob.app.employee.Employee;
 import java.util.List;

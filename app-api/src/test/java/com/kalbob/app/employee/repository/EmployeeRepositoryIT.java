@@ -67,13 +67,13 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
   @Rollback(false)
   public void removeProject() {//Employee deletes its association with department by setting department_id to null
     Employee employee = EmployeeMother.complete();
-    employee.addProject(ProjectMother.simpleRandom()
+    employee.joinProject(ProjectMother.simpleRandom()
     );//if i use simple, then both projects will be equal so only 1 record will get stored.
     employee = employeeRepository.saveAndFlush(employee);
     assertTrue(employee.getProjects().size() != 0);
 
     Project project = employee.getProjects().get(0);
-    employee.removeProject(project);
+    employee.leaveProject(project);
     //employee.setProjects(null);//works without the concept of orphan removal, because both are owning sides
 
     employee = employeeRepository.saveAndFlush(employee);
@@ -98,7 +98,7 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
     List<Employee> employees = employeeRepository
         .saveAll(Arrays.asList(employee1, employee2, employee3));
     assertEquals(2,
-        employeeRepository.findByDepartment_Type(DepartmentType.valueOf(department.getType()))
+        employeeRepository.findByDepartment_Type(DepartmentType.valueOf(department.getType().toString()))
             .size());
   }
 

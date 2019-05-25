@@ -1,7 +1,6 @@
 package com.kalbob.app.department;
 
 import com.kalbob.app.BaseEntity;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -27,7 +26,26 @@ public class Address extends BaseEntity {
   private String city;
   private String state;
   private String zipCode;
-  @OneToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+  @OneToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "department_id")
   private Department department;
+
+  public Address setDepartment(Department department) {
+    if(department != null) {
+      department.setAddressUnidirectional(this);
+    }else{
+      if(this.department != null){
+        this.department.setAddressUnidirectional(null);
+      }
+    }
+    this.department = department;
+    return this;
+  }
+
+  public void removeDepartment() {
+    if(this.department != null){
+      this.department.setAddress(null);
+    }
+    this.department = null;
+  }
 }
