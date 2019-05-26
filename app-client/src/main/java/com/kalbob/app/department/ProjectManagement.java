@@ -1,12 +1,14 @@
-package com.kalbob.app.project;
+package com.kalbob.app.department;
 
 import com.kalbob.app.BaseEntity;
-import com.kalbob.app.employee.Employee;
-import java.time.LocalDateTime;
+import com.kalbob.app.project.Project;
 import javax.persistence.CascadeType;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,16 +22,22 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "project_assignment")
-public class ProjectAssignment extends BaseEntity {
+@Table(name = "department_project")
+public class ProjectManagement extends BaseEntity {
+
+  @EmbeddedId
+  private ProjectManagementKey id;
+
+  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @MapsId("department_id")
+  @JoinColumn(name = "department_id")
+  private Department department;
 
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @MapsId("project_id")
   @JoinColumn(name = "project_id")
   private Project project;
-  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinColumn(name = "employee_id")
-  private Employee employee;
-  private LocalDateTime joinedDate;
-  private LocalDateTime leftDate;
-  private Boolean isCurrent;
+
+  private int rating;
+
 }

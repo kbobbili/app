@@ -1,7 +1,9 @@
 package com.kalbob.app.project;
 
 import com.kalbob.app.BaseEntity;
+import com.kalbob.app.department.ProjectManagement;
 import com.kalbob.app.employee.Employee;
+import com.kalbob.app.task.Task;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,7 +16,10 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,6 +55,19 @@ public class Project extends BaseEntity {
 
   @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "project", fetch = FetchType.LAZY)
   private Set<ProjectAssignment> projectAssignments = new HashSet<>();
+
+  @OneToOne(mappedBy = "project", fetch = FetchType.EAGER)
+  private ProjectManagement managingDepartment;
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "project_tasks",
+      joinColumns = @JoinColumn(
+          name = "project_id", referencedColumnName = "id"),
+      inverseJoinColumns = @JoinColumn(
+          name = "task_id", referencedColumnName = "id")
+  )
+  private Set<Task> tasks = new HashSet<>();
 
   public Project setEmployees(List<Employee> employees) {
     if (employees != null) {
@@ -107,6 +125,51 @@ public class Project extends BaseEntity {
           .map(ProjectAssignment::getEmployee)
           .filter(Objects::nonNull)
           .collect(Collectors.toList());
+    } else {
+      return new ArrayList<>();
+    }
+  }
+
+  public Project setTasks(List<Task> tasks) {
+    if (tasks != null) {
+      tasks.forEach(e -> e.setProject(this));
+      this.tasks = new HashSet<>(tasks);
+    }else{
+      if (this.tasks != null) {
+        this.tasks.forEach(e -> e.setProject(null));
+        this.tasks = null;
+      }
+    }
+    return this;
+  }
+
+  public Project addTask(Task task) {
+    if (this.tasks != null && task != null) {
+      task.setProject(this);
+      this.tasks.add(task);
+    }
+    return this;
+  }
+
+  public Project removeTask(Task task) {
+    if (this.tasks != null && task != null) {
+      this.tasks.remove(task);
+      task.setProject(null);
+    }
+    return this;
+  }
+
+  public Project removeTasks() {
+    if (this.tasks != null) {
+      this.tasks.forEach(e -> e.setProject(null));
+      this.tasks = null;
+    }
+    return this;
+  }
+
+  public List<Task> getTasks() {
+    if (this.tasks != null) {
+      return new ArrayList<>(this.tasks);
     } else {
       return new ArrayList<>();
     }

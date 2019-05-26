@@ -1,8 +1,8 @@
-package com.kalbob.app.project;
+package com.kalbob.app.department;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
-public class ProjectAssignmentKey implements Serializable {
+public class ProjectManagementKey implements Serializable {
 
-  @JoinColumn(name = "project_id")
+  @Column(name = "department_id")
+  private Long departmentId;
+  @Column(name = "project_id")
   private Long projectId;
-  @JoinColumn(name = "employee_id")
-  private Long employeeId;
 }

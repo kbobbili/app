@@ -3,7 +3,6 @@ package com.kalbob.app.department;
 import com.kalbob.app.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -26,8 +25,7 @@ public class Address extends BaseEntity {
   private String city;
   private String state;
   private String zipCode;
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "department_id")
+  @OneToOne(fetch = FetchType.EAGER, mappedBy = "address")
   private Department department;
 
   public Address setDepartment(Department department) {

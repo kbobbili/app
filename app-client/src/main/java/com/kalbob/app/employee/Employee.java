@@ -4,6 +4,7 @@ import com.kalbob.app.BaseEntity;
 import com.kalbob.app.department.Department;
 import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectAssignment;
+import com.kalbob.app.task.Task;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,10 +41,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 @Table(name = "employee")
 public class Employee extends BaseEntity {
 
-  @OneToOne
-  @JoinColumn
-  public Department departmentHeaded;
-
   private String firstName;
 
   private String lastName;
@@ -63,19 +60,25 @@ public class Employee extends BaseEntity {
   @JoinColumn(name = "department_id")
   private Department department;
 
-  @ManyToOne(cascade = {CascadeType.PERSIST})
+  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "manager_id")
   private Employee manager;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "manager", fetch = FetchType.LAZY)
+  @OneToOne(mappedBy = "departmentHead")
+  public Department departmentHeaded;
+
+  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "manager", fetch = FetchType.LAZY)
   private Set<Employee> reportees = new HashSet<>();
 
   @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "employee", fetch = FetchType.LAZY)
   private Set<ProjectAssignment> projectAssignments = new HashSet<>();
 
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee", fetch = FetchType.LAZY)
+  private Set<Task> tasks = new HashSet<>();
+
   public Employee setDepartment(Department department) {
     if(department != null) {
-      if(department.getEmployees() != null) department.getEmployees().add(this);
+      if(department.getEmployees() != null) department.getEmployees().add(this);//Todo
     }else{
       if(this.department != null){
         this.department.getEmployees().remove(this);
@@ -95,7 +98,7 @@ public class Employee extends BaseEntity {
 
   public Employee setManager(Employee manager) {
     if(manager != null) {
-      if(manager.getReportees() != null) manager.getReportees().add(this);
+      if(manager.getReportees() != null) manager.getReportees().add(this);//Todo
     }else{
       if(this.manager != null){
         this.manager.getReportees().remove(this);
@@ -190,7 +193,7 @@ public class Employee extends BaseEntity {
       this.projectAssignments.add(projectAssignment);
       if (project.getProjectAssignments() != null) {
         project.getProjectAssignments().add(projectAssignment);
-      }
+      }//Todo
     }
     return this;
   }
@@ -214,6 +217,70 @@ public class Employee extends BaseEntity {
           .map(ProjectAssignment::getProject)
           .filter(Objects::nonNull)
           .collect(Collectors.toList());
+    } else {
+      return new ArrayList<>();
+    }
+  }
+
+  public Employee setDepartmentHeaded(Department department) {
+    if(department != null) {
+      department.setDepartmentHeadUnidirectional(this);
+    }else{
+      if(this.departmentHeaded != null){
+        this.departmentHeaded.setDepartmentHeadUnidirectional(null);
+      }
+    }
+    this.departmentHeaded = department;
+    return this;
+  }
+
+  public void removeDepartmentHeaded() {
+    if(this.departmentHeaded != null){
+      this.departmentHeaded.setDepartmentHead(null);
+    }
+    this.departmentHeaded = null;
+  }
+
+  public Employee setTasks(List<Task> tasks) {
+    if (tasks != null) {
+      tasks.forEach(e -> e.setEmployee(this));
+      this.tasks = new HashSet<>(tasks);
+    }else{
+      if (this.tasks != null) {
+        this.tasks.forEach(e -> e.setEmployee(null));
+        this.tasks = null;
+      }
+    }
+    return this;
+  }
+
+  public Employee addTask(Task task) {
+    if (this.tasks != null && task != null) {
+      task.setEmployee(this);
+      this.tasks.add(task);
+    }
+    return this;
+  }
+
+  public Employee removeTask(Task task) {
+    if (this.tasks != null && task != null) {
+      this.tasks.remove(task);
+      task.setEmployee(null);
+    }
+    return this;
+  }
+
+  public Employee removeTasks() {
+    if (this.tasks != null) {
+      this.tasks.forEach(e -> e.setEmployee(null));
+      this.tasks = null;
+    }
+    return this;
+  }
+
+  public List<Task> getTasks() {
+    if (this.tasks != null) {
+      return new ArrayList<>(this.tasks);
     } else {
       return new ArrayList<>();
     }

@@ -79,7 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
     return findById(id);
   }
 
-  public Project addEmployees(Long id, List<Employee> employees) {
+  public Project addEmployees(Long id, List<Employee> employees) {//bulk insert stored procedure/saveAll/some spring data jpa way
     Project project = findById(id);
     employees.forEach(e -> addEmployee(project, e));
     return findById(id);
