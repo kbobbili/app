@@ -13,9 +13,8 @@ public class ProjectManagementMother extends ObjectMother {
 
   public static ProjectManagement complete() {
     return simple()
-        .setId(new ProjectManagementKey()
             .setDepartment(DepartmentMother.simple())
-            .setProject(ProjectMother.simple()))
+            .setProject(ProjectMother.simple())
         ;
   }
 
@@ -27,9 +26,8 @@ public class ProjectManagementMother extends ObjectMother {
 
   public static ProjectManagement completeRandom() {
     return simpleRandom()
-        .setId(new ProjectManagementKey()
             .setDepartment(DepartmentMother.simpleRandom())
-            .setProject(ProjectMother.simpleRandom()))
+            .setProject(ProjectMother.simpleRandom())
         ;
   }
 }

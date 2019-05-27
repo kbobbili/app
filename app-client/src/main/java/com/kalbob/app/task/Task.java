@@ -3,8 +3,6 @@ package com.kalbob.app.task;
 import com.kalbob.app.BaseEntity;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.project.Project;
-import java.util.Arrays;
-import java.util.HashSet;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -34,56 +32,44 @@ public class Task extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private TaskStatus status;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   private Project project;
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "employee_id")
   private Employee employee;
 
   public Task setProject(Project project) {
-    if(project != null) {
-      if(project.getTasks() != null) project.getTasks().add(this);
-    }else{
-      if(this.project != null){
-        this.project.getTasks().remove(this);
-      }
+    if(this.project != project) {
+      if(this.project != null) this.project.removeTask(this);
+      this.project = project;
+      if(project != null) project.addTask(this);
     }
-    this.project = project;
     return this;
   }
 
   public Task removeProject() {
-    if(this.project == null) {
-      return this;
+    if(this.project != null){
+      this.project.removeTask(this);
+      this.project = null;
     }
-    this.project.getTasks().remove(this);
-    this.project = null;
     return this;
   }
 
   public Task setEmployee(Employee employee) {
-    if(employee != null) {
-      if(employee.getTasks() != null) {
-        employee.getTasks().add(this);
-      }else {
-        employee.setTasks(new HashSet<>(Arrays.asList(this)));
-      }
-    }else{
-      if(this.employee != null){
-        this.employee.getTasks().remove(this);
-      }
+    if(this.employee != employee) {
+      if(this.employee != null) this.employee.removeTask(this);
+      this.employee = employee;
+      if(employee != null) employee.addTask(this);
     }
-    this.employee = employee;
     return this;
   }
 
   public Task removeEmployee() {
-    if(this.employee == null) {
-      return this;
+    if(this.employee != null){
+      this.employee.removeTask(this);
+      this.employee = null;
     }
-    this.employee.getTasks().remove(this);
-    this.employee = null;
     return this;
   }
 }

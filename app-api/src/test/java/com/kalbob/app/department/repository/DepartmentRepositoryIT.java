@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.kalbob.app.config.data.BaseRepositoryIT;
 import com.kalbob.app.department.Department;
 import com.kalbob.app.department.DepartmentMother;
+import com.kalbob.app.employee.Employee;
 import com.kalbob.app.employee.repository.EmployeeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,14 @@ public class DepartmentRepositoryIT extends BaseRepositoryIT {
   @Test
   public void saveDepartment() {
 
+    Department d = new Department();
+    d.addEmployee(new Employee());
+
     Department department = departmentRepository.save(DepartmentMother.completeRandom());
     assertTrue(departmentRepository.findById(department.getId()).isPresent());
     assertNotNull(department.getAddress());
     assertEquals(2, department.getEmployees().size());
-    //assertEquals(2, department.getProjects().size());
+    assertEquals(2, department.getProjects().size());
   }
 
   @Test

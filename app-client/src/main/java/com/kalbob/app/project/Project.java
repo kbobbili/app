@@ -5,6 +5,7 @@ import com.kalbob.app.department.ProjectManagement;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.task.Task;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -31,8 +32,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"managingDepartment","projectAssignments","tasks"})
-@EqualsAndHashCode(exclude = {"managingDepartment","projectAssignments","tasks"}, callSuper = true)
+@ToString(exclude = {"projectManagement","projectAssignments","tasks"})
+@EqualsAndHashCode(exclude = {"projectManagement","projectAssignments","tasks"}, callSuper = true)
 @Accessors(chain = true)
 @Entity
 @Table(name = "project")
@@ -52,11 +53,11 @@ public class Project extends BaseEntity {
 
   private Boolean isCompleted;
 
-  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "id.project", fetch = FetchType.LAZY)
+  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "project", fetch = FetchType.LAZY)
   private Set<ProjectAssignment> projectAssignments = new HashSet<>();
 
-  @OneToOne(mappedBy = "id.project", fetch = FetchType.EAGER)
-  private ProjectManagement managingDepartment;
+  @OneToOne(mappedBy = "project", fetch = FetchType.LAZY)
+  private ProjectManagement projectManagement;
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinTable(
@@ -128,13 +129,30 @@ public class Project extends BaseEntity {
         .collect(Collectors.toSet());
   }
 
+  public Project setProjectManagement(ProjectManagement projectManagement) {
+    if(this.projectManagement != projectManagement) {
+      if(this.projectManagement != null) this.projectManagement.removeProject();
+      this.projectManagement = projectManagement;
+      if(projectManagement != null) projectManagement.setProject(this);
+    }
+    return this;
+  }
+
+  public Project removeProjectManagement() {
+    if(this.projectManagement != null){
+      this.projectManagement.removeProject();
+      this.projectManagement = null;
+    }
+    return this;
+  }
+
   public Project setTasks(Set<Task> tasks) {
     if (tasks != null) {
-      tasks.forEach(e -> e.setProject(this));
       this.tasks = new HashSet<>(tasks);
+      tasks.forEach(e -> e.setProject(this));
     }else{
       if (this.tasks != null) {
-        this.tasks.forEach(e -> e.setProject(null));
+        this.tasks.forEach(Task::removeProject);
         this.tasks = null;
       }
     }
@@ -142,11 +160,13 @@ public class Project extends BaseEntity {
   }
 
   public Project addTask(@NonNull Task task) {
-    if(this.tasks == null){
+    if (this.tasks == null) {
       this.tasks = new HashSet<>();
     }
-    task.setProject(this);
-    this.tasks.add(task);
+    if(!this.tasks.contains(task)){
+      this.tasks.add(task);
+      task.setProject(this);
+    }
     return this;
   }
 
@@ -154,24 +174,50 @@ public class Project extends BaseEntity {
     if (this.tasks == null) {
       return this;
     }
-    Project project = task.getProject();
-    project.getTasks().stream().filter(t -> t.getProject() == this)
-        .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
-    this.tasks.remove(task);
-    task.setProject(null);
+    if(this.tasks.contains(task)) {
+      Project employee = task.getProject();
+      employee.getTasks().stream().filter(t -> t.getProject() == this)
+          .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+      this.tasks.remove(task);
+      task.setProject(null);
+    }
     return this;
   }
 
   public Project removeTasks() {
-    if (this.tasks == null) {
-      return this;
+    if (this.tasks != null) {
+      this.tasks.forEach(Task::removeProject);
+      this.tasks = null;
     }
-    this.tasks.forEach(e -> e.setProject(null));
-    this.tasks = null;
     return this;
   }
 
   public Set<Task> getTasks() {
-    return this.tasks;
+    return Collections.unmodifiableSet(this.tasks);
+  }
+
+  public Project addProjectAssignment(ProjectAssignment projectAssignment) {
+    if (this.projectAssignments == null) {
+      this.projectAssignments = new HashSet<>();
+    }
+    if(!this.projectAssignments.contains(projectAssignment)){
+      this.projectAssignments.add(projectAssignment);
+      projectAssignment.setProject(this);
+    }
+    return this;
+  }
+
+  public Project removeProjectAssignment(ProjectAssignment projectAssignment) {
+    if (this.projectAssignments == null) {
+      return this;
+    }
+    if(this.projectAssignments.contains(projectAssignment)) {
+      Project project = projectAssignment.getProject();
+      project.getProjectAssignments().stream().filter(t -> t.getProject() == this)
+          .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+      this.projectAssignments.remove(projectAssignment);
+      projectAssignment.setProject(null);
+    }
+    return this;
   }
 }

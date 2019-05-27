@@ -2,6 +2,7 @@ package com.kalbob.app.company;
 
 import com.kalbob.app.BaseEntity;
 import com.kalbob.app.department.Department;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -34,11 +35,11 @@ public class Company extends BaseEntity {
 
   public Company setDepartments(Set<Department> departments) {
     if (departments != null) {
-      departments.forEach(e -> e.setCompany(this));
       this.departments = new HashSet<>(departments);
+      departments.forEach(e -> e.setCompany(this));
     }else{
       if (this.departments != null) {
-        this.departments.forEach(e -> e.setCompany(null));
+        this.departments.forEach(Department::removeCompany);
         this.departments = null;
       }
     }
@@ -49,8 +50,10 @@ public class Company extends BaseEntity {
     if (this.departments == null) {
       this.departments = new HashSet<>();
     }
-    department.setCompany(this);
-    this.departments.add(department);
+    if(!this.departments.contains(department)){
+      this.departments.add(department);
+      department.setCompany(this);
+    }
     return this;
   }
 
@@ -58,24 +61,25 @@ public class Company extends BaseEntity {
     if (this.departments == null) {
       return this;
     }
-    Company company = department.getCompany();
-    company.getDepartments().stream().filter(d -> d.getCompany() == this)
-        .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
-    this.departments.remove(department);
-    department.setCompany(null);
+    if(this.departments.contains(department)) {
+      Company company = department.getCompany();
+      company.getDepartments().stream().filter(t -> t.getCompany() == this)
+          .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+      this.departments.remove(department);
+      department.setCompany(null);
+    }
     return this;
   }
 
   public Company removeDepartments() {
-    if (this.departments == null) {
-      return this;
+    if (this.departments != null) {
+      this.departments.forEach(Department::removeCompany);
+      this.departments = null;
     }
-    this.departments.forEach(e -> e.setCompany(null));
-    this.departments = null;
     return this;
   }
 
   public Set<Department> getDepartments() {
-    return this.departments;
+    return Collections.unmodifiableSet(this.departments);
   }
 }

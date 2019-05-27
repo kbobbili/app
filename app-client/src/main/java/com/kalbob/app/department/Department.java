@@ -5,6 +5,7 @@ import com.kalbob.app.company.Company;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.project.Project;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -31,14 +32,14 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"employees", "managedProjects"})
-@EqualsAndHashCode(exclude = {"employees", "managedProjects"}, callSuper = true)
+@ToString(exclude = {"employees", "projectManagements"})
+@EqualsAndHashCode(exclude = {"employees", "projectManagements"}, callSuper = true)
 @Accessors(chain = true)
 @Entity
 @Table(name = "department")
 public class Department extends BaseEntity {
 
-  @ManyToOne(fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "company_id")
   private Company company;
 
@@ -47,53 +48,44 @@ public class Department extends BaseEntity {
 
   private LocalDate startDate;
 
-  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "address_id")
   private Address address;
 
-  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "department_head")
   public Employee departmentHead;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "department", fetch = FetchType.LAZY)
   private Set<Employee> employees = new HashSet<>();
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "id.department", fetch = FetchType.LAZY)
-  private Set<ProjectManagement> managedProjects = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "department", fetch = FetchType.LAZY)
+  private Set<ProjectManagement> projectManagements = new HashSet<>();
 
   public Department setAddress(Address address) {
-    if(address != null) {
-      address.setDepartment(this);
-    }else{
-      if(this.address != null){
-        this.address.setDepartment(null);
-      }
+    if(this.address != address){
+      if(this.address != null) this.address.removeDepartment();
+      this.address = address;
+      if(address != null) address.setDepartment(this);
     }
-    this.address = address;
-    return this;
-  }
-
-  public Department setAddressUnidirectional(Address address) {
-    this.address = address;
     return this;
   }
 
   public Department removeAddress() {
-    if(this.address == null){
-      return this;
+    if(this.address != null){
+      this.address.setDepartment(null);
+      this.address = null;
     }
-    this.address.setDepartment(null);
-    this.address = null;
     return this;
   }
 
   public Department setEmployees(Set<Employee> employees) {
     if (employees != null) {
-      employees.forEach(e -> e.setDepartment(this));
       this.employees = new HashSet<>(employees);
+      employees.forEach(e -> e.setDepartment(this));
     }else{
       if (this.employees != null) {
-        this.employees.forEach(e -> e.setDepartment(null));
+        this.employees.forEach(Employee::removeDepartment);
         this.employees = null;
       }
     }
@@ -104,8 +96,10 @@ public class Department extends BaseEntity {
     if (this.employees == null) {
       this.employees = new HashSet<>();
     }
-    employee.setDepartment(this);
-    this.employees.add(employee);
+    if(!this.employees.contains(employee)){
+      this.employees.add(employee);
+      employee.setDepartment(this);
+    }
     return this;
   }
 
@@ -113,128 +107,139 @@ public class Department extends BaseEntity {
     if (this.employees == null) {
       return this;
     }
-    Department department = employee.getDepartment();
-    department.getEmployees().stream().filter(t -> t.getDepartment() == this)
-        .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
-    this.employees.remove(employee);
-    employee.setDepartment(null);
+    if(this.employees.contains(employee)) {
+      Department department = employee.getDepartment();
+      department.getEmployees().stream().filter(t -> t.getDepartment() == this)
+          .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+      this.employees.remove(employee);
+      employee.setDepartment(null);
+    }
     return this;
   }
 
   public Department removeEmployees() {
-    if (this.employees == null) {
-      return this;
+    if (this.employees != null) {
+      this.employees.forEach(Employee::removeDepartment);
+      this.employees = null;
     }
-    this.employees.forEach(e -> e.setDepartment(null));
-    this.employees = null;
     return this;
   }
 
   public Set<Employee> getEmployees() {
-    return this.employees;
+    return Collections.unmodifiableSet(this.employees);
   }
 
-  public Department setDepartmentHead(Employee employee) {
-    if(employee != null) {
-      employee.setDepartmentHeaded(this);
-    }else{
-      if(this.departmentHead != null){
-        this.departmentHead.setDepartmentHeaded(null);
-      }
+  public Department setDepartmentHead(Employee departmentHead) {
+    if(this.departmentHead != departmentHead) {
+      if(this.departmentHead != null) this.departmentHead.removeDepartment();
+      this.departmentHead = departmentHead;
+      if(departmentHead != null) departmentHead.setDepartmentHeaded(this);
     }
-    this.departmentHead = employee;
-    return this;
-  }
-
-  public Department setDepartmentHeadUnidirectional(Employee employee) {
-    this.departmentHead = employee;
     return this;
   }
 
   public Department removeDepartmentHead() {
-    if(this.departmentHead == null) {
-      return this;
+    if(this.departmentHead != null){
+      this.departmentHead.removeDepartment();
+      this.departmentHead = null;
     }
-    this.departmentHead.setDepartmentHeaded(null);
-    this.departmentHead = null;
     return this;
   }
 
   public Department setCompany(Company company) {
-    if(company != null) {
-      if(company.getDepartments() != null) company.getDepartments().add(this);
-    }else{
-      if(this.company != null){
-        this.company.getDepartments().remove(this);
-      }
+    if(this.company != company) {
+      if(this.company != null) this.company.removeDepartment(this);
+      this.company = company;
+      if(company != null) company.addDepartment(this);
     }
-    this.company = company;
     return this;
   }
 
   public Department removeCompany() {
-    if(this.company == null) {
-      return this;
+    if(this.company != null){
+      this.company.removeDepartment(this);
+      this.company = null;
     }
-    this.company.getDepartments().remove(this);
-    this.company = null;
     return this;
   }
 
   public Department setProjects(Set<Project> projects) {
     if (projects != null) {
-      this.managedProjects = projects.stream().map(p ->
-          new ProjectManagement()
-              .setId(new ProjectManagementKey()
-                  .setDepartment(this)
-                  .setProject(p))
-              .setRating(3)
+      this.projectManagements = projects.stream().map(p -> {
+            return new ProjectManagement()
+                .setId(new ProjectManagementKey(this.getId(), p.getId()))
+                .setDepartment(this)
+                .setProject(p)
+                .setRating(3);
+          }
       ).collect(Collectors.toSet());
     }else{
-      if(this.managedProjects != null) {
-        this.managedProjects.forEach(pa -> {
+      if(this.projectManagements != null) {
+        this.projectManagements.forEach(pa -> {
           pa
-              .getId()
               .setProject(null)
               .setDepartment(null);
         });
-        this.managedProjects = null;
+        this.projectManagements = null;
       }
     }
     return this;
   }
 
   public Department addProject(@NonNull Project project) {
-    if (this.managedProjects == null) {
-      this.managedProjects = new HashSet<>();
+    if (this.projectManagements == null) {
+      this.projectManagements = new HashSet<>();
     }
     ProjectManagement projectManagement = new ProjectManagement()
-        .setId(new ProjectManagementKey()
-            .setDepartment(this)
-            .setProject(project))
+        .setDepartment(this)
+        .setProject(project)
         .setRating(3);
-    project.setManagingDepartment(projectManagement);
-    this.managedProjects.add(projectManagement);
+    project.setProjectManagement(projectManagement);
+    this.projectManagements.add(projectManagement);
     return this;
   }
 
   public Department removeProject(@NonNull Project project) {
-    if (this.managedProjects == null || project.getManagingDepartment() == null) {
+    if (this.projectManagements == null || project.getProjectManagement() == null) {
       return this;
     }
-    ProjectManagement projectManagement = project.getManagingDepartment();
-    if(projectManagement.getId().getDepartment() != this) throw new ResourceNotFoundException(); //association not found
-    this.managedProjects.remove(projectManagement);
-    projectManagement.getId().setDepartment(null);
+    ProjectManagement projectManagement = project.getProjectManagement();
+    if(projectManagement.getDepartment() != this) throw new ResourceNotFoundException(); //association not found
+    this.projectManagements.remove(projectManagement);
+    projectManagement.setDepartment(null);
     return this;
   }
 
   public Set<Project> getProjects() {
-    return this.managedProjects.stream()
-        .map(pm -> pm.getId().getProject())
+    return this.projectManagements.stream()
+        .map(ProjectManagement::getProject)
         .filter(Objects::nonNull)
         .collect(Collectors.toSet());
   }
-  
 
+  public Department addProjectManagement(@NonNull ProjectManagement projectManagement) {
+    if (this.projectManagements == null) {
+      this.projectManagements = new HashSet<>();
+    }
+    if(!this.projectManagements.contains(projectManagement)){
+      this.projectManagements.add(projectManagement);
+      projectManagement.setDepartment(this);
+    }
+    return this;
+  }
+
+  public Department removeProjectManagement(@NonNull ProjectManagement projectManagement) {
+    if (this.projectManagements == null) {
+      return this;
+    }
+    if(this.projectManagements.contains(projectManagement)) {
+      Department department = projectManagement.getDepartment();
+      department.getProjectManagements().stream().filter(t -> t.getDepartment() == this)
+          .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+      this.projectManagements.remove(projectManagement);
+      projectManagement.setDepartment(null);
+    }
+    return this;
+  }
+  
 }

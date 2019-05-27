@@ -27,27 +27,23 @@ public class Address extends BaseEntity {
   private String city;
   private String state;
   private String zipCode;
-  @OneToOne(mappedBy = "address", fetch = FetchType.EAGER)
+  @OneToOne(mappedBy = "address", fetch = FetchType.LAZY)
   private Department department;
 
   public Address setDepartment(Department department) {
-    if(department != null) {
-      department.setAddressUnidirectional(this);
-    }else{
-      if(this.department != null){
-        this.department.setAddressUnidirectional(null);
-      }
+    if(this.department != department){
+      if(this.department != null) this.department.removeAddress();
+      this.department = department;
+      if(department != null) department.setAddress(this);
     }
-    this.department = department;
     return this;
   }
 
   public Address removeDepartment() {
-    if(this.department == null) {
-      return this;
+    if(this.department != null){
+      this.department.setAddress(null);
+      this.department = null;
     }
-    this.department.setAddress(null);
-    this.department = null;
     return this;
   }
 }
