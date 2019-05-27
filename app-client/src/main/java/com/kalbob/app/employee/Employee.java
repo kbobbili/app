@@ -5,15 +5,15 @@ import com.kalbob.app.department.Department;
 import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectAssignment;
 import com.kalbob.app.task.Task;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -23,10 +23,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.executable.ExecutableValidator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -35,8 +41,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@ToString(exclude = {"manager", "reportees"})
-@EqualsAndHashCode(exclude = {"manager", "reportees"}, callSuper = true)
+@ToString(exclude = {"reportees","departmentHeaded","projectAssignments","tasks"})
+@EqualsAndHashCode(exclude = {"reportees","departmentHeaded","projectAssignments","tasks"}, callSuper = true)
 @Entity
 @Table(name = "employee")
 public class Employee extends BaseEntity {
@@ -52,12 +58,15 @@ public class Employee extends BaseEntity {
 
   private Double commission;
 
+  @Column(nullable = true, updatable = true)
   private LocalDate hireDate;
 
   private LocalDate relievingDate;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "department_id")
+  //@Setter(AccessLevel.NONE) & Remove the written setter
+  //bcoz i'm not cascading..i can actually remove setDepartment() & use this reference just for getting.
   private Department department;
 
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -78,7 +87,7 @@ public class Employee extends BaseEntity {
 
   public Employee setDepartment(Department department) {
     if(department != null) {
-      if(department.getEmployees() != null) department.getEmployees().add(this);//Todo
+      if(department.getEmployees() != null) department.getEmployees().add(this);
     }else{
       if(this.department != null){
         this.department.getEmployees().remove(this);
@@ -89,16 +98,17 @@ public class Employee extends BaseEntity {
   }
 
   public Employee removeDepartment() {
-    if(this.department != null){
-      this.department.getEmployees().remove(this);
-      this.department = null;
+    if(this.department == null) {
+      return this;
     }
+    this.department.getEmployees().remove(this);
+    this.department = null;
     return this;
   }
 
   public Employee setManager(Employee manager) {
     if(manager != null) {
-      if(manager.getReportees() != null) manager.getReportees().add(this);//Todo
+      if(manager.getReportees() != null) manager.getReportees().add(this);
     }else{
       if(this.manager != null){
         this.manager.getReportees().remove(this);
@@ -109,22 +119,19 @@ public class Employee extends BaseEntity {
   }
 
   public Employee removeManager() {
-    if(this.manager != null){
-      this.manager.getReportees().remove(this);
-      this.manager = null;
+    if(this.manager == null) {
+      return this;
     }
+    this.manager.getReportees().remove(this);
+    this.manager = null;
     return this;
   }
 
-  public List<Employee> getReportees() {
-    if (this.reportees != null) {
-      return new ArrayList<>(this.reportees);
-    } else {
-      return new ArrayList<>();
-    }
+  public Set<Employee> getReportees() {
+    return this.reportees;
   }
 
-  public Employee setReportees(List<Employee> reportees) {
+  public Employee setReportees(Set<Employee> reportees) {
     if (reportees != null) {
       reportees.forEach(e -> e.setManager(this));
       this.reportees = new HashSet<>(reportees);
@@ -138,30 +145,36 @@ public class Employee extends BaseEntity {
   }
 
   public Employee addReportee(Employee reportee) {
-    if (this.reportees != null && reportee != null) {
-      reportee.setManager(this);
-      this.reportees.add(reportee);
+    if (this.reportees == null) {
+      this.reportees = new HashSet<>();
     }
+    reportee.setManager(this);
+    this.reportees.add(reportee);
     return this;
   }
 
   public Employee removeReportee(Employee reportee) {
-    if (this.reportees != null && reportee != null) {
-      this.reportees.remove(reportee);
-      reportee.setManager(null);
+    if (this.reportees == null) {
+      return this;
     }
+    Employee manager = reportee.getManager();
+    manager.getReportees().stream().filter(t -> t.getManager() == this)
+        .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+    this.reportees.remove(reportee);
+    reportee.setManager(null);
     return this;
   }
 
   public Employee removeReportees() {
-    if (this.reportees != null) {
-      this.reportees.forEach(e -> e.setManager(null));
-      this.reportees = null;
+    if (this.reportees == null) {
+      return this;
     }
+    this.reportees.forEach(e -> e.setManager(null));
+    this.reportees = null;
     return this;
   }
 
-  public Employee setProjects(List<Project> projects) {
+  public Employee setProjects(Set<Project> projects) {
     if (projects != null) {
       this.projectAssignments = projects.stream().map(p -> new ProjectAssignment()
           .setProject(p)
@@ -182,44 +195,44 @@ public class Employee extends BaseEntity {
     return this;
   }
 
-  public Employee joinProject(Project project) {
+  public Employee joinProject(@NonNull Project project) {
+    if(this.projectAssignments == null){
+      this.projectAssignments = new HashSet<>();
+    }
+    if(project.getProjectAssignments() == null){
+      project.setProjectAssignments(new HashSet<>());
+    }
     ProjectAssignment projectAssignment = new ProjectAssignment()
         .setEmployee(this)
         .setProject(project)
         .setJoinedDate(LocalDateTime.now())
         .setIsCurrent(true)
         ;
-    if (this.projectAssignments != null) {
-      this.projectAssignments.add(projectAssignment);
-      if (project.getProjectAssignments() != null) {
-        project.getProjectAssignments().add(projectAssignment);
-      }//Todo
-    }
+
+    project.getProjectAssignments().add(projectAssignment);
+    this.projectAssignments.add(projectAssignment);
     return this;
   }
 
-  public Employee leaveProject(Project project) {
-    if (this.projectAssignments != null) {
-      ProjectAssignment projectAssignment = project.getProjectAssignments().stream()
-          .filter(pa -> pa.getEmployee() == this && pa.getIsCurrent())
-          .findAny().orElseThrow(ResourceNotFoundException::new);
-      this.projectAssignments.remove(projectAssignment);
-      projectAssignment.setLeftDate(LocalDateTime.now());
-      projectAssignment.setIsCurrent(false);
-      this.projectAssignments.add(projectAssignment);
+  public Employee leaveProject(@NonNull Project project) {
+    if(this.projectAssignments == null || project.getProjectAssignments() == null){
+      return this;
     }
+    ProjectAssignment projectAssignment = project.getProjectAssignments().stream()
+        .filter(pa -> pa.getEmployee() == this && pa.getIsCurrent())
+        .findAny().orElseThrow(ResourceNotFoundException::new);
+    this.projectAssignments.remove(projectAssignment);
+    projectAssignment.setLeftDate(LocalDateTime.now());
+    projectAssignment.setIsCurrent(false);
+    this.projectAssignments.add(projectAssignment);
     return this;
   }
 
-  public List<Project> getProjects() {
-    if (this.projectAssignments != null) {
-      return this.projectAssignments.stream()
-          .map(ProjectAssignment::getProject)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
-    } else {
-      return new ArrayList<>();
-    }
+  public Set<Project> getProjects() {
+    return this.projectAssignments.stream()
+        .map(ProjectAssignment::getProject)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
   }
 
   public Employee setDepartmentHeaded(Department department) {
@@ -234,14 +247,16 @@ public class Employee extends BaseEntity {
     return this;
   }
 
-  public void removeDepartmentHeaded() {
-    if(this.departmentHeaded != null){
-      this.departmentHeaded.setDepartmentHead(null);
+  public Employee removeDepartmentHeaded() {
+    if(this.departmentHeaded == null) {
+      return this;
     }
+    this.departmentHeaded.setDepartmentHead(null);
     this.departmentHeaded = null;
+    return this;
   }
 
-  public Employee setTasks(List<Task> tasks) {
+  public Employee setTasks(Set<Task> tasks) {
     if (tasks != null) {
       tasks.forEach(e -> e.setEmployee(this));
       this.tasks = new HashSet<>(tasks);
@@ -254,36 +269,61 @@ public class Employee extends BaseEntity {
     return this;
   }
 
-  public Employee addTask(Task task) {
-    if (this.tasks != null && task != null) {
-      task.setEmployee(this);
-      this.tasks.add(task);
+  public Employee addTask(@NonNull Task task) {
+    if(this.tasks == null){
+      this.tasks = new HashSet<>();
     }
+    task.setEmployee(this);
+    this.tasks.add(task);
     return this;
   }
 
-  public Employee removeTask(Task task) {
-    if (this.tasks != null && task != null) {
-      this.tasks.remove(task);
-      task.setEmployee(null);
+  public Employee removeTask(@NonNull Task task) {
+    if (this.tasks == null) {
+      return this;
     }
+    Employee employee = task.getEmployee();
+    employee.getTasks().stream().filter(t -> t.getEmployee() == this)
+        .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+    this.tasks.remove(task);
+    task.setEmployee(null);
     return this;
   }
 
   public Employee removeTasks() {
-    if (this.tasks != null) {
-      this.tasks.forEach(e -> e.setEmployee(null));
-      this.tasks = null;
+    if (this.tasks == null) {
+      return this;
     }
+    this.tasks.forEach(e -> e.setEmployee(null));
+    this.tasks = null;
     return this;
   }
 
-  public List<Task> getTasks() {
-    if (this.tasks != null) {
-      return new ArrayList<>(this.tasks);
-    } else {
-      return new ArrayList<>();
+  public static void main(String[] args){
+    Employee e = new Employee();
+    e.setDepartment(null);
+    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    Validator validator = factory.getValidator();
+    Set<ConstraintViolation<Employee>> violations = validator.validate(e);
+    for (ConstraintViolation<Employee> violation : violations) {
+      System.out.println("Field errors "+violation.getMessage());
     }
+    ExecutableValidator executableValidator = factory.getValidator().forExecutables();
+    Method method = null;
+    try {
+      method = Employee.class
+          .getMethod("setDepartment", Department.class);
+    } catch (NoSuchMethodException ex) {
+      ex.printStackTrace();
+    }
+    Object[] parameterValues = {null};
+    violations
+        = executableValidator.validateParameters(e, method, parameterValues);
+    for (ConstraintViolation<Employee> violation : violations) {
+      System.out.println("Method parameter errors "+violation.getMessage());
+    }
+    Project p = new Project();
+    p.getEmployees().add(e);
   }
 
 }

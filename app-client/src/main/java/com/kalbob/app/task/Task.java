@@ -4,6 +4,7 @@ import com.kalbob.app.BaseEntity;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.project.Project;
 import java.util.Arrays;
+import java.util.HashSet;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,13 +16,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"project"})
+@EqualsAndHashCode(exclude = {"project"}, callSuper = true)
 @Entity
 @Table(name = "task")
 public class Task extends BaseEntity {
@@ -51,10 +54,11 @@ public class Task extends BaseEntity {
   }
 
   public Task removeProject() {
-    if(this.project != null){
-      this.project.getTasks().remove(this);
-      this.project = null;
+    if(this.project == null) {
+      return this;
     }
+    this.project.getTasks().remove(this);
+    this.project = null;
     return this;
   }
 
@@ -63,7 +67,7 @@ public class Task extends BaseEntity {
       if(employee.getTasks() != null) {
         employee.getTasks().add(this);
       }else {
-        employee.setTasks(Arrays.asList(this));
+        employee.setTasks(new HashSet<>(Arrays.asList(this)));
       }
     }else{
       if(this.employee != null){
@@ -75,10 +79,11 @@ public class Task extends BaseEntity {
   }
 
   public Task removeEmployee() {
-    if(this.employee != null){
-      this.employee.getTasks().remove(this);
-      this.employee = null;
+    if(this.employee == null) {
+      return this;
     }
+    this.employee.getTasks().remove(this);
+    this.employee = null;
     return this;
   }
 }

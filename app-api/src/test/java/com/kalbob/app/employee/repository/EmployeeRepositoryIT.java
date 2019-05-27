@@ -73,7 +73,7 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
     employee = employeeRepository.saveAndFlush(employee);
     assertTrue(employee.getProjects().size() != 0);
 
-    Project project = employee.getProjects().get(0);
+    Project project = employee.getProjects().iterator().next();
     employee.leaveProject(project);
     //employee.setProjects(null);//works without the concept of orphan removal, because both are owning sides
 

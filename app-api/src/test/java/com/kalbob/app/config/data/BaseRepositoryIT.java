@@ -1,7 +1,7 @@
 package com.kalbob.app.config.data;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Table;
@@ -49,10 +49,10 @@ public class BaseRepositoryIT {
 
   public void clearDB() {
     Metamodel metamodel = entityManager.getMetamodel();
-    List<String> tableNames = metamodel.getManagedTypes().stream()
+    Set<String> tableNames = metamodel.getManagedTypes().stream()
         .filter(m -> m.getJavaType().getAnnotation(Table.class) != null)
         .map(m -> m.getJavaType().getAnnotation(Table.class).name())
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
     entityManager.flush();
     entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0").executeUpdate();
     tableNames.forEach(tableName ->

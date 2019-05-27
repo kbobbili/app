@@ -7,6 +7,7 @@ import com.kalbob.app.config.service.BaseServiceUT;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.employee.EmployeeMother;
 import com.kalbob.app.employee.repository.EmployeeRepository;
+import com.kalbob.app.project.repository.ProjectRepository;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,9 +21,12 @@ public class EmployeeServiceImplUT extends BaseServiceUT {
   @Mock
   private EmployeeRepository employeeRepository;
 
+  @Mock
+  private ProjectRepository projectRepository;
+
   @BeforeEach
   public void beforeEach() {
-    employeeServiceImpl = new EmployeeServiceImpl(employeeRepository);
+    employeeServiceImpl = new EmployeeServiceImpl(employeeRepository, projectRepository);
   }
 
   @Test

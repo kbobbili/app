@@ -4,11 +4,10 @@ import com.kalbob.app.employee.Employee;
 import com.kalbob.app.employee.repository.EmployeeRepository;
 import com.kalbob.app.employee.service.EmployeeService;
 import com.kalbob.app.project.Project;
-import com.kalbob.app.project.service.ProjectService;
+import com.kalbob.app.project.repository.ProjectRepository;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,14 +15,13 @@ import org.springframework.stereotype.Service;
 public class EmployeeServiceImpl implements EmployeeService {
 
   public final EmployeeRepository employeeRepository;
-  public final ProjectService projectService;
+  public final ProjectRepository projectRepository;
 
   public Employee findById(Long id) {
-    Optional<Employee> employee = employeeRepository.findById(id);
-    return employee.orElseThrow(ResourceNotFoundException::new);
+    return employeeRepository.getById(id);
   }
 
-  public List<Project> getProjects(Long id) {
+  public Set<Project> getProjects(Long id) {
     Employee employee = findById(id);
     return employee.getProjects();
   }
@@ -34,12 +32,12 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   public Employee joinProject(Employee employee, Long projectId){
-    Project project = projectService.findById(projectId);
+    Project project = projectRepository.getById(projectId);
     employee.joinProject(project);
     return employeeRepository.saveAndFlush(employee);
   }
 
-  public Employee joinProjects(Long id, List<Long> projectIds) {
+  public Employee joinProjects(Long id, Set<Long> projectIds) {
     Employee employee = findById(id);
     projectIds.forEach(projectId -> joinProject(employee, projectId));
     return findById(id);
@@ -51,12 +49,12 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   public Employee leaveProject(Employee employee, Long projectId){
-    Project project = projectService.findById(projectId);
+    Project project = projectRepository.getById(projectId);
     employee.leaveProject(project);
     return employeeRepository.saveAndFlush(employee);
   }
 
-  public Employee leaveProjects(Long id, List<Long> projectIds) {
+  public Employee leaveProjects(Long id, Set<Long> projectIds) {
     Employee employee = findById(id);
     projectIds.forEach(projectId -> leaveProject(employee, projectId));
     return findById(id);

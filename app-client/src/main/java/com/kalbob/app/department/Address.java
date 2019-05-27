@@ -9,12 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"department"})
+@EqualsAndHashCode(exclude = {"department"}, callSuper = true)
 @Accessors(chain = true)
 @Entity
 @Table(name = "address")
@@ -25,7 +27,7 @@ public class Address extends BaseEntity {
   private String city;
   private String state;
   private String zipCode;
-  @OneToOne(fetch = FetchType.EAGER, mappedBy = "address")
+  @OneToOne(mappedBy = "address", fetch = FetchType.EAGER)
   private Department department;
 
   public Address setDepartment(Department department) {
@@ -40,10 +42,12 @@ public class Address extends BaseEntity {
     return this;
   }
 
-  public void removeDepartment() {
-    if(this.department != null){
-      this.department.setAddress(null);
+  public Address removeDepartment() {
+    if(this.department == null) {
+      return this;
     }
+    this.department.setAddress(null);
     this.department = null;
+    return this;
   }
 }

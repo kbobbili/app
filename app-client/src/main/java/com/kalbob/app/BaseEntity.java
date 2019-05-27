@@ -3,7 +3,6 @@ package com.kalbob.app;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,8 +26,7 @@ public class BaseEntity implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
   @CreatedDate
-  @Column(nullable = false, updatable = false)
-  private LocalDateTime createDate;
+  private LocalDateTime createDate;//auto-populate? & set updatable =false
   @LastModifiedDate
   private LocalDateTime updateDate;
 

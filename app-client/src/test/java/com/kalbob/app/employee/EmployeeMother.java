@@ -4,13 +4,14 @@ import com.kalbob.app.ObjectMother;
 import com.kalbob.app.department.DepartmentMother;
 import com.kalbob.app.project.ProjectMother;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class EmployeeMother extends ObjectMother {
 
   public static Employee simple() {
     return new Employee()
-        .setFirstName("kalyan")
-        .setLastName("bobbili")
+        .setFirstName("Kalyan")
+        .setLastName("Bobbili")
         .setSalary(5000d)
         ;
   }
@@ -18,9 +19,9 @@ public class EmployeeMother extends ObjectMother {
   public static Employee complete() {
     return simple()
         .setDepartment(DepartmentMother.simple())
-        .setProjects(Arrays.asList(ProjectMother.simple()))
+        .setProjects(new HashSet<>(Arrays.asList(ProjectMother.simple())))
         .setManager(EmployeeMother.simple())
-        .setEmployees(Arrays.asList(EmployeeMother.simple(), EmployeeMother.simple()))
+        .setReportees(new HashSet<>(Arrays.asList(EmployeeMother.simple(), EmployeeMother.simple())))
         ;
   }
 
@@ -35,9 +36,9 @@ public class EmployeeMother extends ObjectMother {
   public static Employee completeRandom() {
     return simpleRandom()
         .setDepartment(DepartmentMother.simpleRandom())
-        .setProjects(Arrays.asList(ProjectMother.simpleRandom()))
+        .setProjects(new HashSet<>(Arrays.asList(ProjectMother.simpleRandom())))
         .setManager(EmployeeMother.simpleRandom())
-        .setEmployees(Arrays.asList(EmployeeMother.simpleRandom(), EmployeeMother.simpleRandom()))
+        .setReportees(new HashSet<>(Arrays.asList(EmployeeMother.simpleRandom(), EmployeeMother.simpleRandom())))
         ;
   }
 

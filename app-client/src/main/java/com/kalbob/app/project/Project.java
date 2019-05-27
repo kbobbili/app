@@ -5,9 +5,7 @@ import com.kalbob.app.department.ProjectManagement;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.task.Task;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -32,8 +31,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"projectAssignments"})
-@EqualsAndHashCode(exclude = {"projectAssignments"}, callSuper = true)
+@ToString(exclude = {"managingDepartment","projectAssignments","tasks"})
+@EqualsAndHashCode(exclude = {"managingDepartment","projectAssignments","tasks"}, callSuper = true)
 @Accessors(chain = true)
 @Entity
 @Table(name = "project")
@@ -69,7 +68,7 @@ public class Project extends BaseEntity {
   )
   private Set<Task> tasks = new HashSet<>();
 
-  public Project setEmployees(List<Employee> employees) {
+  public Project setEmployees(Set<Employee> employees) {
     if (employees != null) {
       this.projectAssignments = employees.stream().map(e -> new ProjectAssignment()
           .setProject(this)
@@ -90,47 +89,46 @@ public class Project extends BaseEntity {
     return this;
   }
 
-  public Project addEmployee(Employee employee) {
+  public Project addEmployee(@NonNull Employee employee) {
+    if(this.projectAssignments == null){
+      this.projectAssignments = new HashSet<>();
+    }
+    if(employee.getProjectAssignments() == null){
+      employee.setProjectAssignments(new HashSet<>());
+    }
     ProjectAssignment projectAssignment = new ProjectAssignment()
         .setProject(this)
         .setEmployee(employee)
         .setJoinedDate(LocalDateTime.now())
         .setIsCurrent(true)
         ;
-    if (this.projectAssignments != null) {
-      this.projectAssignments.add(projectAssignment);
-      if (employee.getProjectAssignments() != null) {
-        employee.getProjectAssignments().add(projectAssignment);
-      }
-    }
+    employee.getProjectAssignments().add(projectAssignment);
+    this.projectAssignments.add(projectAssignment);
     return this;
   }
 
-  public Project removeEmployee(Employee employee) {
-    if (this.projectAssignments != null) {
-      ProjectAssignment projectAssignment = employee.getProjectAssignments().stream()
-          .filter(pa -> pa.getProject() == this && pa.getIsCurrent())
-          .findAny().orElseThrow(ResourceNotFoundException::new);
-      this.projectAssignments.remove(projectAssignment);
-      projectAssignment.setLeftDate(LocalDateTime.now());
-      projectAssignment.setIsCurrent(false);
-      this.projectAssignments.add(projectAssignment);
+  public Project removeEmployee(@NonNull Employee employee) {
+    if(this.projectAssignments == null || employee.getProjectAssignments() == null){
+      return this;
     }
+    ProjectAssignment projectAssignment = employee.getProjectAssignments().stream()
+        .filter(pa -> pa.getProject() == this && pa.getIsCurrent())
+        .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+    this.projectAssignments.remove(projectAssignment);
+    projectAssignment.setLeftDate(LocalDateTime.now());  //hard delete would have been setEmp(null) & setPro(null)
+    projectAssignment.setIsCurrent(false);
+    this.projectAssignments.add(projectAssignment);
     return this;
   }
 
-  public List<Employee> getEmployees() {
-    if (this.projectAssignments != null) {
-      return this.projectAssignments.stream()
-          .map(ProjectAssignment::getEmployee)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
-    } else {
-      return new ArrayList<>();
-    }
+  public Set<Employee> getEmployees() {
+    return this.projectAssignments.stream()
+        .map(ProjectAssignment::getEmployee)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
   }
 
-  public Project setTasks(List<Task> tasks) {
+  public Project setTasks(Set<Task> tasks) {
     if (tasks != null) {
       tasks.forEach(e -> e.setProject(this));
       this.tasks = new HashSet<>(tasks);
@@ -143,35 +141,37 @@ public class Project extends BaseEntity {
     return this;
   }
 
-  public Project addTask(Task task) {
-    if (this.tasks != null && task != null) {
-      task.setProject(this);
-      this.tasks.add(task);
+  public Project addTask(@NonNull Task task) {
+    if(this.tasks == null){
+      this.tasks = new HashSet<>();
     }
+    task.setProject(this);
+    this.tasks.add(task);
     return this;
   }
 
-  public Project removeTask(Task task) {
-    if (this.tasks != null && task != null) {
-      this.tasks.remove(task);
-      task.setProject(null);
+  public Project removeTask(@NonNull Task task) {
+    if (this.tasks == null) {
+      return this;
     }
+    Project project = task.getProject();
+    project.getTasks().stream().filter(t -> t.getProject() == this)
+        .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+    this.tasks.remove(task);
+    task.setProject(null);
     return this;
   }
 
   public Project removeTasks() {
-    if (this.tasks != null) {
-      this.tasks.forEach(e -> e.setProject(null));
-      this.tasks = null;
+    if (this.tasks == null) {
+      return this;
     }
+    this.tasks.forEach(e -> e.setProject(null));
+    this.tasks = null;
     return this;
   }
 
-  public List<Task> getTasks() {
-    if (this.tasks != null) {
-      return new ArrayList<>(this.tasks);
-    } else {
-      return new ArrayList<>();
-    }
+  public Set<Task> getTasks() {
+    return this.tasks;
   }
 }

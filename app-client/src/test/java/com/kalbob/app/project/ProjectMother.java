@@ -3,6 +3,7 @@ package com.kalbob.app.project;
 import com.kalbob.app.ObjectMother;
 import com.kalbob.app.employee.EmployeeMother;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class ProjectMother extends ObjectMother {
 
@@ -14,19 +15,19 @@ public class ProjectMother extends ObjectMother {
 
   public static Project complete() {
     return simple()
-        .setEmployees(Arrays.asList(EmployeeMother.simple()))
+        .setEmployees(new HashSet<>(Arrays.asList(EmployeeMother.simple())))
         ;
   }
 
   public static Project simpleRandom() {
     return new Project()
-        .setName(dataFactory.getItem(Arrays.asList(ProjectName.BLUE, ProjectName.GREEN)))
+        .setName(dataFactory.getItem(Arrays.asList(ProjectName.values())))
         ;
   }
 
   public static Project completeRandom() {
     return simpleRandom()
-        .setEmployees(Arrays.asList(EmployeeMother.simpleRandom()))
+        .setEmployees(new HashSet<>(Arrays.asList(EmployeeMother.simpleRandom())))
         ;
   }
 }
