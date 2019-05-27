@@ -52,10 +52,10 @@ public class Project extends BaseEntity {
 
   private Boolean isCompleted;
 
-  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "project", fetch = FetchType.LAZY)
+  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "id.project", fetch = FetchType.LAZY)
   private Set<ProjectAssignment> projectAssignments = new HashSet<>();
 
-  @OneToOne(mappedBy = "project", fetch = FetchType.EAGER)
+  @OneToOne(mappedBy = "id.project", fetch = FetchType.EAGER)
   private ProjectManagement managingDepartment;
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
