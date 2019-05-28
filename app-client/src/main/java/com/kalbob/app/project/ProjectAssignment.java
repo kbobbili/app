@@ -33,34 +33,38 @@ public class ProjectAssignment extends BaseEntity {
   private LocalDateTime leftDate;
   private Boolean isCurrent;
 
-  public ProjectAssignment setProject(Project project) {
-    if(this.project != project) {
-      if(this.project != null) this.project.removeProjectAssignment(this);
-      this.project = project;
-      if(project != null) project.addProjectAssignment(this);
-    }
+  public ProjectAssignment setProject(Project project){
+    if(project != null) project.getProjectAssignments().add(this);
+    this.project = project;
+    return this;
+  }
+
+  public ProjectAssignment setProject_Internal(Project project){
+    this.project = project;
     return this;
   }
 
   public ProjectAssignment removeProject() {
-    if(this.project != null){
+    if(project != null) {
       this.project.removeProjectAssignment(this);
       this.project = null;
     }
     return this;
   }
 
-  public ProjectAssignment setEmployee(Employee employee) {
-    if(this.employee != employee) {
-      if(this.employee != null) this.employee.removeProjectAssignment(this);
-      this.employee = employee;
-      if(employee != null) employee.addProjectAssignment(this);
-    }
+  public ProjectAssignment setEmployee(Employee employee){
+    if(employee != null) employee.getProjectAssignments().add(this);
+    this.employee = employee;
+    return this;
+  }
+
+  public ProjectAssignment setEmployee_Internal(Employee employee){
+    this.employee = employee;
     return this;
   }
 
   public ProjectAssignment removeEmployee() {
-    if(this.employee != null){
+    if(employee != null) {
       this.employee.removeProjectAssignment(this);
       this.employee = null;
     }

@@ -38,37 +38,43 @@ public class ProjectManagement {
 
   private int rating;
 
-  /*public ProjectManagement setDepartment(Department department) {
-    if(this.department != department) {
-      if(this.department != null) this.department.removeProjectManagement(this);
-      this.department = department;
-      if(department != null) department.addProjectManagement(this);
-    }
+  public ProjectManagement setDepartment(Department department){
+    if(department != null) department.getProjectManagements().add(this);
+    this.department = department;
+    return this;
+  }
+
+  public ProjectManagement setDepartment_Internal(Department department){
+    this.department = department;
     return this;
   }
 
   public ProjectManagement removeDepartment() {
-    if(this.department != null){
+    if(department != null) {
       this.department.removeProjectManagement(this);
       this.department = null;
     }
     return this;
-  }*/
+  }
 
-  public ProjectManagement setProject(Project project) {
-    if(this.project != project) {
-      if(this.project != null) this.project.removeProjectManagement();
-      this.project = project;
-      if(project != null) project.setProjectManagement(this);
-    }
+  public ProjectManagement setProject(Project project){
+    if(project != null) project.setProjectManagement(this);
+    this.project = project;
+    return this;
+  }
+
+  public ProjectManagement setProject_Internal(Project project){
+    this.project = project;
     return this;
   }
 
   public ProjectManagement removeProject() {
-    if(this.project != null){
+    if(this.project != null) {
       this.project.setProjectManagement(null);
       this.project = null;
     }
     return this;
   }
+
+
 }

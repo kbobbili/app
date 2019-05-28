@@ -2,8 +2,9 @@ package com.kalbob.app.company;
 
 import com.kalbob.app.BaseEntity;
 import com.kalbob.app.department.Department;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -33,15 +34,12 @@ public class Company extends BaseEntity {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
   private Set<Department> departments = new HashSet<>();
 
-  public Company setDepartments(Set<Department> departments) {
+  public Company setDepartments(List<Department> departments) {
     if (departments != null) {
-      this.departments = new HashSet<>(departments);
       departments.forEach(e -> e.setCompany(this));
+      this.departments = new HashSet<>(departments);
     }else{
-      if (this.departments != null) {
-        this.departments.forEach(Department::removeCompany);
-        this.departments = null;
-      }
+      removeDepartments();
     }
     return this;
   }
@@ -58,13 +56,9 @@ public class Company extends BaseEntity {
   }
 
   public Company removeDepartment(@NonNull Department department) {
-    if (this.departments == null) {
-      return this;
-    }
-    if(this.departments.contains(department)) {
-      Company company = department.getCompany();
-      company.getDepartments().stream().filter(t -> t.getCompany() == this)
-          .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
+    if (this.departments != null) {
+      if (!this.departments.contains(department))
+        throw new ResourceNotFoundException();
       this.departments.remove(department);
       department.setCompany(null);
     }
@@ -73,13 +67,17 @@ public class Company extends BaseEntity {
 
   public Company removeDepartments() {
     if (this.departments != null) {
-      this.departments.forEach(Department::removeCompany);
+      this.departments.forEach(e->e.setCompany(null));
       this.departments = null;
     }
     return this;
   }
 
-  public Set<Department> getDepartments() {
-    return Collections.unmodifiableSet(this.departments);
+  public List<Department> getDepartments() {
+    if(this.departments != null) {
+      return new ArrayList<>(this.departments);
+    }else{
+      return new ArrayList<>();
+    }
   }
 }

@@ -4,6 +4,7 @@ import com.kalbob.app.BaseEntity;
 import com.kalbob.app.company.Company;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.project.Project;
+import com.kalbob.app.project.ProjectName;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +64,6 @@ public class Department extends BaseEntity {
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "department", fetch = FetchType.LAZY)
   private Set<ProjectManagement> projectManagements = new HashSet<>();
-
 
   public Department setAddress(Address address){
     if(address != null) address.setDepartment(this);
@@ -131,24 +131,49 @@ public class Department extends BaseEntity {
     }
   }
 
-  //-------------
+  public Department setCompany(Company company){
+    if(company != null) company.getDepartments().add(this);
+    this.company = company;
+    return this;
+  }
 
-  public Department setProjects(Set<Project> projects) {
+  public Department removeCompany() {
+    if(company != null) {
+      this.company.removeDepartment(this);
+      this.company = null;
+    }
+    return this;
+  }
+
+  public Department setDepartmentHead(Employee departmentHead){
+    if(departmentHead != null) departmentHead.setDepartment(this);
+    this.departmentHead = departmentHead;
+    return this;
+  }
+
+  public Department setDepartmentHead_Internal(Employee departmentHead){
+    this.departmentHead = departmentHead;
+    return this;
+  }
+
+  public Department removeDepartmentHead() {
+    if(this.departmentHead != null) {
+      this.departmentHead.setDepartment(null);
+      this.departmentHead = null;
+    }
+    return this;
+  }
+  
+  public Department setProjects(List<Project> projects) {
     if (projects != null) {
-      this.projectManagements = projects.stream().map(p -> {
-            return new ProjectManagement()
-                    .setDepartment(this)
-                    .setProject(p)
-                    .setRating(3);
-          }
+      this.projectManagements = projects.stream().map(p -> new ProjectManagement()
+          .setDepartment(this)
+          .setProject(p)
+          .setRating(3)
       ).collect(Collectors.toSet());
     }else{
       if(this.projectManagements != null) {
-        this.projectManagements.forEach(pa -> {
-          pa
-              .setProject(null)
-              .setDepartment(null);
-        });
+        this.projectManagements.forEach(pa -> { pa.getProject().setProjectManagement(null);});
         this.projectManagements = null;
       }
     }
@@ -156,15 +181,18 @@ public class Department extends BaseEntity {
   }
 
   public Department addProject(@NonNull Project project) {
-    if (this.projectManagements == null) {
+    if(this.projectManagements == null){
       this.projectManagements = new HashSet<>();
     }
-    ProjectManagement projectManagement = new ProjectManagement()
-        .setDepartment(this)
-        .setProject(project)
-        .setRating(3);
-    project.setProjectManagement(projectManagement);
-    this.projectManagements.add(projectManagement);
+    if(this.projectManagements.stream().anyMatch(pa -> pa.getProject().equals(project))) {
+      throw new ResourceNotFoundException();//Duplicate Exception, Already managing that project.
+    }else{
+      ProjectManagement projectManagement = new ProjectManagement()
+          .setDepartment_Internal(this)
+          .setProject(project)
+          .setRating(3);
+      this.projectManagements.add(projectManagement);
+    }
     return this;
   }
 
@@ -173,18 +201,44 @@ public class Department extends BaseEntity {
       return this;
     }
     ProjectManagement projectManagement = project.getProjectManagement();
-    if(projectManagement.getDepartment() != this) throw new ResourceNotFoundException(); //association not found
+    if(projectManagement.getDepartment() != this) throw new ResourceNotFoundException(); //association not found i.e. this department does not manage that project
+    this.projectManagements.remove(projectManagement);
+    project.setProjectManagement(null);
+    return this;
+  }
+
+  public List<Project> getProjects() {
+    if(this.projectManagements != null) {
+      return this.projectManagements.stream()
+          .map(ProjectManagement::getProject)
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList());
+    }else {
+      return new ArrayList<>();
+    }
+  }
+
+  public Department addProjectManagement(@NonNull ProjectManagement projectManagement) {
+    if(this.projectManagements == null){
+      this.projectManagements = new HashSet<>();
+    }
+    if(this.projectManagements.stream().noneMatch(pm -> pm.equals(projectManagement))) {
+      this.projectManagements.add(projectManagement);
+      projectManagement.setDepartment(this);
+    }
+    return this;
+  }
+
+  public Department removeProjectManagement(@NonNull ProjectManagement projectManagement) {
+    if (this.projectManagements == null || projectManagement.getDepartment() == null) {
+      return this;//exp not managing anything
+    }
+    if(!projectManagement.getDepartment().equals(this)) throw new ResourceNotFoundException(); //association not found i.e. this department does not manage that project
     this.projectManagements.remove(projectManagement);
     projectManagement.setDepartment(null);
     return this;
   }
 
-  public Set<Project> getProjects() {
-    return this.projectManagements.stream()
-        .map(pm -> pm.getProject())
-        .filter(Objects::nonNull)
-        .collect(Collectors.toSet());
-  }
 
   public static void main(String[] args){
     Department d = new Department();
@@ -192,44 +246,90 @@ public class Department extends BaseEntity {
     Address a = new Address();
     a.setStreet("tatum");
 
-    /*d.setAddress(a);
-    System.out.println("---1----");
-    System.out.println(d.getAddress());
-    System.out.println(a.getDepartment());*/
-
-    /*a.setDepartment(d);
-    System.out.println("---2----");
-    System.out.println(d.getAddress());
-    System.out.println(a.getDepartment());*/
-
-    /*d.setAddress(a);
-    a.removeDepartment();
-    System.out.println("---3----");
-    System.out.println(d.getAddress());
-    System.out.println(a.getDepartment());*/
-
-    /*System.out.println("---4----");
-    System.out.println(d.getAddress());
-    System.out.println(a.getDepartment());*/
-
-
     Employee e1 = new Employee();
     e1.setFirstName("kal");
-
     Employee e2 = new Employee();
-    e2.setFirstName("bob");
+    e2.setFirstName("kal");
+    Project p1 = new Project();
+    p1.setName(ProjectName.RED);
+    Project p2 = new Project();
+    p2.setName(ProjectName.BLUE);
 
-    Employee e3 = new Employee();
-    e3.setFirstName("axl");
+    /*d.setAddress(a);
+    d.removeAddress();
+    a.setDepartment(d);
+    a.removeDepartment();
+    System.out.println(d.getAddress());
+    System.out.println(a.getDepartment());*/
 
-    d.setEmployees(Arrays.asList(e1, e2));
+
+
+    /*//d.setEmployees(Arrays.asList(e1, e2));
     //d.addEmployee(e1);
-    //e1.setDepartment(d);
     //d.removeEmployee(e1);
+    //e1.setDepartment(d);
     //e1.removeDepartment();
     d.removeEmployees();
     System.out.println(d.getEmployees());
-    System.out.println(e1.getDepartment());
+    System.out.println(e1.getDepartment());*/
+
+
+
+    e1.setProjects(Arrays.asList(p1, p2));
+    //e1.addProject(p1);
+    //e1.removeProject(p1);
+    System.out.println(e1.getProjects());
+    System.out.println(p1.getEmployees());
+    if(e1.getProjectAssignments()!=null) System.out.println("* "+e1.getProjectAssignments().size());
+    System.out.println(e1.getProjectAssignments());
+    if(p1.getProjectAssignments()!=null) System.out.println("** "+p1.getProjectAssignments().size());
+    System.out.println(p1.getProjectAssignments());
+    System.out.println("----------");
+    //e1.setProjects(null);
+    e1.removeProject(p1);//just changes meta-data but not deleting
+    System.out.println(e1.getProjects());
+    System.out.println(p1.getEmployees());
+    if(e1.getProjectAssignments()!=null) System.out.println("* "+e1.getProjectAssignments().size());
+    System.out.println(e1.getProjectAssignments());
+    if(p1.getProjectAssignments()!=null) System.out.println("** "+p1.getProjectAssignments().size());
+    System.out.println(p1.getProjectAssignments());
+
+
+    /*p1.setEmployees(Arrays.asList(e1, e2));
+    //p1.addEmployee(e1);
+    //p1.removeEmployee(e1);
+    System.out.println(e1.getProjects());
+    System.out.println(p1.getEmployees());
+    if(e1.getProjectAssignments()!=null) System.out.println("* "+e1.getProjectAssignments().size());
+    System.out.println(e1.getProjectAssignments());
+    if(p1.getProjectAssignments()!=null) System.out.println("** "+p1.getProjectAssignments().size());
+    System.out.println(p1.getProjectAssignments());
+    System.out.println("----------");
+    p1.setEmployees(null);
+    //p1.removeEmployee(e1);
+    System.out.println(e1.getProjects());
+    System.out.println(p1.getEmployees());
+    if(e1.getProjectAssignments()!=null) System.out.println("* "+e1.getProjectAssignments().size());
+    System.out.println(e1.getProjectAssignments());
+    if(p1.getProjectAssignments()!=null) System.out.println("** "+p1.getProjectAssignments().size());
+    System.out.println(p1.getProjectAssignments());*/
+
+
+    /*d.setProjects(Arrays.asList(p1, p2));
+    //d.addProject(p1);
+    //d.removeProject(p1);
+    //p1.setDepartment(d);
+    System.out.println(d.getProjects());
+    System.out.println(p1.getProjectManagement());
+    if(p1.getProjectManagement()!=null) System.out.println("-> "+p1.getProjectManagement().getDepartment());
+    System.out.println(d.getProjectManagements());
+    d.setProjects(null);
+    //d.removeProject(p1);
+    //p1.removeDepartment();
+    System.out.println(d.getProjects());
+    System.out.println(p1.getProjectManagement());
+    if(p1.getProjectManagement()!=null) System.out.println("-> "+p1.getProjectManagement().getDepartment());
+    System.out.println(d.getProjectManagements());*/
   }
 
 }

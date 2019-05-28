@@ -4,7 +4,6 @@ import com.kalbob.app.ObjectMother;
 import com.kalbob.app.department.DepartmentMother;
 import com.kalbob.app.project.ProjectMother;
 import java.util.Arrays;
-import java.util.HashSet;
 
 public class EmployeeMother extends ObjectMother {
 
@@ -19,9 +18,9 @@ public class EmployeeMother extends ObjectMother {
   public static Employee complete() {
     return simple()
         .setDepartment(DepartmentMother.simple())
-        .setProjects(new HashSet<>(Arrays.asList(ProjectMother.simple())))
+        .setProjects(Arrays.asList(ProjectMother.simple()))
         .setManager(EmployeeMother.simple())
-        .setReportees(new HashSet<>(Arrays.asList(EmployeeMother.simple(), EmployeeMother.simple())))
+        .setReportees(Arrays.asList(EmployeeMother.simple(), EmployeeMother.simple()))
         ;
   }
 
@@ -36,9 +35,9 @@ public class EmployeeMother extends ObjectMother {
   public static Employee completeRandom() {
     return simpleRandom()
         .setDepartment(DepartmentMother.simpleRandom())
-        .setProjects(new HashSet<>(Arrays.asList(ProjectMother.simpleRandom())))
+        .setProjects(Arrays.asList(ProjectMother.simpleRandom()))
         .setManager(EmployeeMother.simpleRandom())
-        .setReportees(new HashSet<>(Arrays.asList(EmployeeMother.simpleRandom(), EmployeeMother.simpleRandom())))
+        .setReportees(Arrays.asList(EmployeeMother.simpleRandom(), EmployeeMother.simpleRandom()))
         ;
   }
 

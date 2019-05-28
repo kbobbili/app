@@ -3,7 +3,6 @@ package com.kalbob.app.company;
 import com.kalbob.app.ObjectMother;
 import com.kalbob.app.department.DepartmentMother;
 import java.util.Arrays;
-import java.util.HashSet;
 
 public class CompanyMother extends ObjectMother {
 
@@ -15,7 +14,7 @@ public class CompanyMother extends ObjectMother {
 
   public static Company complete() {
     return simple()
-        .setDepartments(new HashSet<>(Arrays.asList(DepartmentMother.simple())))
+        .setDepartments(Arrays.asList(DepartmentMother.simple()))
         ;
   }
 
@@ -27,7 +26,7 @@ public class CompanyMother extends ObjectMother {
 
   public static Company completeRandom() {
     return simpleRandom()
-        .setDepartments(new HashSet<>(Arrays.asList(DepartmentMother.simpleRandom())))
+        .setDepartments(Arrays.asList(DepartmentMother.simpleRandom()))
         ;
   }
 }

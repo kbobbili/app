@@ -44,20 +44,4 @@ public class Address extends BaseEntity {
     return this;
   }
 
-  /*public Address setDepartment(Department department) {
-    if(this.department != department){
-      if(this.department != null) this.department.removeAddress();
-      this.department = department;
-      if(department != null) department.setAddress(this);
-    }
-    return this;
-  }
-
-  public Address removeDepartment() {
-    if(this.department != null){
-      if(this.department.getAddress() != null)this.department.removeAddress();
-      this.department = null;
-    }
-    return this;
-  }*/
 }

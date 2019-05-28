@@ -3,7 +3,6 @@ package com.kalbob.app.project;
 import com.kalbob.app.ObjectMother;
 import com.kalbob.app.employee.EmployeeMother;
 import java.util.Arrays;
-import java.util.HashSet;
 
 public class ProjectMother extends ObjectMother {
 
@@ -15,7 +14,7 @@ public class ProjectMother extends ObjectMother {
 
   public static Project complete() {
     return simple()
-        .setEmployees(new HashSet<>(Arrays.asList(EmployeeMother.simple())))
+        .setEmployees(Arrays.asList(EmployeeMother.simple()))
         ;
   }
 
@@ -27,7 +26,7 @@ public class ProjectMother extends ObjectMother {
 
   public static Project completeRandom() {
     return simpleRandom()
-        .setEmployees(new HashSet<>(Arrays.asList(EmployeeMother.simpleRandom())))
+        .setEmployees(Arrays.asList(EmployeeMother.simpleRandom()))
         ;
   }
 }

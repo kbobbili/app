@@ -39,37 +39,33 @@ public class Task extends BaseEntity {
   @JoinColumn(name = "employee_id")
   private Employee employee;
 
-  public Task setProject(Project project) {
-    if(this.project != project) {
-      if(this.project != null) this.project.removeTask(this);
-      this.project = project;
-      if(project != null) project.addTask(this);
-    }
+  public Task setProject(Project project){
+    if(project != null) project.getTasks().add(this);
+    this.project = project;
     return this;
   }
 
   public Task removeProject() {
-    if(this.project != null){
+    if(project != null) {
       this.project.removeTask(this);
       this.project = null;
     }
     return this;
   }
 
-  public Task setEmployee(Employee employee) {
-    if(this.employee != employee) {
-      if(this.employee != null) this.employee.removeTask(this);
-      this.employee = employee;
-      if(employee != null) employee.addTask(this);
-    }
+  public Task setEmployee(Employee employee){
+    if(employee != null) employee.getTasks().add(this);
+    this.employee = employee;
     return this;
   }
 
   public Task removeEmployee() {
-    if(this.employee != null){
+    if(employee != null) {
       this.employee.removeTask(this);
       this.employee = null;
     }
     return this;
   }
+  
+  
 }
