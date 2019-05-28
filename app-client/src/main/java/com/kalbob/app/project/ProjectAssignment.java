@@ -44,7 +44,8 @@ public class ProjectAssignment extends BaseEntity {
 
   public ProjectAssignment removeProject() {
     if(project != null) {
-      this.project.removeProjectAssignment(this);
+      this.project.getProjectAssignments().remove(this);//actual object set to null
+      //this.project.removeProjectAssignment(this);//meta-data
       this.project = null;
     }
     return this;
@@ -63,12 +64,12 @@ public class ProjectAssignment extends BaseEntity {
 
   public ProjectAssignment removeEmployee() {
     if(employee != null) {
-      this.employee.removeProjectAssignment(this);
+      this.employee.getProjectAssignments().remove(this);//actual object set to null
+      //this.employee.removeProjectAssignment(this);//meta-data
       this.employee = null;
     }
     return this;
   }
-
 
   public boolean equals(final Object o) {
     if (o == this) {

@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -230,6 +229,7 @@ public class Employee extends BaseEntity {
           .setJoinedDate(LocalDateTime.now())
           .setIsCurrent(true)
       ).collect(Collectors.toSet());
+      projects.forEach(p -> p.setProjectAssignments(projectAssignments));
     }else{
       if(this.projectAssignments != null) {
         this.projectAssignments.forEach(pa ->  {
@@ -248,7 +248,7 @@ public class Employee extends BaseEntity {
     if(project.getProjectAssignments() == null){
       project.setProjectAssignments(new HashSet<>());
     }
-    if(this.projectAssignments.stream().anyMatch(pa -> pa.getProject().equals(project))) {
+    if(this.projectAssignments.stream().anyMatch(pa -> pa.getProject() != null && pa.getProject().equals(project))) {
       throw new ResourceNotFoundException();//Duplicate Exception
     }else{
       ProjectAssignment projectAssignment = new ProjectAssignment()
@@ -257,27 +257,23 @@ public class Employee extends BaseEntity {
           .setJoinedDate(LocalDateTime.now())
           .setIsCurrent(true);
       this.projectAssignments.add(projectAssignment);
+      project.getProjectAssignments().add(projectAssignment);
     }
     return this;
   }
 
   public Employee removeProject(@NonNull Project project) {
     if(this.projectAssignments != null && project.getProjectAssignments() != null) {
-      if(this.projectAssignments.stream().anyMatch(pa -> pa.getProject().equals(project))) {
+      if(this.projectAssignments.stream().anyMatch(pa -> pa.getProject() != null && pa.getProject().equals(project))) {
         ProjectAssignment projectAssignment = project.getProjectAssignments().stream()
             .filter(pa -> pa.getEmployee() == this )
-            .findAny().orElseThrow(ResourceNotFoundException::new);//
-        System.out.println(project.getProjectAssignments().remove(Arrays.asList(project.getProjectAssignments()).get(0)));
-
-        System.out.println(projectAssignment);
-        System.out.println(this.projectAssignments);
-        System.out.println(this.projectAssignments.remove(projectAssignment));
-        System.out.println(projectAssignment);
-        System.out.println(project.getProjectAssignments());
-        System.out.println(project.getProjectAssignments().remove(projectAssignment));
-       /* projectAssignment.setLeftDate(LocalDateTime.now());
+            .findAny().orElseThrow(ResourceNotFoundException::new);
+        this.projectAssignments.remove(projectAssignment);
+        project.getProjectAssignments().remove(projectAssignment);
+        projectAssignment.setLeftDate(LocalDateTime.now());
         projectAssignment.setIsCurrent(false);
-        this.projectAssignments.add(projectAssignment);*/
+        this.projectAssignments.add(projectAssignment);
+        project.getProjectAssignments().add(projectAssignment);
       }else{
         throw new ResourceNotFoundException();
       }
@@ -312,7 +308,9 @@ public class Employee extends BaseEntity {
       if (!this.projectAssignments.contains(projectAssignment))
         throw new ResourceNotFoundException();
       this.projectAssignments.remove(projectAssignment);
-      projectAssignment.setEmployee(null);
+      projectAssignment.setLeftDate(LocalDateTime.now());//meta-data or projectAssignment.setEmployee(null);
+      projectAssignment.setIsCurrent(false);
+      this.projectAssignments.add(projectAssignment);
     }
     return this;
   }

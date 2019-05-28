@@ -7,7 +7,6 @@ import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectName;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -166,14 +165,23 @@ public class Department extends BaseEntity {
   
   public Department setProjects(List<Project> projects) {
     if (projects != null) {
-      this.projectManagements = projects.stream().map(p -> new ProjectManagement()
+      this.projectManagements = projects.stream().map(p -> {
+        ProjectManagement pm = new ProjectManagement()
           .setDepartment(this)
           .setProject(p)
-          .setRating(3)
-      ).collect(Collectors.toSet());
+          .setRating(3);
+        p.setProjectManagement(pm);//
+        return pm;
+      }).collect(Collectors.toSet());
+
     }else{
       if(this.projectManagements != null) {
-        this.projectManagements.forEach(pa -> { pa.getProject().setProjectManagement(null);});
+        this.projectManagements.forEach(pa -> {
+          if(pa.getProject() != null) {
+            pa.getProject().setProjectManagement(null);
+            pa.setDepartment(null);
+          }
+        });
         this.projectManagements = null;
       }
     }
@@ -184,7 +192,7 @@ public class Department extends BaseEntity {
     if(this.projectManagements == null){
       this.projectManagements = new HashSet<>();
     }
-    if(this.projectManagements.stream().anyMatch(pa -> pa.getProject().equals(project))) {
+    if(this.projectManagements.stream().anyMatch(pa -> pa.getProject()!=null && pa.getProject().equals(project))) {
       throw new ResourceNotFoundException();//Duplicate Exception, Already managing that project.
     }else{
       ProjectManagement projectManagement = new ProjectManagement()
@@ -192,6 +200,7 @@ public class Department extends BaseEntity {
           .setProject(project)
           .setRating(3);
       this.projectManagements.add(projectManagement);
+      project.setProjectManagement(projectManagement);
     }
     return this;
   }
@@ -263,7 +272,6 @@ public class Department extends BaseEntity {
     System.out.println(a.getDepartment());*/
 
 
-
     /*//d.setEmployees(Arrays.asList(e1, e2));
     //d.addEmployee(e1);
     //d.removeEmployee(e1);
@@ -273,63 +281,73 @@ public class Department extends BaseEntity {
     System.out.println(d.getEmployees());
     System.out.println(e1.getDepartment());*/
 
+    /*ProjectManagement pm = new ProjectManagement();
+    pm.setDepartment(d);
+    pm.setProject(p1);
+    if(d.getProjectManagements()!=null && !d.getProjectManagements().isEmpty())System.out.println("pm.d == d.pm.d "+pm.getDepartment().equals(new ArrayList<>(d.getProjectManagements()).get(0).getDepartment()));
+    if(d.getProjectManagements()!=null && !d.getProjectManagements().isEmpty())System.out.println("pm.p == d.pm.p "+pm.getProject().equals(new ArrayList<>(d.getProjectManagements()).get(0).getProject()));
+    if(d.getProjects()!=null && !d.getProjects().isEmpty()) System.out.println("d.p "+d.getProjects().contains(p1));
+    if(p1.getProjectManagement()!=null && p1.getProjectManagement().getDepartment()!=null) System.out.println("p.d "+p1.getProjectManagement().getDepartment().equals(d));
+    pm.removeDepartment();//Removing references
+    //pm.removeProject();
+    System.out.println(d);
+    System.out.println(p1);
+    if(d.getProjectManagements()!=null && !d.getProjectManagements().isEmpty() && new ArrayList<>(d.getProjectManagements()).get(0).getDepartment()!=null) System.out.println("pm.d == d.pm.d "+pm.getDepartment().equals(new ArrayList<>(d.getProjectManagements()).get(0).getDepartment()));
+    if(d.getProjectManagements()!=null && !d.getProjectManagements().isEmpty() && new ArrayList<>(d.getProjectManagements()).get(0).getProject()!=null) System.out.println("pm.p == d.pm.p "+pm.getProject().equals(new ArrayList<>(d.getProjectManagements()).get(0).getProject()));
+    if(d.getProjects()!=null && !d.getProjects().isEmpty()) System.out.println("d.p "+d.getProjects().contains(p1));
+    if(p1.getProjectManagement()!=null && p1.getProjectManagement().getDepartment()!=null) System.out.println("p.d "+p1.getProjectManagement().getDepartment().equals(d));*/
 
-
-    e1.setProjects(Arrays.asList(p1, p2));
-    //e1.addProject(p1);
-    //e1.removeProject(p1);
-    System.out.println(e1.getProjects());
-    System.out.println(p1.getEmployees());
-    if(e1.getProjectAssignments()!=null) System.out.println("* "+e1.getProjectAssignments().size());
-    System.out.println(e1.getProjectAssignments());
-    if(p1.getProjectAssignments()!=null) System.out.println("** "+p1.getProjectAssignments().size());
-    System.out.println(p1.getProjectAssignments());
-    System.out.println("----------");
-    //e1.setProjects(null);
-    e1.removeProject(p1);//just changes meta-data but not deleting
-    System.out.println(e1.getProjects());
-    System.out.println(p1.getEmployees());
-    if(e1.getProjectAssignments()!=null) System.out.println("* "+e1.getProjectAssignments().size());
-    System.out.println(e1.getProjectAssignments());
-    if(p1.getProjectAssignments()!=null) System.out.println("** "+p1.getProjectAssignments().size());
-    System.out.println(p1.getProjectAssignments());
-
-
-    /*p1.setEmployees(Arrays.asList(e1, e2));
-    //p1.addEmployee(e1);
-    //p1.removeEmployee(e1);
-    System.out.println(e1.getProjects());
-    System.out.println(p1.getEmployees());
-    if(e1.getProjectAssignments()!=null) System.out.println("* "+e1.getProjectAssignments().size());
-    System.out.println(e1.getProjectAssignments());
-    if(p1.getProjectAssignments()!=null) System.out.println("** "+p1.getProjectAssignments().size());
-    System.out.println(p1.getProjectAssignments());
-    System.out.println("----------");
-    p1.setEmployees(null);
-    //p1.removeEmployee(e1);
-    System.out.println(e1.getProjects());
-    System.out.println(p1.getEmployees());
-    if(e1.getProjectAssignments()!=null) System.out.println("* "+e1.getProjectAssignments().size());
-    System.out.println(e1.getProjectAssignments());
-    if(p1.getProjectAssignments()!=null) System.out.println("** "+p1.getProjectAssignments().size());
-    System.out.println(p1.getProjectAssignments());*/
-
-
-    /*d.setProjects(Arrays.asList(p1, p2));
+    /*//d.setProjects(Arrays.asList(p1));//Sets both sides
     //d.addProject(p1);
-    //d.removeProject(p1);
-    //p1.setDepartment(d);
-    System.out.println(d.getProjects());
-    System.out.println(p1.getProjectManagement());
-    if(p1.getProjectManagement()!=null) System.out.println("-> "+p1.getProjectManagement().getDepartment());
-    System.out.println(d.getProjectManagements());
-    d.setProjects(null);
-    //d.removeProject(p1);
+    p1.setDepartment(d);
+    if(d.getProjectManagements()!=null && !d.getProjectManagements().isEmpty())System.out.println("d == d.pm.d "+d.equals(new ArrayList<>(d.getProjectManagements()).get(0).getDepartment()));
+    if(d.getProjectManagements()!=null && !d.getProjectManagements().isEmpty())System.out.println("p == d.pm.p "+p1.equals(new ArrayList<>(d.getProjectManagements()).get(0).getProject()));
+    if(d.getProjects()!=null && !d.getProjects().isEmpty()) System.out.println("d.p "+d.getProjects().contains(p1));
+    if(p1.getProjectManagement()!=null && p1.getProjectManagement().getDepartment()!=null) System.out.println("p.d "+p1.getProjectManagement().getDepartment().equals(d));
+    d.removeProject(p1);//Removing references both sides  i.e. removeProject = removeProjectManagement from both sides of relation.
     //p1.removeDepartment();
-    System.out.println(d.getProjects());
-    System.out.println(p1.getProjectManagement());
-    if(p1.getProjectManagement()!=null) System.out.println("-> "+p1.getProjectManagement().getDepartment());
-    System.out.println(d.getProjectManagements());*/
+    //d.setProjects(null);
+    System.out.println(d);
+    System.out.println(p1);
+    if(d.getProjectManagements()!=null && !d.getProjectManagements().isEmpty())System.out.println("d == d.pm.d "+d.equals(new ArrayList<>(d.getProjectManagements()).get(0).getDepartment()));
+    if(d.getProjectManagements()!=null && !d.getProjectManagements().isEmpty())System.out.println("p == d.pm.p "+p1.equals(new ArrayList<>(d.getProjectManagements()).get(0).getProject()));
+    if(d.getProjects()!=null && !d.getProjects().isEmpty()) System.out.println("d.p "+d.getProjects().contains(p1));
+    if(p1.getProjectManagement()!=null && p1.getProjectManagement().getDepartment()!=null) System.out.println("p.d "+p1.getProjectManagement().getDepartment().equals(d));*/
+
+
+    /*ProjectAssignment pa = new ProjectAssignment();
+    pa.setProject(p1);//Only sets for project & no employee is set until next line, so first println errors.
+    //pa.setEmployee(e1);
+    if(e1.getProjectAssignments()!=null && !e1.getProjectAssignments().isEmpty()) System.out.println(e1.getProjectAssignments().contains(new ArrayList<>(e1.getProjectAssignments()).get(0))+" e.pa "+e1.getProjectAssignments().size());
+    if(p1.getProjectAssignments()!=null && !p1.getProjectAssignments().isEmpty()) System.out.println(p1.getProjectAssignments().contains(new ArrayList<>(p1.getProjectAssignments()).get(0))+" p.pa "+p1.getProjectAssignments().size());
+    System.out.println(e1.getProjects().contains(p1)+" e.p "+e1.getProjects().size());
+    System.out.println(p1.getEmployees().contains(e1) +" p.e "+p1.getEmployees().size());
+    System.out.println("pa.e "+(pa.getEmployee() != null));
+    System.out.println("pa.p "+(pa.getProject() != null));
+    pa.removeEmployee();//Removing references
+    //pa.removeProject();
+    if(e1.getProjectAssignments()!=null && !e1.getProjectAssignments().isEmpty())System.out.println(e1.getProjectAssignments().contains(new ArrayList<>(e1.getProjectAssignments()).get(0))+" e.pa "+e1.getProjectAssignments().size());
+    if(p1.getProjectAssignments()!=null && !p1.getProjectAssignments().isEmpty())System.out.println(p1.getProjectAssignments().contains(new ArrayList<>(p1.getProjectAssignments()).get(0))+" p.pa "+p1.getProjectAssignments().size());//When pa.removeEmployee() -> contains is false, bcoz project still holds the reference to pa unlike employee
+    if(e1.getProjects() != null && !e1.getProjects().isEmpty())System.out.println(e1.getProjects().contains(p1)+" e.p "+e1.getProjects().size());
+    if(p1.getEmployees() != null && !p1.getEmployees().isEmpty())System.out.println(p1.getEmployees().contains(e1) +" p.e "+p1.getEmployees().size());
+    System.out.println("pa.e "+(pa.getEmployee() == null));
+    System.out.println("pa.p "+(pa.getProject() == null));*/
+
+    /*p1.setEmployees(Arrays.asList(e1));
+    //e1.setProjects(Arrays.asList(p1));
+    System.out.println(e1.getProjectAssignments().contains(new ArrayList<>(e1.getProjectAssignments()).get(0))+" e.pa "+e1.getProjectAssignments().size());
+    System.out.println(p1.getProjectAssignments().contains(new ArrayList<>(p1.getProjectAssignments()).get(0))+" p.pa "+p1.getProjectAssignments().size());
+    System.out.println(e1.getProjects().contains(p1)+" e.p "+e1.getProjects().size());
+    System.out.println(p1.getEmployees().contains(e1) +" p.e "+p1.getEmployees().size());
+    System.out.println(e1.getProjectAssignments());
+    p1.removeEmployee(e1);//Changing meta-data
+    //e1.removeProject(p1);
+    //e1.setProjects(null);//Removing references
+    if(e1.getProjectAssignments()!=null && !e1.getProjectAssignments().isEmpty())System.out.println(e1.getProjectAssignments().contains(new ArrayList<>(e1.getProjectAssignments()).get(0))+" e.pa "+e1.getProjectAssignments().size());
+    if(p1.getProjectAssignments()!=null && !p1.getProjectAssignments().isEmpty())System.out.println(p1.getProjectAssignments().contains(new ArrayList<>(p1.getProjectAssignments()).get(0))+" p.pa "+p1.getProjectAssignments().size());
+    if(e1.getProjects() != null && !e1.getProjects().isEmpty())System.out.println(e1.getProjects().contains(p1)+" e.p "+e1.getProjects().size());
+    if(p1.getEmployees() != null && !p1.getEmployees().isEmpty())System.out.println(p1.getEmployees().contains(e1) +" p.e "+p1.getEmployees().size());
+    System.out.println(e1.getProjectAssignments());*/
   }
 
 }
