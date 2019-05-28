@@ -30,7 +30,21 @@ public class Address extends BaseEntity {
   @OneToOne(mappedBy = "address", fetch = FetchType.LAZY)
   private Department department;
 
-  public Address setDepartment(Department department) {
+  public Address setDepartment(Department department){
+    if(department != null) department.setAddress_Internal(this);
+    this.department = department;
+    return this;
+  }
+
+  public Address removeDepartment() {
+    if(department != null) {
+      this.department.setAddress(null);
+      this.department = null;
+    }
+    return this;
+  }
+
+  /*public Address setDepartment(Department department) {
     if(this.department != department){
       if(this.department != null) this.department.removeAddress();
       this.department = department;
@@ -41,9 +55,9 @@ public class Address extends BaseEntity {
 
   public Address removeDepartment() {
     if(this.department != null){
-      this.department.setAddress(null);
+      if(this.department.getAddress() != null)this.department.removeAddress();
       this.department = null;
     }
     return this;
-  }
+  }*/
 }

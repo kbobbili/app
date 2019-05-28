@@ -43,7 +43,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 @AllArgsConstructor
 @Accessors(chain = true)
 @ToString(exclude = {"reportees","departmentHeaded","projectAssignments","tasks"})
-@EqualsAndHashCode(exclude = {"reportees","departmentHeaded","projectAssignments","tasks"}, callSuper = true)
+@EqualsAndHashCode(exclude = {"reportees","departmentHeaded","projectAssignments","tasks"}, callSuper = false)
 @Entity
 @Table(name = "employee")
 public class Employee extends BaseEntity {
@@ -86,156 +86,20 @@ public class Employee extends BaseEntity {
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "employee", fetch = FetchType.LAZY)
   private Set<Task> tasks = new HashSet<>();
 
-  public Employee setDepartment(Department department) {
-    if(this.department != department) {
-      if(this.department != null) this.department.removeEmployee(this);
-      this.department = department;
-      if(department != null) department.addEmployee(this);
-    }
+  public Employee setDepartment(Department department){
+    if(department != null) department.getEmployees().add(this);
+    this.department = department;
     return this;
   }
 
   public Employee removeDepartment() {
-    if(this.department != null){
+    if(department != null) {
       this.department.removeEmployee(this);
       this.department = null;
     }
     return this;
   }
 
-  public Employee setManager(Employee manager) {
-    if(this.manager != manager) {
-      if(this.manager != null) this.manager.removeReportee(this);
-      this.manager = manager;
-      if(manager != null) manager.addReportee(this);
-    }
-    return this;
-  }
-
-  public Employee removeManager() {
-    if(this.manager != null){
-      this.manager.removeReportee(this);
-      this.manager = null;
-    }
-    return this;
-  }
-
-  public Employee setDepartmentHeaded(Department departmentHeaded) {
-    if(this.departmentHeaded != departmentHeaded){
-      if(this.departmentHeaded != null) this.departmentHeaded.removeDepartmentHead();//remove existing
-      this.departmentHeaded = departmentHeaded;//appoint new
-      if(departmentHeaded != null) departmentHeaded.setDepartmentHead(this);//intimate new guy
-    }
-    return this;
-  }
-
-  public Employee removeDepartmentHeaded() {
-    if(this.departmentHeaded != null){
-      this.departmentHeaded.setDepartmentHead(null);//intimate existing
-      this.departmentHeaded = null;//remove
-    }
-    return this;
-  }
-
-  public Employee setReportees(Set<Employee> reportees) {
-    if (reportees != null) {
-      this.reportees = new HashSet<>(reportees);
-      reportees.forEach(e -> e.setManager(this));
-    }else{
-      if (this.reportees != null) {
-        this.reportees.forEach(Employee::removeManager);
-        this.reportees = null;
-      }
-    }
-    return this;
-  }
-
-  public Employee addReportee(@NonNull Employee reportee) {
-    if (this.reportees == null) {
-      this.reportees = new HashSet<>();
-    }
-    if(!this.reportees.contains(reportee)){
-      this.reportees.add(reportee);
-      reportee.setManager(this);
-    }
-    return this;
-  }
-
-  public Employee removeReportee(@NonNull Employee reportee) {
-    if (this.reportees == null) {
-      return this;
-    }
-    if(this.reportees.contains(reportee)) {
-      Employee manager = reportee.getManager();
-      manager.getReportees().stream().filter(t -> t.getManager() == this)
-          .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
-      this.reportees.remove(reportee);
-      reportee.setManager(null);
-    }
-    return this;
-  }
-
-  public Employee removeReportees() {
-    if (this.reportees != null) {
-      this.reportees.forEach(Employee::removeManager);
-      this.reportees = null;
-    }
-    return this;
-  }
-
-  public Set<Employee> getReportees() {
-    return Collections.unmodifiableSet(this.reportees);
-  }
-
-  public Employee setTasks(Set<Task> tasks) {
-    if (tasks != null) {
-      this.tasks = new HashSet<>(tasks);
-      tasks.forEach(e -> e.setEmployee(this));
-    }else{
-      if (this.tasks != null) {
-        this.tasks.forEach(Task::removeEmployee);
-        this.tasks = null;
-      }
-    }
-    return this;
-  }
-
-  public Employee addTask(@NonNull Task task) {
-    if (this.tasks == null) {
-      this.tasks = new HashSet<>();
-    }
-    if(!this.tasks.contains(task)){
-      this.tasks.add(task);
-      task.setEmployee(this);
-    }
-    return this;
-  }
-
-  public Employee removeTask(@NonNull Task task) {
-    if (this.tasks == null) {
-      return this;
-    }
-    if(this.tasks.contains(task)) {
-      Employee employee = task.getEmployee();
-      employee.getTasks().stream().filter(t -> t.getEmployee() == this)
-          .findAny().orElseThrow(ResourceNotFoundException::new); //association not found
-      this.tasks.remove(task);
-      task.setEmployee(null);
-    }
-    return this;
-  }
-
-  public Employee removeTasks() {
-    if (this.tasks != null) {
-      this.tasks.forEach(Task::removeEmployee);
-      this.tasks = null;
-    }
-    return this;
-  }
-
-  public Set<Task> getTasks() {
-    return Collections.unmodifiableSet(this.tasks);
-  }
   
   //-------------
 
