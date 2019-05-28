@@ -81,7 +81,9 @@ public class Project extends BaseEntity {
       ).collect(Collectors.toSet());
     }else{
       if(this.projectAssignments != null) {
-        this.projectAssignments.forEach(pa -> pa.getEmployee().setProjectAssignments(null));
+        this.projectAssignments.forEach(pa ->  {
+          pa.getEmployee().setProjectAssignments(null);
+          pa.getProject().setProjectAssignments(null);});
         this.projectAssignments = null;
       }
     }
@@ -243,5 +245,5 @@ public class Project extends BaseEntity {
     return this;
   }
 
-  
+
 }

@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -231,7 +232,9 @@ public class Employee extends BaseEntity {
       ).collect(Collectors.toSet());
     }else{
       if(this.projectAssignments != null) {
-        this.projectAssignments.forEach(pa -> pa.getProject().setProjectAssignments(null));
+        this.projectAssignments.forEach(pa ->  {
+          pa.getEmployee().setProjectAssignments(null);
+          pa.getProject().setProjectAssignments(null);});
         this.projectAssignments = null;
       }
     }
@@ -264,12 +267,14 @@ public class Employee extends BaseEntity {
         ProjectAssignment projectAssignment = project.getProjectAssignments().stream()
             .filter(pa -> pa.getEmployee() == this )
             .findAny().orElseThrow(ResourceNotFoundException::new);//
+        System.out.println(project.getProjectAssignments().remove(Arrays.asList(project.getProjectAssignments()).get(0)));
+
         System.out.println(projectAssignment);
         System.out.println(this.projectAssignments);
         System.out.println(this.projectAssignments.remove(projectAssignment));
         System.out.println(projectAssignment);
         System.out.println(project.getProjectAssignments());
-        System.out.println(project.getProjectAssignments().contains(projectAssignment));
+        System.out.println(project.getProjectAssignments().remove(projectAssignment));
        /* projectAssignment.setLeftDate(LocalDateTime.now());
         projectAssignment.setIsCurrent(false);
         this.projectAssignments.add(projectAssignment);*/
