@@ -7,7 +7,6 @@ import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectAssignment;
 import com.kalbob.app.project.ProjectName;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,8 +63,8 @@ public class Department extends BaseEntity {
   private Set<ProjectManagement> projectManagements = new HashSet<>();
 
   public Department setAddress(Address address){
-    if(address != null) address.setDepartment(this);
     this.address = address;
+    if(address != null) address.setDepartment(this);
     return this;
   }
 
@@ -84,40 +83,35 @@ public class Department extends BaseEntity {
 
   public Department setEmployees(List<Employee> employees) {
     if (employees != null) {
-      employees.forEach(e -> e.setDepartment(this));
-      this.employees = new HashSet<>(employees);
+      employees.forEach(this::addEmployee);
     }else{
       removeEmployees();
     }
     return this;
   }
 
-  public Department addEmployee(@NonNull Employee employee) {
-    if (this.employees == null) {
-      this.employees = new HashSet<>();
-    }
-    if(!this.employees.contains(employee)){
-      this.employees.add(employee);
-      employee.setDepartment(this);
-    }
-    return this;
+  public void addEmployee(Employee employee) {
+    employee.setDepartment(this);
+  }
+  public void removeEmployee(Employee employee) {
+    employee.setDepartment(null);
   }
 
-  public Department removeEmployee(@NonNull Employee employee) {
-    if (this.employees != null) {
-      if (!this.employees.contains(employee))
-        throw new ResourceNotFoundException();
-      this.employees.remove(employee);
-      employee.setDepartment(null);
-    }
-    return this;
+  public void addEmployee_Internal(Employee employee) {
+    if(this.employees == null) this.employees = new HashSet<>();
+    this.employees.add(employee);
+  }
+  public void removeEmployee_Internal(Employee employee) {
+    if(this.employees == null) this.employees = new HashSet<>();
+    this.employees.remove(employee);
   }
 
   public Department removeEmployees() {
-    if (this.employees != null) {
-      this.employees.forEach(e->e.setDepartment(null));
-      this.employees = null;
+    if (this.employees == null) {
+      throw new ResourceNotFoundException();//no employees
     }
+    this.employees.forEach(e->e.setDepartment(null));
+    this.employees = null;
     return this;
   }
 
@@ -126,8 +120,8 @@ public class Department extends BaseEntity {
   }
 
   public Department setCompany(Company company){
-    if(company != null) company.getDepartments().add(this);
     this.company = company;
+    if(company != null) company.getDepartments().add(this);
     return this;
   }
 
@@ -140,8 +134,8 @@ public class Department extends BaseEntity {
   }
 
   public Department setDepartmentHead(Employee departmentHead){
-    if(departmentHead != null) departmentHead.setDepartment(this);
     this.departmentHead = departmentHead;
+    if(departmentHead != null) departmentHead.setDepartment(this);
     return this;
   }
 
@@ -157,76 +151,11 @@ public class Department extends BaseEntity {
     }
     return this;
   }
-  
-  /*public Department setProjects(List<Project> projects) {
-    if (projects != null) {
-      this.projectManagements = projects.stream().map(p -> {
-        ProjectManagement pm = new ProjectManagement()
-          .setDepartment(this)
-          .setProject(p)
-          .setRating(3);
-        p.setProjectManagement(pm);//
-        return pm;
-      }).collect(Collectors.toSet());
-
-    }else{
-      if(this.projectManagements != null) {
-        this.projectManagements.forEach(pa -> {
-          if(pa.getProject() != null) {
-            pa.getProject().setProjectManagement(null);
-            pa.setDepartment(null);
-          }
-        });
-        this.projectManagements = null;
-      }
-    }
-    return this;
-  }
-
-  public Department addProject(@NonNull Project project) {
-    if(this.projectManagements == null){
-      this.projectManagements = new HashSet<>();
-    }
-    if(this.projectManagements.stream().anyMatch(pa -> pa.getProject()!=null && pa.getProject().equals(project))) {
-      throw new ResourceNotFoundException();//Duplicate Exception, Already managing that project.
-    }else{
-      ProjectManagement projectManagement = new ProjectManagement()
-          .setDepartment_Internal(this)
-          .setProject(project)
-          .setRating(3);
-      this.projectManagements.add(projectManagement);
-      project.setProjectManagement(projectManagement);
-    }
-    return this;
-  }
-
-  public Department removeProject(@NonNull Project project) {
-    if (this.projectManagements == null || project.getProjectManagement() == null) {
-      return this;
-    }
-    ProjectManagement projectManagement = project.getProjectManagement();
-    if(projectManagement.getDepartment() != this) throw new ResourceNotFoundException(); //association not found i.e. this department does not manage that project
-    this.projectManagements.remove(projectManagement);
-    project.setProjectManagement(null);
-    return this;
-  }
-
-  public List<Project> getProjects() {
-    if(this.projectManagements != null) {
-      return this.projectManagements.stream()
-          .map(ProjectManagement::getProject)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
-    }else {
-      return new ArrayList<>();
-    }
-  }*/
-
 
   public Department setProjectManagements(List<ProjectManagement> projectManagements) {
     if (projectManagements != null) {
-      projectManagements.forEach(e -> e.setDepartment(this));
       this.projectManagements = new HashSet<>(projectManagements);
+      projectManagements.forEach(e -> e.setDepartment(this));
     }else{
       removeProjectManagements();
     }
@@ -234,17 +163,12 @@ public class Department extends BaseEntity {
   }
 
   public Set<ProjectManagement> getProjectManagements() {
-    /*if(this.projectManagements != null) {
-      return new ArrayList<>(projectManagements);
-    }else {
-      return new ArrayList<>();
-    }*/
     return this.projectManagements;
   }
 
   public Department removeProjectManagements() {
     if (this.projectManagements != null) {
-      this.projectManagements.forEach(e->e.setDepartment(null));//setDepartment(null));
+      this.projectManagements.forEach(e->e.setDepartment(null));
       this.projectManagements = null;
     }
     return this;
@@ -255,8 +179,8 @@ public class Department extends BaseEntity {
       this.projectManagements = new HashSet<>();
     }
     if(this.projectManagements.stream().noneMatch(pm -> pm.equals(projectManagement))) {
-      this.projectManagements.add(projectManagement);
       projectManagement.setDepartment(this);
+      this.projectManagements.add(projectManagement);
     }
     return this;
   }
@@ -288,81 +212,98 @@ public class Department extends BaseEntity {
 
     //OnetoOne
     /*d.setAddress(a);
-    a.setDepartment(d);
-    a.removeDepartment();
-    System.out.println("1 "+d.getAddress()+"-"+a.getDepartment());
-    System.out.println("2 "+d.getAddress().equals(a));
-    System.out.println("3 "+a.getDepartment().equals(d));
+    //a.setDepartment(d);
+    printOneToOne(d, a);
     System.out.println("----------------------------------------------------------------------------------");
-    d.removeAddress();
-    a.removeDepartment();
-    System.out.println("1 "+d.getAddress()+"-"+a.getDepartment());
-    System.out.println("2 "+d.getAddress().equals(a));
-    System.out.println("3 "+a.getDepartment().equals(d));*/
+    //d.removeAddress();
+    //a.removeDepartment();
+    printOneToOne(d, a);*/
+
 
     //OneToMany
     /*d.setEmployees(Arrays.asList(e1));
     //d.addEmployee(e1);
     //e1.setDepartment(d);
-    System.out.println("1 "+d.getEmployees()+"-"+e1.getDepartment());
-    System.out.println("2 "+d.getEmployees().contains(e1));
-    System.out.println("3 "+e1.getDepartment().equals(d));
+    printOneToMany(d, e1);
     System.out.println("----------------------------------------------------------------------------------");
-    d.removeEmployees();
-    //d.removeEmployee(e1);
+    //d.removeEmployees();
+    d.removeEmployee(e1);
     //e1.removeDepartment();
-    System.out.println("1 "+d.getEmployees()+"-"+e1.getDepartment());
-    System.out.println("2 "+d.getEmployees().contains(e1));
-    System.out.println("3 "+e1.getDepartment().equals(d));*/
+    printOneToMany(d, e1);*/
 
     //OneToMany Join Table
-    /*ProjectManagement pm = new ProjectManagement();
+    ProjectManagement pm = new ProjectManagement();
     pm.setDepartment(d);
     pm.setProject(p1);
-    //d.setProjectManagements(Arrays.asList(pm));
-    //d.addProjectManagement(pm);
-    //pm.setDepartment(d);
-    //pm.setProject(p1);
-    System.out.println("1 "+d.getProjectManagements()+"-"+pm);
-    System.out.println("2 "+d.getProjectManagements().contains(pm));
-    System.out.println("3 "+pm.getDepartment().equals(d));
+    printOneToManyJoinTable(pm, d);
     System.out.println("----------------------------------------------------------------------------------");
-    d.removeProjectManagements();
-    //d.removeProjectManagement(pm);
+    pm.removeDepartment();
     //pm.removeProject();
-    //pm.removeDepartment();
-    System.out.println("1 "+d.getProjectManagements()+"-"+pm);
-    System.out.println("2 "+d.getProjectManagements().contains(pm));
-    System.out.println("3 "+pm.getDepartment().equals(d));*/
+    printOneToManyJoinTable(pm, d);
 
     //ManyToMany
-    ProjectAssignment pa = new ProjectAssignment();
+    /*ProjectAssignment pa = new ProjectAssignment();
     pa.setProject(p1);
     pa.setEmployee(e1);
-    p1.setProjectAssignments(Arrays.asList(pa));
-    p1.addProjectAssignment(pa);
-    e1.setProjectAssignments(Arrays.asList(pa));
-    e1.addProjectAssignment(pa);
-    System.out.println("1 "+pa.getEmployee() + "-" + p1.getProjectAssignments().iterator().next().getEmployee());
-    System.out.println("2 "+pa.getProject() + "-" + p1.getProjectAssignments().iterator().next().getProject());
-    System.out.println("3 "+pa.getProject().equals(p1.getProjectAssignments().iterator().next().getProject()));
-    System.out.println("4 "+p1.getProjectAssignments().contains(pa));
-    System.out.println("5 "+pa.getEmployee().equals(e1.getProjectAssignments().iterator().next().getEmployee()));
-    System.out.println("6 "+e1.getProjectAssignments().contains(pa));
+    printManyToManyJoinTable(pa, p1, e1);
     System.out.println("----------------------------------------------------------------------------------");
-    pa.removeProject();//Actual delete of pa & p
-    //pa.removeEmployee();
-    //p1.removeProjectAssignment(pa);//Soft delete i.e. meta-data change of pa & update p
-    //e1.removeProjectAssignment(pa);
-    System.out.println(pa);
-    System.out.println(e1.getProjectAssignments());
-    System.out.println(p1.getProjectAssignments());
-    /*System.out.println("1 "+pa.getEmployee() + "-" + p1.getProjectAssignments().iterator().next().getEmployee());
-    System.out.println("2 "+pa.getProject() + "-" + p1.getProjectAssignments().iterator().next().getProject());
-    System.out.println("3 "+pa.getProject().equals(p1.getProjectAssignments().iterator().next().getProject()));
-    System.out.println("4 "+p1.getProjectAssignments().contains(pa));
-    System.out.println("5 "+pa.getEmployee().equals(e1.getProjectAssignments().iterator().next().getEmployee()));
-    System.out.println("6 "+e1.getProjectAssignments().contains(pa));*/
+    pa.removeProject();//Actual delete of pa
+    pa.removeEmployee();
+    printManyToManyJoinTable(pa, p1, e1);*/
   }
+
+  private static void printOneToOne(Department d, Address a) {
+    System.out.println("d "+d);
+    if(d.getAddress() != null) System.out.print("d.getAddress() != null |");
+    if(a.getDepartment() != null) System.out.print("a.getDepartment() != null ");
+    System.out.println();
+    if(d.getAddress() != null) System.out.println("d.getAddress().equals(a) "+d.getAddress().equals(a));
+    if(a.getDepartment() != null) System.out.println("a.getDepartment().equals(d)"+a.getDepartment().equals(d));
+  }
+
+  private static void printOneToMany(Department d, Employee e1){
+    System.out.println("d "+d);
+    if(d.getEmployees() != null) System.out.print("d.getEmployees() != null |");
+    if(e1.getDepartment() != null) System.out.print("e1.getDepartment() != null |");
+    System.out.println();
+    if(d.getEmployees() != null) System.out.println("d.getEmployees().contains(e1) "+d.getEmployees().contains(e1));
+    if(e1.getDepartment() != null) System.out.println("e1.getDepartment().equals(d) "+e1.getDepartment().equals(d));
+  }
+
+  private static void printOneToManyJoinTable(ProjectManagement pm, Department d){
+    System.out.println("pm "+pm);
+    if(pm.getDepartment() != null) System.out.print("pm.getDepartment() != null |");
+    if(d.getProjectManagements() != null) System.out.print("d.getProjectManagements() != null |");
+    if (d.getProjectManagements() != null && !d.getProjectManagements().isEmpty()
+        && d.getProjectManagements().iterator().next().getDepartment() != null) {
+      System.out.print("d.getProjectManagements().getDepartment() != null ");
+    }
+    System.out.println();
+    if(pm.getDepartment() != null && d.getProjectManagements() != null && !d.getProjectManagements().isEmpty() && d.getProjectManagements().iterator().next().getDepartment() != null) System.out.println("pm.getDepartment() == d.getProjectManagements().getDepartment() "+pm.getDepartment().equals(d.getProjectManagements().iterator().next().getDepartment()));
+    if(pm.getProject() != null && d.getProjectManagements() != null && !d.getProjectManagements().isEmpty() && d.getProjectManagements().iterator().next().getProject() != null)System.out.println("pm.getProject() == d.getProjectManagements().getProject() "+pm.getProject().equals(d.getProjectManagements().iterator().next().getProject()));
+  }
+
+  private static void printManyToManyJoinTable(ProjectAssignment pa, Project p1, Employee e1){
+    System.out.println("pa "+pa);
+    if(pa.getProject() != null) System.out.print("pa.getProject() != null |");
+    if(p1.getProjectAssignments() != null) System.out.print("p1.getProjectAssignments() != null |");
+    if (p1.getProjectAssignments() != null && !p1.getProjectAssignments().isEmpty()
+        && p1.getProjectAssignments().iterator().next().getProject() != null) {
+      System.out.print("p1.getProjectAssignments().getProject() != null ");
+    }
+    System.out.println();
+    if(pa.getEmployee() != null) System.out.print("pa.getEmployee() != null |");
+    if(e1.getProjectAssignments() != null) System.out.print("e1.getProjectAssignments() != null |");
+    if (e1.getProjectAssignments() != null && !e1.getProjectAssignments().isEmpty()
+        && e1.getProjectAssignments().iterator().next().getEmployee() != null) {
+      System.out.print("e1.getProjectAssignments().getEmployee() != null ");
+    }
+    System.out.println();
+    if(pa.getProject()!= null && e1.getProjectAssignments()!=null && !e1.getProjectAssignments().isEmpty() && e1.getProjectAssignments().iterator().next().getProject()!=null) System.out.println("pa.getProject() == e1.getProjectAssignments().getProject() "+pa.getProject().equals(e1.getProjectAssignments().iterator().next().getProject()));
+    if(pa.getEmployee()!= null && e1.getProjectAssignments()!=null && !e1.getProjectAssignments().isEmpty() && e1.getProjectAssignments().iterator().next().getEmployee()!=null)System.out.println("pa.getEmployee() == e1.getProjectAssignments().getEmployee() "+pa.getEmployee().equals(e1.getProjectAssignments().iterator().next().getEmployee()));
+    if(pa.getProject()!= null && p1.getProjectAssignments()!=null && !p1.getProjectAssignments().isEmpty() && p1.getProjectAssignments().iterator().next().getProject()!=null) System.out.println("pa.getEmployee() == p1.getProjectAssignments().getProject() "+pa.getProject().equals(p1.getProjectAssignments().iterator().next().getProject()));
+    if(pa.getEmployee()!= null && p1.getProjectAssignments()!=null && !p1.getProjectAssignments().isEmpty() && p1.getProjectAssignments().iterator().next().getEmployee()!=null)System.out.println("pa.getEmployee() == p1.getProjectAssignments().getEmployee() "+pa.getEmployee().equals(p1.getProjectAssignments().iterator().next().getEmployee()));
+  }
+
 
 }

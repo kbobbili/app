@@ -31,8 +31,8 @@ public class Address extends BaseEntity {
   private Department department;
 
   public Address setDepartment(Department department){
-    if(department != null) department.setAddress_Internal(this);
     this.department = department;
+    if(department != null) department.setAddress_Internal(this);
     return this;
   }
 

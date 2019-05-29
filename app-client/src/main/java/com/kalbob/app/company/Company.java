@@ -35,8 +35,8 @@ public class Company extends BaseEntity {
 
   public Company setDepartments(List<Department> departments) {
     if (departments != null) {
-      departments.forEach(e -> e.setCompany(this));
       this.departments = new HashSet<>(departments);
+      departments.forEach(e -> e.setCompany(this));
     }else{
       removeDepartments();
     }

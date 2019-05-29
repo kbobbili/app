@@ -39,8 +39,8 @@ public class ProjectManagement {
   private int rating;
 
   public ProjectManagement setDepartment(Department department){
-    if(department != null) department.getProjectManagements().add(this);
     this.department = department;
+    if(department != null) department.getProjectManagements().add(this);
     return this;
   }
 
@@ -58,8 +58,8 @@ public class ProjectManagement {
   }
 
   public ProjectManagement setProject(Project project){
-    if(project != null) project.setProjectManagement(this);
     this.project = project;
+    if(project != null) project.setProjectManagement(this);
     return this;
   }
 

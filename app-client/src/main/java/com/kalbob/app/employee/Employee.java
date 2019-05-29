@@ -81,22 +81,24 @@ public class Employee extends BaseEntity {
   private Set<Task> tasks = new HashSet<>();
 
   public Employee setDepartment(Department department){
-    if(department != null) department.getEmployees().add(this);
+    if (this.department != null) { this.department.removeEmployee_Internal(this); }
     this.department = department;
+    if (department != null) { this.department.addEmployee_Internal(this); }
     return this;
   }
 
   public Employee removeDepartment() {
-    if(department != null) {
-      this.department.removeEmployee(this);
-      this.department = null;
+    if(department == null) {
+      throw new ResourceNotFoundException();//no department
     }
+    this.department.removeEmployee(this);
+    this.department = null;
     return this;
   }
 
   public Employee setDepartmentHeaded(Department departmentHeaded){
-    if(departmentHeaded != null) departmentHeaded.setDepartmentHead_Internal(this);
     this.departmentHeaded = departmentHeaded;
+    if(departmentHeaded != null) departmentHeaded.setDepartmentHead_Internal(this);
     return this;
   }
 
@@ -109,8 +111,8 @@ public class Employee extends BaseEntity {
   }
 
   public Employee setManager(Employee manager){
-    if(manager != null) manager.getReportees().add(this);
     this.manager = manager;
+    if(manager != null) manager.getReportees().add(this);
     return this;
   }
 
@@ -124,8 +126,8 @@ public class Employee extends BaseEntity {
 
   public Employee setReportees(List<Employee> reportees) {
     if (reportees != null) {
-      reportees.forEach(e -> e.setManager(this));
       this.reportees = new HashSet<>(reportees);
+      reportees.forEach(e -> e.setManager(this));
     }else{
       removeReportees();
     }
@@ -167,8 +169,8 @@ public class Employee extends BaseEntity {
 
   public Employee setTasks(List<Task> tasks) {
     if (tasks != null) {
-      tasks.forEach(e -> e.setEmployee(this));
       this.tasks = new HashSet<>(tasks);
+      tasks.forEach(e -> e.setEmployee(this));
     }else{
       removeTasks();
     }
@@ -208,81 +210,10 @@ public class Employee extends BaseEntity {
     return this.tasks;
   }
 
-  /*public Employee setProjects(List<Project> projects) {
-    if (projects != null) {
-      this.projectAssignments = projects.stream().map(p -> new ProjectAssignment()
-          .setEmployee_Internal(this)
-          .setProject(p)
-          .setJoinedDate(LocalDateTime.now())
-          .setIsCurrent(true)
-      ).collect(Collectors.toSet());
-      projects.forEach(p -> p.setProjectAssignments(projectAssignments));
-    }else{
-      if(this.projectAssignments != null) {
-        this.projectAssignments.forEach(pa ->  {
-          pa.getEmployee().setProjectAssignments(null);
-          pa.getProject().setProjectAssignments(null);});
-        this.projectAssignments = null;
-      }
-    }
-    return this;
-  }
-
-  public Employee addProject(@NonNull Project project) {
-    if(this.projectAssignments == null){
-      this.projectAssignments = new HashSet<>();
-    }
-    if(project.getProjectAssignments() == null){
-      project.setProjectAssignments(new HashSet<>());
-    }
-    if(this.projectAssignments.stream().anyMatch(pa -> pa.getProject() != null && pa.getProject().equals(project))) {
-      throw new ResourceNotFoundException();//Duplicate Exception
-    }else{
-      ProjectAssignment projectAssignment = new ProjectAssignment()
-          .setEmployee_Internal(this)
-          .setProject(project)
-          .setJoinedDate(LocalDateTime.now())
-          .setIsCurrent(true);
-      this.projectAssignments.add(projectAssignment);
-      project.getProjectAssignments().add(projectAssignment);
-    }
-    return this;
-  }
-
-  public Employee removeProject(@NonNull Project project) {
-    if(this.projectAssignments != null && project.getProjectAssignments() != null) {
-      if(this.projectAssignments.stream().anyMatch(pa -> pa.getProject() != null && pa.getProject().equals(project))) {
-        ProjectAssignment projectAssignment = project.getProjectAssignments().stream()
-            .filter(pa -> pa.getEmployee() == this )
-            .findAny().orElseThrow(ResourceNotFoundException::new);
-        this.projectAssignments.remove(projectAssignment);
-        project.getProjectAssignments().remove(projectAssignment);
-        projectAssignment.setLeftDate(LocalDateTime.now());
-        projectAssignment.setIsCurrent(false);
-        this.projectAssignments.add(projectAssignment);
-        project.getProjectAssignments().add(projectAssignment);
-      }else{
-        throw new ResourceNotFoundException();
-      }
-    }
-    return this;
-  }
-
-  public List<Project> getProjects() {
-    if(this.projectAssignments != null) {
-      return this.projectAssignments.stream()
-          .map(ProjectAssignment::getProject)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
-    }else {
-      return new ArrayList<>();
-    }
-  }*/
-
-  public Employee setProjectAssignments(List<ProjectAssignment> projectAssignments) {
+  public Employee setProjectAssignments(Set<ProjectAssignment> projectAssignments) {
     if (projectAssignments != null) {
+      this.projectAssignments = projectAssignments;
       projectAssignments.forEach(e -> e.setEmployee(this));
-      this.projectAssignments = new HashSet<>(projectAssignments);
     }else{
       removeProjectAssignments();
     }
@@ -307,13 +238,13 @@ public class Employee extends BaseEntity {
   public Employee removeProjectAssignment(ProjectAssignment projectAssignment) {
     if (this.projectAssignments != null) {
       if (!this.projectAssignments.contains(projectAssignment))
-        throw new ResourceNotFoundException();
-      this.projectAssignments.remove(projectAssignment);
+        return this;
       projectAssignment.removeEmployee();
-      //
-      /*projectAssignment.setLeftDate(LocalDateTime.now());//meta-data or projectAssignment.setEmployee(null);
+      this.projectAssignments.remove(projectAssignment);
+      /*projectAssignment.setLeftDate(LocalDateTime.now());//meta-data or projectAssignment.setProject(null);
       projectAssignment.setIsCurrent(false);
-      this.projectAssignments.add(projectAssignment);*/
+      this.projectAssignments.add(projectAssignment);
+      projectAssignment.addProject();*/
     }
     return this;
   }

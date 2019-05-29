@@ -34,8 +34,8 @@ public class ProjectAssignment extends BaseEntity {
   private Boolean isCurrent;
 
   public ProjectAssignment setProject(Project project){
-    if(project != null) project.getProjectAssignments().add(this);
     this.project = project;
+    if(project != null) project.getProjectAssignments().add(this);
     return this;
   }
 
@@ -54,8 +54,8 @@ public class ProjectAssignment extends BaseEntity {
   }
 
   public ProjectAssignment setEmployee(Employee employee){
-    if(employee != null) employee.getProjectAssignments().add(this);
     this.employee = employee;
+    if(employee != null) employee.getProjectAssignments().add(this);
     return this;
   }
 

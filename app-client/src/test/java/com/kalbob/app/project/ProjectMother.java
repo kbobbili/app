@@ -2,6 +2,7 @@ package com.kalbob.app.project;
 
 import com.kalbob.app.ObjectMother;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class ProjectMother extends ObjectMother {
 
@@ -13,8 +14,8 @@ public class ProjectMother extends ObjectMother {
 
   public static Project complete() {
     return simple()
-        .setProjectAssignments(Arrays.asList(ProjectAssignmentMother.simple().setProject(
-            ProjectMother.simple())))
+        .setProjectAssignments(new HashSet<>(Arrays.asList(ProjectAssignmentMother.simple().setProject(
+            ProjectMother.simple()))))
         ;
   }
 
@@ -26,8 +27,8 @@ public class ProjectMother extends ObjectMother {
 
   public static Project completeRandom() {
     return simpleRandom()
-        .setProjectAssignments(Arrays.asList(ProjectAssignmentMother.simple().setProject(
-            ProjectMother.simpleRandom())))
+        .setProjectAssignments(new HashSet<>(Arrays.asList(ProjectAssignmentMother.simple().setProject(
+            ProjectMother.simpleRandom()))))
         ;
   }
 }
