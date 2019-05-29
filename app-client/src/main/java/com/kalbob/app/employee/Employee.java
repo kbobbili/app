@@ -2,7 +2,6 @@ package com.kalbob.app.employee;
 
 import com.kalbob.app.BaseEntity;
 import com.kalbob.app.department.Department;
-import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectAssignment;
 import com.kalbob.app.task.Task;
 import java.lang.reflect.Method;
@@ -351,8 +350,6 @@ public class Employee extends BaseEntity {
     for (ConstraintViolation<Employee> violation : violations) {
       System.out.println("Method parameter errors "+violation.getMessage());
     }
-    Project p = new Project();
-    p.getProjectAssignments().add(new ProjectAssignment().setEmployee(e));
   }
 
 }
