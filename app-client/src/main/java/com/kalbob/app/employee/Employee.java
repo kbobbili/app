@@ -7,13 +7,9 @@ import com.kalbob.app.project.ProjectAssignment;
 import com.kalbob.app.task.Task;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -166,12 +162,8 @@ public class Employee extends BaseEntity {
     return this;
   }
 
-  public List<Employee> getReportees() {
-    if(this.reportees != null) {
-      return new ArrayList<>(this.reportees);
-    }else{
-      return new ArrayList<>();
-    }
+  public Set<Employee> getReportees() {
+    return this.reportees;
   }
 
   public Employee setTasks(List<Task> tasks) {
@@ -213,15 +205,11 @@ public class Employee extends BaseEntity {
     return this;
   }
 
-  public List<Task> getTasks() {
-    if(this.tasks != null) {
-      return new ArrayList<>(this.tasks);
-    }else{
-      return new ArrayList<>();
-    }
+  public Set<Task> getTasks() {
+    return this.tasks;
   }
 
-  public Employee setProjects(List<Project> projects) {
+  /*public Employee setProjects(List<Project> projects) {
     if (projects != null) {
       this.projectAssignments = projects.stream().map(p -> new ProjectAssignment()
           .setEmployee_Internal(this)
@@ -290,6 +278,20 @@ public class Employee extends BaseEntity {
     }else {
       return new ArrayList<>();
     }
+  }*/
+
+  public Employee setProjectAssignments(List<ProjectAssignment> projectAssignments) {
+    if (projectAssignments != null) {
+      projectAssignments.forEach(e -> e.setEmployee(this));
+      this.projectAssignments = new HashSet<>(projectAssignments);
+    }else{
+      removeProjectAssignments();
+    }
+    return this;
+  }
+
+  public Set<ProjectAssignment> getProjectAssignments() {
+    return this.projectAssignments;
   }
 
   public Employee addProjectAssignment(ProjectAssignment projectAssignment) {
@@ -308,9 +310,19 @@ public class Employee extends BaseEntity {
       if (!this.projectAssignments.contains(projectAssignment))
         throw new ResourceNotFoundException();
       this.projectAssignments.remove(projectAssignment);
-      projectAssignment.setLeftDate(LocalDateTime.now());//meta-data or projectAssignment.setEmployee(null);
+      projectAssignment.removeEmployee();
+      //
+      /*projectAssignment.setLeftDate(LocalDateTime.now());//meta-data or projectAssignment.setEmployee(null);
       projectAssignment.setIsCurrent(false);
-      this.projectAssignments.add(projectAssignment);
+      this.projectAssignments.add(projectAssignment);*/
+    }
+    return this;
+  }
+
+  public Employee removeProjectAssignments() {
+    if (this.projectAssignments != null) {
+      this.projectAssignments.forEach(e->e.setEmployee(null));
+      this.projectAssignments = null;
     }
     return this;
   }
@@ -340,7 +352,7 @@ public class Employee extends BaseEntity {
       System.out.println("Method parameter errors "+violation.getMessage());
     }
     Project p = new Project();
-    p.getEmployees().add(e);
+    p.getProjectAssignments().add(new ProjectAssignment().setEmployee(e));
   }
 
 }

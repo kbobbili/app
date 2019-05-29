@@ -1,17 +1,13 @@
 package com.kalbob.app.project;
 
 import com.kalbob.app.BaseEntity;
-import com.kalbob.app.department.Department;
 import com.kalbob.app.department.ProjectManagement;
-import com.kalbob.app.employee.Employee;
 import com.kalbob.app.task.Task;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -71,7 +67,7 @@ public class Project extends BaseEntity {
   )
   private Set<Task> tasks = new HashSet<>();
 
-  public Project setEmployees(List<Employee> employees) {
+  /*public Project setEmployees(List<Employee> employees) {
     if (employees != null) {
       this.projectAssignments = employees.stream().map(p -> new ProjectAssignment()
           .setProject_Internal(this)
@@ -140,7 +136,7 @@ public class Project extends BaseEntity {
     }else {
       return new ArrayList<>();
     }
-  }
+  }*/
 
   public Set<ProjectAssignment> getProjectAssignments() {
     return this.projectAssignments;
@@ -152,7 +148,6 @@ public class Project extends BaseEntity {
     return this;
   }
 
-
   public Project removeProjectManagement() {
     if(this.projectManagement != null) {
       this.projectManagement.setDepartment(null);
@@ -162,7 +157,7 @@ public class Project extends BaseEntity {
   }
 
 
-  public Project setDepartment(@NonNull Department department){
+  /*public Project setDepartment(@NonNull Department department){
     if(department != null) department.addProject(this);
     if(this.projectManagement != null) {
       this.projectManagement.setDepartment(department);
@@ -177,7 +172,7 @@ public class Project extends BaseEntity {
       this.projectManagement = null;
     }
     return this;
-  }
+  }*/
 
   public Project setTasks(List<Task> tasks) {
     if (tasks != null) {
@@ -226,7 +221,15 @@ public class Project extends BaseEntity {
     }
   }
 
-
+  public Project setProjectAssignments(List<ProjectAssignment> projectAssignments) {
+    if (projectAssignments != null) {
+      projectAssignments.forEach(e -> e.setProject(this));
+      this.projectAssignments = new HashSet<>(projectAssignments);
+    }else{
+      removeProjectAssignments();
+    }
+    return this;
+  }
 
   public Project addProjectAssignment(ProjectAssignment projectAssignment) {
     if (this.projectAssignments == null) {
@@ -244,9 +247,19 @@ public class Project extends BaseEntity {
       if (!this.projectAssignments.contains(projectAssignment))
         throw new ResourceNotFoundException();
       this.projectAssignments.remove(projectAssignment);
+      projectAssignment.removeProject();
+      /*
       projectAssignment.setLeftDate(LocalDateTime.now());//meta-data or projectAssignment.setProject(null);
       projectAssignment.setIsCurrent(false);
-      this.projectAssignments.add(projectAssignment);
+      this.projectAssignments.add(projectAssignment);*/
+    }
+    return this;
+  }
+
+  public Project removeProjectAssignments() {
+    if (this.projectAssignments != null) {
+      this.projectAssignments.forEach(e->e.setProject(null));
+      this.projectAssignments = null;
     }
     return this;
   }

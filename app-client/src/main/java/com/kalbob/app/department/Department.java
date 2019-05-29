@@ -6,12 +6,9 @@ import com.kalbob.app.employee.Employee;
 import com.kalbob.app.project.Project;
 import com.kalbob.app.project.ProjectName;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -122,12 +119,8 @@ public class Department extends BaseEntity {
     return this;
   }
 
-  public List<Employee> getEmployees() {
-    if(this.employees != null) {
-      return new ArrayList<>(this.employees);
-    }else{
-      return new ArrayList<>();
-    }
+  public Set<Employee> getEmployees() {
+    return this.employees;
   }
 
   public Department setCompany(Company company){
@@ -163,7 +156,7 @@ public class Department extends BaseEntity {
     return this;
   }
   
-  public Department setProjects(List<Project> projects) {
+  /*public Department setProjects(List<Project> projects) {
     if (projects != null) {
       this.projectManagements = projects.stream().map(p -> {
         ProjectManagement pm = new ProjectManagement()
@@ -225,6 +218,34 @@ public class Department extends BaseEntity {
     }else {
       return new ArrayList<>();
     }
+  }*/
+
+
+  public Department setProjectManagements(List<ProjectManagement> projectManagements) {
+    if (projectManagements != null) {
+      projectManagements.forEach(e -> e.setDepartment(this));
+      this.projectManagements = new HashSet<>(projectManagements);
+    }else{
+      removeProjectManagements();
+    }
+    return this;
+  }
+
+  public Set<ProjectManagement> getProjectManagements() {
+    /*if(this.projectManagements != null) {
+      return new ArrayList<>(projectManagements);
+    }else {
+      return new ArrayList<>();
+    }*/
+    return this.projectManagements;
+  }
+
+  public Department removeProjectManagements() {
+    if (this.projectManagements != null) {
+      this.projectManagements.forEach(e->e.setDepartment(null));//setDepartment(null));
+      this.projectManagements = null;
+    }
+    return this;
   }
 
   public Department addProjectManagement(@NonNull ProjectManagement projectManagement) {
@@ -264,22 +285,87 @@ public class Department extends BaseEntity {
     Project p2 = new Project();
     p2.setName(ProjectName.BLUE);
 
+
+    //OnetoOne
     /*d.setAddress(a);
-    d.removeAddress();
     a.setDepartment(d);
     a.removeDepartment();
     System.out.println(d.getAddress());
-    System.out.println(a.getDepartment());*/
+    System.out.println(a.getDepartment());
+    System.out.println(d.getAddress().equals(a));
+    System.out.println(a.getDepartment().equals(d));
+    d.removeAddress();
+    a.removeDepartment();
+    System.out.println(d.getAddress());
+    System.out.println(a.getDepartment());
+    System.out.println(d.getAddress().equals(a));
+    System.out.println(a.getDepartment().equals(d));*/
 
-
-    /*//d.setEmployees(Arrays.asList(e1, e2));
+    //OneToMany
+    /*d.setEmployees(Arrays.asList(e1));
     //d.addEmployee(e1);
-    //d.removeEmployee(e1);
     //e1.setDepartment(d);
-    //e1.removeDepartment();
-    d.removeEmployees();
     System.out.println(d.getEmployees());
-    System.out.println(e1.getDepartment());*/
+    System.out.println(e1.getDepartment());
+    System.out.println(d.getEmployees().contains(e1));
+    System.out.println(e1.getDepartment().equals(d));
+    d.removeEmployees();
+    //d.removeEmployee(e1);
+    //e1.removeDepartment();
+    System.out.println(d.getEmployees());
+    System.out.println(e1.getDepartment());
+    System.out.println(d.getEmployees().contains(e1));
+    System.out.println(e1.getDepartment().equals(d));*/
+
+    //OneToMany Join Table
+    /*ProjectManagement pm = new ProjectManagement();
+    pm.setDepartment(d);
+    pm.setProject(p1);
+    //d.setProjectManagements(Arrays.asList(pm));
+    //d.addProjectManagement(pm);
+    //pm.setDepartment(d);
+    //pm.setProject(p1);
+    System.out.println(d.getProjectManagements());
+    System.out.println(pm);
+    System.out.println(d.getProjectManagements().contains(pm));
+    System.out.println(pm.getDepartment().equals(d));
+    d.removeProjectManagements();
+    //d.removeProjectManagement(pm);
+    //pm.removeProject();
+    //pm.removeDepartment();
+    System.out.println(d.getProjectManagements());
+    System.out.println(pm);
+    System.out.println(d.getProjectManagements().contains(pm));
+    System.out.println(pm.getDepartment().equals(d));*/
+
+    //ManyToMany
+    /*ProjectAssignment pa = new ProjectAssignment();
+    pa.setProject(p1);
+    pa.setEmployee(e1);
+    p1.setProjectAssignments(Arrays.asList(pa));
+    p1.addProjectAssignment(pa);
+    e1.setProjectAssignments(Arrays.asList(pa));
+    e1.addProjectAssignment(pa);
+    System.out.println(pa.getEmployee() + "-" + pa.getProject());
+    System.out.println(p1.getProjectAssignments());
+    System.out.println(e1.getProjectAssignments());
+    System.out.println(pa.getProject().equals(p1.getProjectAssignments().iterator().next().getProject()));
+    System.out.println(p1.getProjectAssignments().contains(pa));
+    System.out.println(pa.getEmployee().equals(e1.getProjectAssignments().iterator().next().getEmployee()));
+    System.out.println(e1.getProjectAssignments().contains(pa));
+    pa.removeProject();
+    //pa.removeEmployee();
+    //p1.removeProjectAssignment(pa);
+    //e1.removeProjectAssignment(pa);
+    System.out.println(pa.getEmployee() + "-" + pa.getProject());
+    System.out.println(p1.getProjectAssignments());
+    System.out.println(e1.getProjectAssignments());
+    System.out.println(pa.getProject().equals(p1.getProjectAssignments().iterator().next().getProject()));
+    System.out.println(p1.getProjectAssignments().contains(pa));
+    System.out.println(pa.getEmployee().equals(e1.getProjectAssignments().iterator().next().getEmployee()));
+    System.out.println(e1.getProjectAssignments().contains(pa));*/
+
+    //-------
 
     /*ProjectManagement pm = new ProjectManagement();
     pm.setDepartment(d);
@@ -348,6 +434,7 @@ public class Department extends BaseEntity {
     if(e1.getProjects() != null && !e1.getProjects().isEmpty())System.out.println(e1.getProjects().contains(p1)+" e.p "+e1.getProjects().size());
     if(p1.getEmployees() != null && !p1.getEmployees().isEmpty())System.out.println(p1.getEmployees().contains(e1) +" p.e "+p1.getEmployees().size());
     System.out.println(e1.getProjectAssignments());*/
+
   }
 
 }

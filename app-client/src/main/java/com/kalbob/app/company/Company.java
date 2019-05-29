@@ -2,7 +2,6 @@ package com.kalbob.app.company;
 
 import com.kalbob.app.BaseEntity;
 import com.kalbob.app.department.Department;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,11 +72,7 @@ public class Company extends BaseEntity {
     return this;
   }
 
-  public List<Department> getDepartments() {
-    if(this.departments != null) {
-      return new ArrayList<>(this.departments);
-    }else{
-      return new ArrayList<>();
-    }
+  public Set<Department> getDepartments() {
+    return this.departments;
   }
 }

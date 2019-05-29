@@ -1,7 +1,6 @@
 package com.kalbob.app.project;
 
 import com.kalbob.app.ObjectMother;
-import com.kalbob.app.employee.EmployeeMother;
 import java.util.Arrays;
 
 public class ProjectMother extends ObjectMother {
@@ -14,7 +13,8 @@ public class ProjectMother extends ObjectMother {
 
   public static Project complete() {
     return simple()
-        .setEmployees(Arrays.asList(EmployeeMother.simple()))
+        .setProjectAssignments(Arrays.asList(ProjectAssignmentMother.simple().setProject(
+            ProjectMother.simple())))
         ;
   }
 
@@ -26,7 +26,8 @@ public class ProjectMother extends ObjectMother {
 
   public static Project completeRandom() {
     return simpleRandom()
-        .setEmployees(Arrays.asList(EmployeeMother.simpleRandom()))
+        .setProjectAssignments(Arrays.asList(ProjectAssignmentMother.simple().setProject(
+            ProjectMother.simpleRandom())))
         ;
   }
 }

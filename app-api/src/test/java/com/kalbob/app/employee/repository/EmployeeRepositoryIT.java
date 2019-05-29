@@ -81,7 +81,6 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
     assertTrue(employeeRepository.findById(employee.getId()).orElseThrow(ResourceNotFoundException::new).getProjects().size() == 1);
   }
 
-
   @Test
   public void findByDepartment_NameIgnoreCase() {
 

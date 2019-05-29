@@ -38,7 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
     projectRepository.deleteById(id);
   }
 
-  public Set<Employee> getEmployees(Long id) {
+  public List<Employee> getEmployees(Long id) {
     Project project = findById(id);
     return project.getEmployees();
   }
