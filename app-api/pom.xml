@@ -107,6 +107,13 @@
   <profiles>
     <profile>
       <id>jib</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+       <!-- <aws.environment>jib</aws.environment>
+        <aws.region>us-east-1</aws.region>-->
+      </properties>
       <build>
         <resources>
           <resource>
@@ -115,16 +122,56 @@
           </resource>
         </resources>
         <plugins>
-          <plugin>
-            <groupId>com.google.cloud.tools</groupId>
-            <artifactId>jib-maven-plugin</artifactId>
-          </plugin>
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>${jib-maven-plugin.version}</version>
+          <configuration>
+            <from>
+              <image>docker.io/adoptopenjdk/openjdk11-openj9:slim</image>
+              <auth>
+                <username>kalyan27</username>
+                <password>Kalbob@27</password>
+              </auth>
+            </from>
+            <to>
+              <image>docker.io/kalyan27/app-api-jib:v12</image>
+              <auth>
+                <username>kalyan27</username>
+                <password>Kalbob@27</password>
+              </auth>
+            </to>
+            <allowInsecureRegistries>true</allowInsecureRegistries>
+            <container>
+              <jvmFlags>
+                <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+              </jvmFlags>
+              <ports>
+                <port>8090</port>
+              </ports>
+            </container>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>build</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
         </plugins>
       </build>
     </profile>
   </profiles>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
