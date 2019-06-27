@@ -23,6 +23,11 @@
     <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
     <maven-failsafe-plugin.version>2.22.1</maven-failsafe-plugin.version>
     <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+    <maven-help-plugin.version>3.1.1</maven-help-plugin.version>
+    <!-- docker -->
+    <jib-maven-plugin.version>1.3.0</jib-maven-plugin.version>
+    <aws.environment>dev</aws.environment>
+    <aws.region>us-east-1</aws.region>
     <!-- spring -->
     <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
     <spring-boot-admin.version>2.1.1</spring-boot-admin.version>
@@ -230,8 +235,66 @@
             <tagNameFormat>v@{project.version}</tagNameFormat>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-help-plugin</artifactId>
+          <version>${maven-help-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>show-profiles</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>active-profiles</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>${jib-maven-plugin.version}</version>
+          <configuration>
+            <from>
+              <image>docker.io/adoptopenjdk/openjdk11-openj9:slim</image>
+              <auth>
+                <username>kalyan27</username>
+                <password>Kalbob@27</password>
+              </auth>
+            </from>
+            <to>
+              <image>docker.io/kalyan27/app-api-${aws.environment}:v10</image>
+              <auth>
+                <username>kalyan27</username>
+                <password>Kalbob@27</password>
+              </auth>
+            </to>
+            <allowInsecureRegistries>true</allowInsecureRegistries>
+            <container>
+              <jvmFlags>
+                <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+              </jvmFlags>
+              <ports>
+                <port>8090</port>
+              </ports>
+            </container>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>build</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 
 </project>

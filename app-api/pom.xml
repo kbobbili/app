@@ -102,19 +102,35 @@
       <version>${project.parent.version}</version>
       <type>test-jar</type>
     </dependency>
-
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>jib</id>
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+          </resource>
+        </resources>
+        <plugins>
+          <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
+        <artifactId>maven-help-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
-
-
-
 
 </project>
