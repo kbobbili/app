@@ -15,6 +15,13 @@
     <relativePath>..</relativePath>
   </parent>
 
+  <properties>
+    <docker.port>8090</docker.port>
+    <!-- default to us-east-1 -->
+    <aws.environment>dev</aws.environment>
+    <aws.region>us-east-1</aws.region>
+  </properties>
+
   <dependencies>
     <!-- rest -->
     <dependency>
@@ -107,11 +114,6 @@
   <profiles>
     <profile>
       <id>jib-to-aws</id>
-      <properties>
-        <!-- default to us-east-1 -->
-        <aws.environment>dev</aws.environment>
-        <aws.region>us-east-1</aws.region>
-      </properties>
       <build>
         <resources>
           <resource>
@@ -167,12 +169,6 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <build>
-        <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-          </resource>
-        </resources>
         <plugins>
           <plugin>
             <groupId>com.google.cloud.tools</groupId>
