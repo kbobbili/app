@@ -37,15 +37,15 @@ spring:
   profiles: local_db
   flyway:
     locations: classpath:db/migration
-    enabled: true
+    enabled: false #switch to true
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
   datasource:
-    url: jdbc:mysql://localhost:3307/app_local_db?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${db.containerId:localhost}:3306/app_local_db?useSSL=false&allowPublicKeyRetrieval=true
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop #validate
 a:
   local_db
 ---

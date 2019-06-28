@@ -17,9 +17,6 @@
 
   <properties>
     <docker.port>8090</docker.port>
-    <!-- default to us-east-1 -->
-    <aws.environment>dev</aws.environment>
-    <aws.region>us-east-1</aws.region>
   </properties>
 
   <dependencies>
@@ -111,46 +108,78 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-info</goal>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven-failsafe-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>${jib-maven-plugin.version}</version>
+          <configuration>
+            <from>
+              <image>registry.hub.docker.com/adoptopenjdk/openjdk8:latest</image>
+            </from>
+            <allowInsecureRegistries>true</allowInsecureRegistries>
+            <container>
+              <jvmFlags>
+                <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+              </jvmFlags>
+              <ports>
+                <port>${docker.port}</port>
+              </ports>
+              <useCurrentTimestamp>true</useCurrentTimestamp>
+            </container>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
   <profiles>
     <profile>
-      <id>jib-to-aws</id>
+      <id>dev-jib</id>
+      <properties>
+        <environment>dev</environment>
+        <aws.region>us-east-1</aws.region>
+      </properties>
       <build>
-        <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-          </resource>
-        </resources>
         <plugins>
           <plugin>
             <groupId>com.google.cloud.tools</groupId>
             <artifactId>jib-maven-plugin</artifactId>
-            <version>${jib-maven-plugin.version}</version>
-            <configuration>
-              <from>
-                <image>docker.io/adoptopenjdk/openjdk11-openj9:slim</image>
-                <auth>
-                  <username>kalyan27</username>
-                  <password>Kalbob@27</password>
-                </auth>
-              </from>
-              <to>
-                <image>docker.io/kalyan27/app-api-${aws.environment}:${project.version}</image>
-                <auth>
-                  <username>kalyan27</username>
-                  <password>Kalbob@27</password>
-                </auth>
-              </to>
-              <allowInsecureRegistries>true</allowInsecureRegistries>
-              <container>
-                <jvmFlags>
-                  <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
-                </jvmFlags>
-                <ports>
-                  <port>8090</port>
-                </ports>
-              </container>
-            </configuration>
             <executions>
               <execution>
                 <phase>package</phase>
@@ -159,40 +188,71 @@
                 </goals>
               </execution>
             </executions>
+            <configuration>
+              <to>
+                <image>
+                  402850851130.dkr.ecr.${aws.region}.amazonaws.com/app-api-${environment}:${project.version}
+                </image>
+                <credHelper>ecr-login</credHelper>
+              </to>
+            </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
     <profile>
-      <id>jib-to-local</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
+      <id>prod-jib</id>
+      <properties>
+        <environment>prod</environment>
+        <aws.region>us-west-2</aws.region>
+      </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>com.google.cloud.tools</groupId>
             <artifactId>jib-maven-plugin</artifactId>
-            <version>${jib-maven-plugin.version}</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
             <configuration>
-              <from>
-                <image>docker.io/adoptopenjdk/openjdk11-openj9:slim</image>
-                <auth>
-                  <username>kalyan27</username>
-                  <password>Kalbob@27</password>
-                </auth>
-              </from>
               <to>
-                <image>docker.io/kalyan27/app-api-local:v18</image>
+                <image>
+                  402850851130.dkr.ecr.${aws.region}.amazonaws.com/app-api-${environment}:${project.version}
+                </image>
+                <credHelper>ecr-login</credHelper>
               </to>
-              <allowInsecureRegistries>true</allowInsecureRegistries>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>local-jib</id>
+      <properties>
+        <environment>local</environment>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <configuration>
+              <to>
+                <image>
+                  402850851130.dkr.ecr.local.amazonaws.com/app-api-${environment}
+                </image>
+              </to>
               <container>
-                <jvmFlags>
-                  <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
-                </jvmFlags>
-                <ports>
-                  <port>8090</port>
-                </ports>
+                <args>
+                  <arg>--spring.cloud.config.enabled=false</arg>
+                  <arg>--spring.profiles.active=local</arg>
+                  <arg>--aws.kms.enabled=false</arg>
+                </args>
               </container>
             </configuration>
             <executions>
@@ -208,14 +268,5 @@
       </build>
     </profile>
   </profiles>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-help-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

@@ -11,12 +11,14 @@ services:
       - MYSQL_DATABASE=app_local_db
     ports:
       # <Port exposed> : <MySQL Port running inside container>
-      - '3307:3306'
+      - '3306:3306'
     expose:
-      # Opens port 3307 on the container
-      - '3307'
+      # Opens port 3306 on the container
+      - '3306'
     volumes:
       - app_local_db:/var/lib/mysql
+    networks:
+      - app_local_network
   app-it-db:
     container_name: app_it_db
     image: mysql:8.0
@@ -26,12 +28,30 @@ services:
       - MYSQL_ROOT_PASSWORD=kpwd
       - MYSQL_DATABASE=app_it_db
     ports:
-      - '3308:3306'
+      - '3307:3306'
     expose:
-      - '3308'
+      - '3307'
     volumes:
       - app_it_db:/var/lib/mysql
+    networks:
+      - app_local_network
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.3
+    container_name: app_local_elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - xpack.security.enabled=false
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - app_local_network
 
 volumes:
   app_local_db:
   app_it_db:
+  esdata:
+
+networks:
+  app_local_network:
