@@ -17,10 +17,10 @@
   </appender>
 
   <springProfile name="default,local">
-    <logger name="com.kubra.iq" level="${appLevel}" additivity="false">
+    <logger name="com.kalbob.iq" level="${appLevel}" additivity="false">
       <appender-ref ref="CONSOLE" />
     </logger>
-    <logger name="com.kubra.security" level="${appLevel}" additivity="false">
+    <logger name="com.kalbob.security" level="${appLevel}" additivity="false">
       <appender-ref ref="CONSOLE" />
     </logger>
     <logger name="org.springframework" level="${springLevel}" additivity="false">
@@ -43,10 +43,10 @@
   </appender>
 
   <springProfile name="dev,qa,staging,prod">
-    <logger name="com.kubra.iq" level="${appLevel}" additivity="false">
+    <logger name="com.kalbob.iq" level="${appLevel}" additivity="false">
       <appender-ref ref="JSON" />
     </logger>
-    <logger name="com.kubra.security" level="${appLevel}" additivity="false">
+    <logger name="com.kalbob.security" level="${appLevel}" additivity="false">
       <appender-ref ref="JSON" />
     </logger>
     <logger name="org.springframework" level="${springLevel}" additivity="false">
