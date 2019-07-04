@@ -1,0 +1,39 @@
+groups:
+    # The name of the group. Must be unique within a file.
+  - name: CPU Rules
+    # How often rules in the group are evaluated.
+    interval: 5s # default = global.evaluation_interval
+    rules:
+        # The name of the time series to output to. Must be a valid metric name.
+      - record: system_cpu_usage:sum
+        # The PromQL expression to evaluate. Every evaluation cycle this is
+        # evaluated at the current time, and the result recorded as a new set of
+        # time series with the metric name as given by 'record'.
+        expr: sum(system_cpu_usage)
+        # Labels to add or overwrite before storing the result.
+        labels:
+        # The name of the alert. Must be a valid metric name.
+
+      - alert: system_cpu_usage:avg:exceeds
+        # The PromQL expression to evaluate. Every evaluation cycle this is
+        # evaluated at the current time, and all resultant time series become
+        # pending/firing alerts.
+        expr: max(sum(system_cpu_usage)) > 0.1
+        # Alerts are considered firing once they have been returned for this long.
+        # Alerts which have not yet fired for long enough are considered pending.
+        for: 5s # default = 0s
+        # Labels to add or overwrite for each alert.
+        labels:
+          severity: critical
+        # Annotations to add to each alert.
+        annotations:
+          summary: "CPU usage of instance {{ $labels.instance }}"
+          description: "CPU usage of instance {{ $labels.instance }}"
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          description: "Instances of {{ $labels.application }} are down"

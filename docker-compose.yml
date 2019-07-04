@@ -1,6 +1,7 @@
 version: '3.2'
 
 services:
+
   app-local-db:
     container_name: app_local_db
     image: mysql:8.0
@@ -11,24 +12,40 @@ services:
       - MYSQL_DATABASE=app_local_db
     ports:
       # <Port exposed> : <MySQL Port running inside container>
-      - '3306:3306'
+      - '3307:3306'
     expose:
       # Opens port 3306 on the container
-      - '3306'
+      - '3307'
     volumes:
       - app_local_db:/var/lib/mysql
     networks:
       - app_local_network
+
   prometheus:
     container_name: app_prometheus
     image: prom/prometheus:v2.10.0
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-lifecycle'
     ports:
       - '9090:9090'
     network_mode: host
+
+  alertmanager:
+    container_name: app_alertmanager
+    image: prom/alertmanager:v0.17.0
+    volumes:
+      - ./alertmanager:/etc/alertmanager
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - '9093:9093'
+    network_mode: host
+
   grafana:
     container_name: app_grafana
     image: grafana/grafana:6.2.5
@@ -36,7 +53,10 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     ports:
       - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
     network_mode: host
+
   ngrok:
     container_name: app_ngrok
     image: gtriggiano/ngrok-tunnel
@@ -50,6 +70,9 @@ services:
 volumes:
   app_local_db:
   app_local_elasticsearch:
+  prometheus_data: {}
+  alertmanager_data: {}
+  grafana_data: {}
 
 networks:
   app_local_network:

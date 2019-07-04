@@ -10,9 +10,9 @@ services:
       - MYSQL_ROOT_PASSWORD=kpwd
       - MYSQL_DATABASE=app_it_db
     ports:
-      - '3307:3306'
+      - '3308:3306'
     expose:
-      - '3307'
+      - '3308'
     volumes:
       - app_it_db:/var/lib/mysql
     networks:
