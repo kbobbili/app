@@ -40,7 +40,8 @@ public class ProjectServiceImpl implements ProjectService {
 
   public List<Employee> getEmployees(Long id) {
     Project project = findById(id);
-    return project.getEmployees();
+    //return project.getEmployees();
+    return null;
   }
 
   public Project addEmployee(Long id, Long employeeId){
@@ -53,12 +54,12 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   public Project addEmployee(Project project, Employee employee){
-    project.addEmployee(employee);
+    //project.addEmployee(employee);
     return projectRepository.saveAndFlush(project);
   }
 
   public Project addEmployee(Project project, Long employeeId){
-    project.addEmployee(employeeRepository.getById(employeeId));
+    //project.addEmployee(employeeRepository.getById(employeeId));
     return projectRepository.saveAndFlush(project);
   }
 
@@ -68,7 +69,7 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   public Project removeEmployee(Project project, Long employeeId) {
-    project.removeEmployee(employeeRepository.getById(employeeId));
+    //project.removeEmployee(employeeRepository.getById(employeeId));
     return projectRepository.saveAndFlush(project);
   }
 

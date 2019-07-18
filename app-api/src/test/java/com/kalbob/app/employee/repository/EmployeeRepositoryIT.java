@@ -12,8 +12,6 @@ import com.kalbob.app.department.DepartmentMother;
 import com.kalbob.app.department.DepartmentType;
 import com.kalbob.app.employee.Employee;
 import com.kalbob.app.employee.EmployeeMother;
-import com.kalbob.app.project.Project;
-import com.kalbob.app.project.ProjectMother;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -63,7 +61,7 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
     assertNull(employeeRepository.findById(employee.getId()).orElseThrow(ResourceNotFoundException::new).getDepartment());
   }
 
-  @Test
+  /*@Test
   @Transactional//(propagation = Propagation.REQUIRED, noRollbackFor = Exception.class)
   @Rollback(false)
   public void removeProject() {//Employee deletes its association with department by setting department_id to null
@@ -79,7 +77,7 @@ public class EmployeeRepositoryIT extends BaseRepositoryIT {
 
     employee = employeeRepository.saveAndFlush(employee);
     assertTrue(employeeRepository.findById(employee.getId()).orElseThrow(ResourceNotFoundException::new).getProjects().size() == 1);
-  }
+  }*/
 
   @Test
   public void findByDepartment_NameIgnoreCase() {

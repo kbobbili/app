@@ -1,5 +1,6 @@
 package com.kalbob.app.department;
 
+import com.kalbob.app.BaseEntity;
 import com.kalbob.app.project.Project;
 import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
@@ -23,7 +24,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode
 @Entity
 @Table(name = "project_management")
-public class ProjectManagement {
+public class ProjectManagement extends BaseEntity {
 
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "department_id")

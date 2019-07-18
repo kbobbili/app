@@ -23,7 +23,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   public Set<Project> getProjects(Long id) {
     Employee employee = findById(id);
-    return employee.getProjects();
+    //return employee.getProjects();
+    return null;
   }
 
   public Employee joinProject(Long id, Long projectId) {
@@ -33,7 +34,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   public Employee joinProject(Employee employee, Long projectId){
     Project project = projectRepository.getById(projectId);
-    employee.joinProject(project);
+    //employee.joinProject(project);
     return employeeRepository.saveAndFlush(employee);
   }
 
@@ -50,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   public Employee leaveProject(Employee employee, Long projectId){
     Project project = projectRepository.getById(projectId);
-    employee.leaveProject(project);
+    //employee.leaveProject(project);
     return employeeRepository.saveAndFlush(employee);
   }
 
