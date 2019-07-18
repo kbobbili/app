@@ -23,7 +23,7 @@ scrape_configs:
           environment: 'qa'
 
 rule_files:
-  - "/etc/prometheus/prometheus_rules.yml"
+  #- "/etc/prometheus/prometheus_rules.yml"
 
 alerting:
   alertmanagers:
