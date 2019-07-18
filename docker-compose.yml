@@ -21,6 +21,19 @@ services:
     networks:
       - app_local_network
 
+  app-local-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.3
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - app_local_elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    network_mode: host
+
   prometheus:
     container_name: app_prometheus
     image: prom/prometheus:v2.10.0
@@ -70,6 +83,7 @@ services:
 volumes:
   app_local_db:
   app_local_elasticsearch:
+    driver: local
   prometheus_data: {}
   alertmanager_data: {}
   grafana_data: {}
