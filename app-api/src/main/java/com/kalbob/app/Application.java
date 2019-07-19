@@ -14,7 +14,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @SpringBootApplication
 public class Application {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(Application.class);
 
   private final ApplicationContext applicationContext;
 
@@ -33,6 +33,7 @@ public class Application {
   @Profile("local")
   public CommandLineRunner run(ApplicationContext appContext) {
     return args -> {
+      System.out.println("APP PROFILE - "+environment.getProperty("spring.profiles.active"));
       logger.info("[::::::Application::::::");
       logger
           .info("spring.cloud.config.uri: {}", environment.getProperty("spring.cloud.config.uri"));
