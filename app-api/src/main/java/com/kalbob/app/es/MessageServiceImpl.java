@@ -173,7 +173,7 @@ public class MessageServiceImpl implements MessageService {
     RestStatus status = searchResponse.status();
     TimeValue took = searchResponse.getTook();
     SearchHits hits = searchResponse.getHits();
-    long totalHits = hits.getTotalHits();
+    //long totalHits = hits.getTotalHits();
     SearchHit[] searchHits = hits.getHits();
     List<Message> messages = new ArrayList<>();
     for (SearchHit hit : searchHits) {

@@ -119,7 +119,7 @@ public class ElasticSearchITCopy {
     request.waitForNodes("le(1)");
     request.waitForActiveShards(1);
     request.waitForEvents(Priority.NORMAL);
-    request.level(ClusterHealthRequest.Level.SHARDS);
+    //request.level(ClusterHealthRequest.Level.SHARDS);
     ClusterHealthResponse response = client.cluster().health(request, RequestOptions.DEFAULT);
     System.out.println(response);
     assertTrue(response.getActivePrimaryShards() > 0);
@@ -253,7 +253,7 @@ public class ElasticSearchITCopy {
     RestStatus status = searchResponse.status();
     TimeValue took = searchResponse.getTook();
     SearchHits hits = searchResponse.getHits();
-    long totalHits = hits.getTotalHits();
+    //long totalHits = hits.getTotalHits();
     SearchHit[] searchHits = hits.getHits();
     List<Message> messages = new ArrayList<>();
     for (SearchHit hit : searchHits) {

@@ -56,7 +56,12 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -123,7 +128,7 @@ public class ElasticSearchIT {
     request.waitForNodes("le(1)");
     request.waitForActiveShards(1);
     request.waitForEvents(Priority.NORMAL);
-    request.level(ClusterHealthRequest.Level.SHARDS);
+    //request.level(ClusterHealthRequest.Level.SHARDS);
     ClusterHealthResponse response = client.cluster().health(request, RequestOptions.DEFAULT);
     System.out.println(response);
     assertTrue(response.getActivePrimaryShards() > 0);
@@ -138,7 +143,7 @@ public class ElasticSearchIT {
       Map<String, Object> msgPayload = new HashMap<>();
       msgPayload.put("text", dataFactory.getItem(Arrays
           .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")));
-      msgPayload.put("user", new User().setUserId("USER-" + ((i % 10)+1)));
+      msgPayload.put("user", new User().setUserId("USER-" + ((i % 10))));
       Map<String, Object> tags = new HashMap<>();
       tags.put("intent", "welcome");
       tags.put("lang", "en-US");
@@ -148,7 +153,7 @@ public class ElasticSearchIT {
           .setApplication("IQ")
           .setChannel(Arrays.asList("TWILIO","FACEBOOK","GOOGLE").get(dataFactory.getNumberUpTo(2)))
           .setChannelUserId("13343329276")
-          .setSessionId("SESSION-" + ((i % 10)+1))
+          .setSessionId("SESSION-" + ((i % 10)))
           .setMessage(msgPayload)
           .setMessageDirection(dataFactory.getItem(Arrays.asList("IN_BOUND")))
           .setSentAt(ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes((count*10)-i))
@@ -165,7 +170,7 @@ public class ElasticSearchIT {
       Map<String, Object> msgPayload = new HashMap<>();
       msgPayload.put("text", dataFactory.getItem(Arrays
           .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")));
-      msgPayload.put("user", new User().setUserId("USER-" + ((i % 10)+1)));
+      msgPayload.put("user", new User().setUserId("USER-" + ((i % 10))));
       Map<String, Object> tags = new HashMap<>();
       tags.put("intent", "welcome");
       tags.put("lang", "en-US");
@@ -175,7 +180,7 @@ public class ElasticSearchIT {
           .setApplication("IQ")
           .setChannel("TWILIO")
           .setChannelUserId("13343329276")
-          .setSessionId("SESSION-" + ((i % 10)+1))
+          .setSessionId("SESSION-" + ((i % 10)))
           .setMessage(msgPayload)
           .setMessageDirection(dataFactory.getItem(Arrays.asList("IN_BOUND")))
           .setSentAt(ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes((count*10)-i))
@@ -202,6 +207,22 @@ public class ElasticSearchIT {
     }
     assertEquals(response.getResult(), DocWriteResponse.Result.CREATED);
     //assertGet
+  }
+//2019-07-20T06:29:45.35515Z
+  @Test
+  public void update() throws IOException {
+    UpdateByQueryRequest request = new UpdateByQueryRequest("messages-01");
+    request.setQuery(new TermQueryBuilder("sessionId","SESSION-1"));
+    Script inline = new Script(ScriptType.INLINE, "painless",
+        "ctx._source['channel']='C'", new HashMap<>());
+    request.setScript(inline);
+    request.setConflicts("proceed");
+    request.setRefresh(true);
+    System.out.println(request);
+    BulkByScrollResponse bulkResponse = client.updateByQuery(request, RequestOptions.DEFAULT);
+    long updatedDocs = bulkResponse.getUpdated();
+    System.out.println(bulkResponse);
+    assertEquals(updatedDocs, 1);
   }
 
   @Test
@@ -278,7 +299,7 @@ public class ElasticSearchIT {
     RestStatus status = searchResponse.status();
     TimeValue took = searchResponse.getTook();
     SearchHits hits = searchResponse.getHits();
-    long totalHits = hits.getTotalHits();
+    //long totalHits = hits.getTotalHits();
     SearchHit[] searchHits = hits.getHits();
     List<Message> messages = new ArrayList<>();
     for (SearchHit hit : searchHits) {
