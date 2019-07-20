@@ -71,7 +71,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 @Slf4j
-public class ElasticSearchIT {
+public class ElasticSearchITCopy {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private RestHighLevelClient client = new RestHighLevelClient(
@@ -95,16 +95,12 @@ public class ElasticSearchIT {
 
   @Test
   public void test() throws JsonProcessingException {
-    ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+    ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"));
     System.out.println(now);//2019-07-19T00:00:00.000Z[UTC]
     System.out.println(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").format(now));
     System.out.println(ZonedDateTime.parse(now.toString(), DateTimeFormatter.ISO_ZONED_DATE_TIME));
-    System.out.println(ZonedDateTime.now(ZoneId.of("UTC")).minusDays(7).format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
-    System.out.println(ZonedDateTime.now(ZoneId.of("UTC")).minusDays(7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
-    ZonedDateTime.now(ZoneId.of("UTC")).minusMonths(3).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ"));
-    //System.out.println(objectMapper.writeValueAsString(getMessagesCollapsedToSessions(1)));
-    //searchSourceBuilder();
-
+    //System.out.println(objectMapper.writeValueAsString(getMessages(1)));
+    searchSourceBuilder();
   }
 
   @Test
@@ -132,13 +128,19 @@ public class ElasticSearchIT {
     assertTrue(indices.size() > 0);
   }
 
-  private List<Message> getRandomizedMessagesForXSessions(int count){
+  private List<Message> getMessages(int count){
     List<Message> messages = new ArrayList<>();
-    for(int i = 1; i <=count*10; i++) {
+    for(int i = 1; i <=count; i++) {
+      int id = 0;
+      if(count <=5 ) {
+        id = dataFactory.getNumberUpTo(count) + 1; //[1,count]
+      } else {
+        id = dataFactory.getNumberUpTo(count/5) + 1; //[1,count/5]
+      }
       Map<String, Object> msgPayload = new HashMap<>();
       msgPayload.put("text", dataFactory.getItem(Arrays
           .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")));
-      msgPayload.put("user", new User().setUserId("USER-" + ((i % 10)+1)));
+      msgPayload.put("user", new User().setUserId("USER-" + id));
       Map<String, Object> tags = new HashMap<>();
       tags.put("intent", "welcome");
       tags.put("lang", "en-US");
@@ -148,37 +150,10 @@ public class ElasticSearchIT {
           .setApplication("IQ")
           .setChannel(Arrays.asList("TWILIO","FACEBOOK","GOOGLE").get(dataFactory.getNumberUpTo(2)))
           .setChannelUserId("13343329276")
-          .setSessionId("SESSION-" + ((i % 10)+1))
+          .setSessionId("SESSION-" + id)
           .setMessage(msgPayload)
           .setMessageDirection(dataFactory.getItem(Arrays.asList("IN_BOUND")))
-          .setSentAt(ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes((count*10)-i))
-          .setApplicationMeta(new ApplicationMeta().setVersion("v0"))
-          .setTags(tags);
-      messages.add(message);
-    }
-    return messages;
-  }
-
-  private List<Message> getMessagesForXSessions(int count){
-    List<Message> messages = new ArrayList<>();
-    for(int i = 1; i <=count*10; i++) {
-      Map<String, Object> msgPayload = new HashMap<>();
-      msgPayload.put("text", dataFactory.getItem(Arrays
-          .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")));
-      msgPayload.put("user", new User().setUserId("USER-" + ((i % 10)+1)));
-      Map<String, Object> tags = new HashMap<>();
-      tags.put("intent", "welcome");
-      tags.put("lang", "en-US");
-      tags.put("confidence", 1);
-      Message message = new Message()
-          .setTenantId("ABC")
-          .setApplication("IQ")
-          .setChannel("TWILIO")
-          .setChannelUserId("13343329276")
-          .setSessionId("SESSION-" + ((i % 10)+1))
-          .setMessage(msgPayload)
-          .setMessageDirection(dataFactory.getItem(Arrays.asList("IN_BOUND")))
-          .setSentAt(ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes((count*10)-i))
+          .setSentAt(ZonedDateTime.now(ZoneId.of("UTC")))
           .setApplicationMeta(new ApplicationMeta().setVersion("v0"))
           .setTags(tags);
       messages.add(message);
@@ -188,7 +163,7 @@ public class ElasticSearchIT {
 
   @Test
   public void index() throws IOException {
-    Message message = getRandomizedMessagesForXSessions(2).get(0);
+    Message message = getMessages(1).get(0);
     String document = objectMapper.writeValueAsString(message);
     IndexRequest request = new IndexRequest("messages-01","_doc")
         .source(document, XContentType.JSON);
@@ -206,8 +181,8 @@ public class ElasticSearchIT {
 
   @Test
   public void bulkIndex() throws IOException {
-    List<Message> messages = getMessagesForXSessions(30);
-    BulkProcessor.Listener bulkListener = getBulkListener();
+    List<Message> messages = getMessages(20);
+    Listener bulkListener = getBulkListener();
     BulkProcessor.Builder bulkProcessorBuilder = BulkProcessor.builder(
         (request, listener) ->
             client.bulkAsync(request, RequestOptions.DEFAULT, listener),
@@ -232,7 +207,7 @@ public class ElasticSearchIT {
   }
 
   private Listener getBulkListener() {
-    return new BulkProcessor.Listener() {
+    return new Listener() {
       @Override
       public void beforeBulk(long executionId, BulkRequest request) {
         int numberOfActions = request.numberOfActions();
@@ -314,8 +289,6 @@ public class ElasticSearchIT {
             .setMessageCount(1);
         sessionSummaryMap.put(message.getSessionId(), sessionSummary);
       } else {
-
-
         if (message.getSentAt().isBefore(sessionSummary.getStartTime())) {
           sessionSummary.setStartTime(message.getSentAt());
           sessionSummary.setDuration(
@@ -326,12 +299,6 @@ public class ElasticSearchIT {
           sessionSummary.setDuration(
               Duration.between(sessionSummary.getStartTime(), sessionSummary.getEndTime()));
         }
-
-
-
-
-
-
         Object intent = message.getTags().get("intent");
         if (intent != null) {
           sessionSummary.getIntents().add(intent.toString());
@@ -356,7 +323,7 @@ public class ElasticSearchIT {
   }
 
   private SearchSourceBuilder searchSourceBuilder(){
-    String url = "?page=0&size=10";
+    String url = "?tenantId=ABC&channelUserId=13343329276&from=2019-07-15T00:00:00.000Z&to=2019-07-20T00:00:00.000Z&page=0&size=10";//&channel=TWILIO&message.text=pay
     List<NameValuePair> listOfParams = new ArrayList<>();
     try {
       listOfParams = URLEncodedUtils.parse(new URI(url), Charset.forName("UTF-8"));
@@ -369,7 +336,7 @@ public class ElasticSearchIT {
     }
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.from(Integer.parseInt(params.get("page")));
-    searchSourceBuilder.size(Integer.parseInt(params.get("size")));//fetch 100 messages for 10 sessions on the page. //but for messages endpoint; upper limit it to 1000
+    searchSourceBuilder.size(Integer.parseInt(params.get("size"))*2);//fetch 100 messages for 10 sessions on the page. //but for messages endpoint; upper limit it to 1000
     params.remove("page");params.remove("size");
     searchSourceBuilder.query(queryBuilder(params));
     searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
@@ -385,17 +352,11 @@ public class ElasticSearchIT {
         .rangeQuery("sentAt");
     if(params.containsKey("from") && !params.get("from").isEmpty()) {
       dateRangeBuilder
-          .gte(ZonedDateTime.parse(params.get("from"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
-    }else {
-      dateRangeBuilder
-          .gte(ZonedDateTime.now(ZoneId.of("UTC")).minusDays(7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
+          .gte(ZonedDateTime.parse(params.get("from"), DateTimeFormatter.ISO_ZONED_DATE_TIME));
     }
     if(params.containsKey("to") && !params.get("to").isEmpty()) {
       dateRangeBuilder
-          .lte(ZonedDateTime.parse(params.get("to"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
-    }else {
-      dateRangeBuilder
-          .gte(ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
+          .lte(ZonedDateTime.parse(params.get("to"), DateTimeFormatter.ISO_ZONED_DATE_TIME));
     }
     boolQueryBuilder.filter(dateRangeBuilder);
     for (String key : params.keySet()) {

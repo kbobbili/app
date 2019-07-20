@@ -4,18 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -35,6 +34,9 @@ import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -110,9 +112,16 @@ public class MessageServiceImpl implements MessageService {
     searchSourceBuilder.from(from);
     searchSourceBuilder.size(size);//fetch 100 messages for 10 sessions on the page. //but for messages endpoint; upper limit it to 1000
     searchSourceBuilder.query(queryBuilder(params));
+    searchSourceBuilder.sort(sortBuilder(params));
     searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
     System.out.println(searchSourceBuilder);
     return searchSourceBuilder;
+  }
+
+  private SortBuilder sortBuilder(Map<String, String> params) {
+    return SortBuilders
+        .fieldSort("sentAt")
+        .order(SortOrder.ASC);
   }
 
   private QueryBuilder queryBuilder(Map<String, String> params) {
@@ -123,15 +132,21 @@ public class MessageServiceImpl implements MessageService {
         .rangeQuery("sentAt");
     if(params.containsKey("from") && !params.get("from").isEmpty()) {
       dateRangeBuilder
-          .gte(ZonedDateTime.parse(params.get("from"), DateTimeFormatter.ISO_ZONED_DATE_TIME));
+          .gte(ZonedDateTime.parse(params.get("from"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
+    }else {
+      dateRangeBuilder
+          .gte(ZonedDateTime.now(ZoneId.of("UTC")).minusMonths(3).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
     }
     if(params.containsKey("to") && !params.get("to").isEmpty()) {
       dateRangeBuilder
-          .lte(ZonedDateTime.parse(params.get("to"), DateTimeFormatter.ISO_ZONED_DATE_TIME));
+          .lte(ZonedDateTime.parse(params.get("to"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
+    }else {
+      dateRangeBuilder
+          .lte(ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
     }
     boolQueryBuilder.filter(dateRangeBuilder);
     for (String key : params.keySet()) {
-      if(!params.get(key).isEmpty() && !dateRangeFields().contains(key)) {
+      if(!params.get(key).isEmpty() && !dateRangeFields().contains(key) && !paginationFields().contains(key)) {
         if (fullTextQueryFields().contains(key))
           boolQueryBuilder.must(QueryBuilders.matchQuery(key, params.get(key)));
         else
@@ -148,6 +163,10 @@ public class MessageServiceImpl implements MessageService {
 
   private List<String> dateRangeFields(){
     return Arrays.asList("from", "to");
+  }
+
+  private List<String> paginationFields(){
+    return Arrays.asList("page","size","sort");
   }
 
   private List<Message> retrieveMessages(SearchResponse searchResponse) {
@@ -180,7 +199,7 @@ public class MessageServiceImpl implements MessageService {
     List<SessionSummary> sessionSummaries = new ArrayList<>();
     int retrievedSessionsCount = 0;
     int msgsSize = size * 10;
-    while (retrievedSessionsCount < size) {
+    while (retrievedSessionsCount < size && (from+msgsSize) < 10000) {
       SearchResponse searchResponse = search(params, from, msgsSize);
       if (searchResponse != null) {
         List<SessionSummary> interimSessionSummaries = retrieveSessionSummaries(retrieveMessages(searchResponse));
@@ -238,9 +257,7 @@ public class MessageServiceImpl implements MessageService {
         sessionSummaryMap.put(message.getSessionId(), sessionSummary);
       }
     }
-    List<SessionSummary> sessionSummaries = sessionSummaryMap.values().stream()
-        .sorted((Comparator.comparing(SessionSummary::getStartTime)).reversed())
-        .collect(Collectors.toList());
+    List<SessionSummary> sessionSummaries = new ArrayList<>(sessionSummaryMap.values());
     System.out.println("Total Sessions Count "+sessionSummaries.size());
     System.out.println("Sessions "+sessionSummaries);
     return sessionSummaries;
