@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -69,6 +70,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+@Slf4j
 public class ElasticSearchIT {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -125,8 +127,8 @@ public class ElasticSearchIT {
     assertTrue(indices.size() > 0);
   }
 
-  private List<HistMessage> getMessages(int count){
-    List<HistMessage> messages = new ArrayList<>();
+  private List<Message> getMessages(int count){
+    List<Message> messages = new ArrayList<>();
     for(int i = 1; i <=count; i++) {
       int id = 0;
       if(count <=5 ) {
@@ -142,7 +144,7 @@ public class ElasticSearchIT {
       tags.put("intent", "welcome");
       tags.put("lang", "en-US");
       tags.put("confidence", 1);
-      HistMessage message = new HistMessage()
+      Message message = new Message()
           .setTenantId("ABC")
           .setApplication("IQ")
           .setChannel(Arrays.asList("TWILIO","FACEBOOK","GOOGLE").get(dataFactory.getNumberUpTo(2)))
@@ -152,7 +154,6 @@ public class ElasticSearchIT {
           .setMessageDirection(dataFactory.getItem(Arrays.asList("IN_BOUND")))
           .setSentAt(ZonedDateTime.now(ZoneId.of("UTC")))
           .setApplicationMeta(new ApplicationMeta().setVersion("v0"))
-          .setTest("test")
           .setTags(tags);
       messages.add(message);
     }
@@ -161,7 +162,7 @@ public class ElasticSearchIT {
 
   @Test
   public void index() throws IOException {
-    HistMessage message = getMessages(1).get(0);
+    Message message = getMessages(1).get(0);
     String document = objectMapper.writeValueAsString(message);
     IndexRequest request = new IndexRequest("messages-01","_doc")
         .source(document, XContentType.JSON);
@@ -179,7 +180,7 @@ public class ElasticSearchIT {
 
   @Test
   public void bulkIndex() throws IOException {
-    List<HistMessage> messages = getMessages(100);
+    List<Message> messages = getMessages(20);
     BulkProcessor.Listener bulkListener = getBulkListener();
     BulkProcessor.Builder bulkProcessorBuilder = BulkProcessor.builder(
         (request, listener) ->
@@ -192,7 +193,7 @@ public class ElasticSearchIT {
     bulkProcessorBuilder.setBackoffPolicy(BackoffPolicy
         .constantBackoff(TimeValue.timeValueSeconds(1L), 3));
     BulkProcessor bulkProcessor = bulkProcessorBuilder.build();
-    for(HistMessage message: messages) {
+    for(Message message: messages) {
       bulkProcessor.add(new IndexRequest("messages-01", "_doc")
           .source(objectMapper.writeValueAsString(message), XContentType.JSON));
     }
@@ -253,22 +254,22 @@ public class ElasticSearchIT {
     SearchHits hits = searchResponse.getHits();
     long totalHits = hits.getTotalHits();
     SearchHit[] searchHits = hits.getHits();
-    List<HistMessage> messages = new ArrayList<>();
+    List<Message> messages = new ArrayList<>();
     for (SearchHit hit : searchHits) {
       String index = hit.getIndex();
       String id = hit.getId();
       float score = hit.getScore();
       Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-      messages.add(objectMapper.convertValue(sourceAsMap, HistMessage.class));
+      messages.add(objectMapper.convertValue(sourceAsMap, Message.class));
     }
     System.out.println("Total Messages Count "+messages.size());
     System.out.println("Messages "+messages);
     buildSessionSummaries(messages);
   }
 
-  private void buildSessionSummaries(List<HistMessage> messages) {
+  private void buildSessionSummaries(List<Message> messages) {
     Map<String, SessionSummary> sessionSummaryMap = new LinkedHashMap<>();
-    for (HistMessage message : messages) {
+    for (Message message : messages) {
       SessionSummary sessionSummary = sessionSummaryMap.get(message.getSessionId());
       if (sessionSummary == null) {
         Object intent = message.getTags().get("intent");

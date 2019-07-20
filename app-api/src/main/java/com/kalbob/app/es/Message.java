@@ -1,7 +1,6 @@
 package com.kalbob.app.es;
 
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +11,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class HistMessage {
+public class Message {
   private String tenantId;
   private String application;
   private String channel;
@@ -22,6 +21,5 @@ public class HistMessage {
   private String messageDirection;
   private ApplicationMeta applicationMeta;
   private ZonedDateTime sentAt;
-  private String test;
-  private Map<String, Object> tags = new HashMap<>();
+  private Map<String, Object> tags;
 }
