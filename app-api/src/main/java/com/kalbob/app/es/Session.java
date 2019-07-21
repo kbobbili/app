@@ -12,23 +12,19 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Message {
-  private String messageId;
+public class Session {
+  private String sessionId;
   private String tenantId;
   private String channel;
-  private String provider;
-  private String providerId;
   private String channelUserId;
-  private String text;
-  private Map<String, Object> additionalPayload;
-  private String type;
+  private ZonedDateTime createTime;
+  private ZonedDateTime updateTime;
+  private float messageCount;
   private String direction;
+  private List<String> intents;
   private String application;
-  private ApplicationMeta applicationMeta;
-  private ZonedDateTime sentAt;
+  private ApplicationMeta ApplicationMetaObject;
+  private List<Message> messages;
+  private Map<String, Object> additionalPayload;
   private Map<String, Object> tags;
-  private boolean isSent;
-  private String notSentReason;
-  private boolean resend;
-  private List<Event> events;
 }

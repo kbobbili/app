@@ -12,11 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Event {
-  private String tenantId;
-  private String providerId;
-  private String messageId;
-  private String event;
+  private String eventName;
   private String eventDetails;
   private ZonedDateTime sentAt;
+  private Map<String, Object> additionalPayload;
   private Map<String, Object> tags;
 }

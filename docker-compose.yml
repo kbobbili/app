@@ -32,7 +32,16 @@ services:
       - app_local_elasticsearch:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
-    network_mode: host
+    networks:
+      - app_local_network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.4.3
+    container_name: kibana
+    ports:
+      - 5601:5601
+    networks:
+      - app_local_network
 
   prometheus:
     container_name: app_prometheus
