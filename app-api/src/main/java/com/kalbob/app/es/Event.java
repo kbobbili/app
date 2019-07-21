@@ -3,14 +3,14 @@ package com.kalbob.app.es;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Event {
   private String eventName;
   private String eventDetails;

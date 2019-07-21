@@ -11,4 +11,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ApplicationMeta {
   private String version;
+  private String environment;
 }

@@ -22,7 +22,7 @@ public class MessageController {
   }
 
   @GetMapping("/sessions")
-  public Page<SessionSummary> sessionSummaries(@RequestParam Map<String, String> params,
+  public Page<SessionAggregate> sessionSummaries(@RequestParam Map<String, String> params,
       Pageable pageable) {
     return messageService.getSessionSummaries(params, pageable);
   }

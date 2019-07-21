@@ -1,0 +1,430 @@
+DELETE _template/m
+DELETE m
+DELETE _template/s
+DELETE s
+
+GET m
+GET s
+
+PUT _template/m
+{
+    "index_patterns": [
+      "m*"
+    ],
+    "version": 0,
+    "aliases": {
+      "m_w": {}
+    },
+    "mappings": {
+      "_doc": {
+        "dynamic_date_formats": [
+          "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+          "yyyy-MM-dd'T'HH:mm:ssZZ"
+        ],
+        "properties": {
+          "additionalPayload": {
+            "dynamic": false,
+            "type": "object"
+          },
+          "application": {
+            "type": "keyword"
+          },
+          "applicationMeta": {
+            "properties": {
+              "environment": {
+                "type": "keyword"
+              },
+              "version": {
+                "type": "keyword"
+              }
+            }
+          },
+          "channel": {
+            "type": "keyword"
+          },
+          "channelUserId": {
+            "type": "keyword"
+          },
+          "direction": {
+            "type": "keyword"
+          },
+          "events": {
+            "properties": {
+              "additionalPayload": {
+                "dynamic": false,
+                "type": "object"
+              },
+              "eventDetails": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "eventName": {
+                "type": "keyword"
+              },
+              "sentAt": {
+                "type": "date",
+                "format": "date_time||date_time_no_millis"
+              },
+              "tags": {
+                "type": "object"
+              }
+            }
+          },
+          "isSent": {
+            "type": "boolean"
+          },
+          "messageId": {
+            "type": "keyword"
+          },
+          "notSentReason": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "resend": {
+            "type": "boolean"
+          },
+          "sentAt": {
+            "type": "date",
+            "format": "date_time||date_time_no_millis"
+          },
+          "tags": {
+            "properties": {
+              "confidence": {
+                "type": "long"
+              },
+              "intent": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "lang": {
+                "type": "keyword"
+              }
+            }
+          },
+          "tenantId": {
+            "type": "keyword"
+          },
+          "text": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "type": {
+            "type": "keyword"
+          },
+          "userMeta": {
+            "dynamic": false,
+            "type": "object"
+          }
+        }
+      }
+    },
+    "settings": {
+      "index": {
+        "number_of_shards": "5",
+        "number_of_replicas": "1"
+      }
+    }
+}
+PUT _template/s
+{
+  "index_patterns": [
+    "s*"
+  ],
+  "version": 0,
+  "aliases": {
+    "s_w": {}
+  },
+  "mappings": {
+    "_doc": {
+      "dynamic_date_formats": [
+        "yyyy-MM-dd'T'HH:mm:ss.SSSZZ",
+        "yyyy-MM-dd'T'HH:mm:ssZZ"
+      ],
+      "properties": {
+        "sessionId": {
+          "type": "keyword"
+        },
+        "messages": {
+          "properties": {
+            "additionalPayload": {
+              "dynamic": false,
+              "type": "object"
+            },
+            "application": {
+              "type": "keyword"
+            },
+            "applicationMeta": {
+              "properties": {
+                "environment": {
+                  "type": "keyword"
+                },
+                "version": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "channel": {
+              "type": "keyword"
+            },
+            "channelUserId": {
+              "type": "keyword"
+            },
+            "direction": {
+              "type": "keyword"
+            },
+            "events": {
+              "properties": {
+                "additionalPayload": {
+                  "dynamic": false,
+                  "type": "object"
+                },
+                "eventDetails": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "eventName": {
+                  "type": "keyword"
+                },
+                "sentAt": {
+                  "type": "date",
+                  "format": "date_time||date_time_no_millis"
+                },
+                "tags": {
+                  "type": "object"
+                }
+              }
+            },
+            "isSent": {
+              "type": "boolean"
+            },
+            "messageId": {
+              "type": "keyword"
+            },
+            "notSentReason": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "resend": {
+              "type": "boolean"
+            },
+            "sentAt": {
+              "type": "date",
+              "format": "date_time||date_time_no_millis"
+            },
+            "tags": {
+              "properties": {
+                "confidence": {
+                  "type": "long"
+                },
+                "intent": {
+                  "type": "text",
+                  "fields": {
+                    "keyword": {
+                      "type": "keyword",
+                      "ignore_above": 256
+                    }
+                  }
+                },
+                "lang": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "tenantId": {
+              "type": "keyword"
+            },
+            "text": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "type": {
+              "type": "keyword"
+            },
+            "userMeta": {
+              "dynamic": false,
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "number_of_shards": "5",
+      "number_of_replicas": "1"
+    }
+  }
+}
+
+PUT s/_doc/1
+{
+  "sessionId": "SESSION-1",
+  "messages": [
+    {
+      "messageId": "MESSAGE-1",
+      "tenantId": "ABC",
+      "channel": "TWILIO",
+      "channelUserId": "13343329276",
+      "text": "report outage",
+      "additionalPayload": {},
+      "type": "SMS",
+      "direction": "IN_BOUND",
+      "application": "IQ",
+      "applicationMeta": {
+        "version": "v0",
+        "environment": "dev"
+      },
+      "userMeta": {},
+      "sentAt": "2019-07-18T22:35:01.856Z",
+      "tags": {
+        "lang": "en-US",
+        "intent": "welcome",
+        "confidence": 1
+      },
+      "isSent": true,
+      "notSentReason": "",
+      "resend": true,
+      "events": [
+        {
+          "eventName": "EVENT-1",
+          "eventDetails": "event-1-deatils",
+          "sentAt": "2019-07-18T22:30:02.856Z",
+          "additionalPayload": {},
+          "tags": {}
+        }
+      ]
+    }
+  ]
+}
+PUT m/_doc/1
+{
+  "messageId": "MESSAGE-1",
+  "tenantId": "ABC",
+  "channel": "TWILIO",
+  "channelUserId": "13343329276",
+  "text": "report outage",
+  "additionalPayload": {},
+  "type": "SMS",
+  "direction": "IN_BOUND",
+  "application": "SM",
+  "applicationMeta": {
+    "version": "v0",
+    "environment": "dev"
+  },
+  "userMeta": {},
+  "sentAt": "2019-07-17T22:30:01.856Z",
+  "tags": {
+    "lang": "en-US",
+    "intent": "welcome",
+    "confidence": 1
+  },
+  "isSent": true,
+  "notSentReason": "",
+  "resend": true,
+  "events": [
+    {
+      "eventName": "EVENT-1",
+      "eventDetails": "event-1-deatils",
+      "sentAt": "2019-07-18T22:30:02.856Z",
+      "additionalPayload": {},
+      "tags": {}
+    }
+  ]
+}
+
+GET s,m/_search
+
+GET s,m/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "messages.text": "report"
+          }
+        },
+        {
+          "match": {
+            "text": "report"
+          }
+        }
+      ],
+        "filter": [
+        {
+          "bool": {
+            "should": [
+              {
+                "range": {
+                  "messages.sentAt": {
+                    "gte": "now-1M/d",
+                    "lte": "now"
+                  }
+                }
+              },
+              {
+                "range": {
+                  "sentAt": {
+                    "gte": "now-1M/d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+POST s/_update_by_query?conflicts=proceed
+{
+  "script": {
+    "lang": "painless",
+    "source": """if (ctx._source.containsKey("messages")) {ctx._source.messages.add(params.message);} else {ctx._source.messages = [params.message]}""",
+    "params": {
+      "message": {
+        "pid": "1",
+        "amt": "10"
+      }
+    }
+  }
+}

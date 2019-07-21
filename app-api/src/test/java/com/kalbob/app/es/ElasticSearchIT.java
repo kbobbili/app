@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -18,19 +19,16 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -65,6 +63,8 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.fluttercode.datafactory.impl.DataFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +73,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 @Slf4j
 public class ElasticSearchIT {
@@ -84,6 +84,8 @@ public class ElasticSearchIT {
           new HttpHost("localhost", 9200, "http")));
   private ObjectMapper objectMapper = new ObjectMapper();
   public static DataFactory dataFactory = new DataFactory();
+  private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ");
+  private ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"));
 
   @BeforeEach
   public void beforeEach() throws Exception {
@@ -102,11 +104,11 @@ public class ElasticSearchIT {
   public void test() throws JsonProcessingException {
     ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
     System.out.println(now);//2019-07-19T00:00:00.000Z[UTC]
-    System.out.println(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").format(now));
+    System.out.println(dateTimeFormatter.format(now));
     System.out.println(ZonedDateTime.parse(now.toString(), DateTimeFormatter.ISO_ZONED_DATE_TIME));
-    System.out.println(ZonedDateTime.now(ZoneId.of("UTC")).minusDays(7).format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
-    System.out.println(ZonedDateTime.now(ZoneId.of("UTC")).minusDays(7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
-    ZonedDateTime.now(ZoneId.of("UTC")).minusMonths(3).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ"));
+    System.out.println(now.minusDays(7).format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
+    System.out.println(now.minusDays(7).format(dateTimeFormatter));
+    now.minusMonths(3).format(dateTimeFormatter);
     //System.out.println(objectMapper.writeValueAsString(getMessagesCollapsedToSessions(1)));
     //searchSourceBuilder();
 
@@ -128,7 +130,7 @@ public class ElasticSearchIT {
     request.waitForNodes("le(1)");
     request.waitForActiveShards(1);
     request.waitForEvents(Priority.NORMAL);
-    //request.level(ClusterHealthRequest.Level.SHARDS);
+    request.level(ClusterHealthRequest.Level.SHARDS);
     ClusterHealthResponse response = client.cluster().health(request, RequestOptions.DEFAULT);
     System.out.println(response);
     assertTrue(response.getActivePrimaryShards() > 0);
@@ -137,65 +139,11 @@ public class ElasticSearchIT {
     assertTrue(indices.size() > 0);
   }
 
-  private List<Message> getRandomizedMessagesForXSessions(int count){
-    List<Message> messages = new ArrayList<>();
-    for(int i = 1; i <=count*10; i++) {
-      Map<String, Object> msgPayload = new HashMap<>();
-      msgPayload.put("text", dataFactory.getItem(Arrays
-          .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")));
-      msgPayload.put("user", new User().setUserId("USER-" + ((i % 10))));
-      Map<String, Object> tags = new HashMap<>();
-      tags.put("intent", "welcome");
-      tags.put("lang", "en-US");
-      tags.put("confidence", 1);
-      Message message = new Message()
-          .setTenantId("ABC")
-          .setApplication("IQ")
-          .setChannel(Arrays.asList("TWILIO","FACEBOOK","GOOGLE").get(dataFactory.getNumberUpTo(2)))
-          .setChannelUserId("13343329276")
-          .setSessionId("SESSION-" + ((i % 10)))
-          .setMessage(msgPayload)
-          .setMessageDirection(dataFactory.getItem(Arrays.asList("IN_BOUND")))
-          .setSentAt(ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes((count*10)-i))
-          .setApplicationMeta(new ApplicationMeta().setVersion("v0"))
-          .setTags(tags);
-      messages.add(message);
-    }
-    return messages;
-  }
-
-  private List<Message> getMessagesForXSessions(int count){
-    List<Message> messages = new ArrayList<>();
-    for(int i = 1; i <=count*10; i++) {
-      Map<String, Object> msgPayload = new HashMap<>();
-      msgPayload.put("text", dataFactory.getItem(Arrays
-          .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")));
-      msgPayload.put("user", new User().setUserId("USER-" + ((i % 10))));
-      Map<String, Object> tags = new HashMap<>();
-      tags.put("intent", "welcome");
-      tags.put("lang", "en-US");
-      tags.put("confidence", 1);
-      Message message = new Message()
-          .setTenantId("ABC")
-          .setApplication("IQ")
-          .setChannel("TWILIO")
-          .setChannelUserId("13343329276")
-          .setSessionId("SESSION-" + ((i % 10)))
-          .setMessage(msgPayload)
-          .setMessageDirection(dataFactory.getItem(Arrays.asList("IN_BOUND")))
-          .setSentAt(ZonedDateTime.now(ZoneId.of("UTC")).minusMinutes((count*10)-i))
-          .setApplicationMeta(new ApplicationMeta().setVersion("v0"))
-          .setTags(tags);
-      messages.add(message);
-    }
-    return messages;
-  }
-
   @Test
   public void index() throws IOException {
-    Message message = getRandomizedMessagesForXSessions(2).get(0);
-    String document = objectMapper.writeValueAsString(message);
-    IndexRequest request = new IndexRequest("messages-01","_doc")
+    Session session = getSessions(1).get(0);
+    String document = objectMapper.writeValueAsString(session);
+    IndexRequest request = new IndexRequest("s_w","_doc")
         .source(document, XContentType.JSON);
     IndexResponse response = null;
     try {
@@ -208,26 +156,116 @@ public class ElasticSearchIT {
     assertEquals(response.getResult(), DocWriteResponse.Result.CREATED);
     //assertGet
   }
-//2019-07-20T06:29:45.35515Z
+
+  private List<Message> getMessages(int count) {
+    List<Message> messages = new ArrayList<>();
+    for(int i = 1; i <= count; i++) {
+      Map<String, Object> userMeta = new HashMap<>();
+      userMeta.put("isActive", true);
+      Map<String, Object> eventTags = new HashMap<>();
+      eventTags.put("isAnswered", true);
+      Message message = new Message()
+          .setTenantId("ABC")
+          .setProvider("TROPO")
+          .setProviderId("PROVIDER-" + i)
+          .setChannel(Arrays.asList("TWILIO","FACEBOOK","GOOGLE").get(dataFactory.getNumberUpTo(2)))
+          .setChannelUserId("USER-" + i)
+          .setText(dataFactory.getItem(Arrays
+              .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")))
+          .setType("SMS")
+          .setAdditionalPayload(new HashMap<>())
+          .setUserMeta(userMeta)
+          .setDirection(dataFactory.getItem(Arrays.asList("OUT_BOUND")))
+          .setSentAt(now.minusMinutes((count*10)-i))
+          .setApplication("SM")
+          .setApplicationMeta(new ApplicationMeta().setVersion("v0").setEnvironment("dev"))
+          .setIsSent(false)
+          .setNotSentReason("failed due to x error")
+          .setResend(true)
+          .setTags(null)
+          .setEvents(Arrays.asList(new Event().setEventName("IN_PROGRESS").setTags(eventTags)));
+      messages.add(message);
+    }
+    return messages;
+  }
+
+  private List<Session> getSessions(int count){
+    List<Session> sessions = new ArrayList<>();
+    for(int s = 1; s <= count; s++) {
+      Session session = new Session();
+      session.setSessionId("SESSION-" + s);
+      List<Message> messages = new ArrayList<>();
+      for(int m = 1; m <= 10; m++) {
+        Map<String, Object> userMeta = new HashMap<>();
+        userMeta.put("isActive", true);
+        Map<String, Object> tags = new HashMap<>();
+        tags.put("intent", "welcome");
+        tags.put("lang", "en-US");
+        tags.put("confidence", 1);
+        Message message = new Message()
+            .setTenantId("ABC")
+            .setChannel(
+                Arrays.asList("TWILIO", "FACEBOOK", "GOOGLE").get(dataFactory.getNumberUpTo(2)))
+            .setChannelUserId("USER-" + m)
+            .setText(dataFactory.getItem(Arrays
+                .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")))
+            .setType("SMS")
+            .setAdditionalPayload(new HashMap<>())
+            .setUserMeta(userMeta)
+            .setDirection(dataFactory.getItem(Arrays.asList("OUT_BOUND")))
+            .setSentAt(now.minusMinutes((count * 10) - m))
+            .setApplication("SM")
+            .setApplicationMeta(new ApplicationMeta().setVersion("v0").setEnvironment("dev"))
+            .setTags(tags);
+        messages.add(message);
+      }
+      session.setMessages(messages);
+      sessions.add(session);
+    }
+    return sessions;
+  }
+
   @Test
   public void update() throws IOException {
-    UpdateByQueryRequest request = new UpdateByQueryRequest("messages-01");
+    UpdateByQueryRequest request = new UpdateByQueryRequest("s_w");
     request.setQuery(new TermQueryBuilder("sessionId","SESSION-1"));
+    Map<String, Object> params = new HashMap<>();
+    Message message = getMessages(1).get(0);
+    System.out.println(objectMapper.writeValueAsString(message));
+    params.put("message", objectMapper.writeValueAsString(message));
     Script inline = new Script(ScriptType.INLINE, "painless",
-        "ctx._source['channel']='C'", new HashMap<>());
+        "if (ctx._source.containsKey(\"messages\")) {ctx._source.messages.add(params.message);} else {ctx._source.messages = [params.message];}",params);
     request.setScript(inline);
     request.setConflicts("proceed");
     request.setRefresh(true);
+    request.setSize(1);
     System.out.println(request);
-    BulkByScrollResponse bulkResponse = client.updateByQuery(request, RequestOptions.DEFAULT);
-    long updatedDocs = bulkResponse.getUpdated();
-    System.out.println(bulkResponse);
-    assertEquals(updatedDocs, 1);
+    //BulkByScrollResponse bulkResponse = client.updateByQuery(request, RequestOptions.DEFAULT);
+    client.updateByQueryAsync(request, RequestOptions.DEFAULT, asyncUpdateByQueryListener());
+    /*long updatedDocs = bulkResponse.getUpdated();
+    System.out.println(bulkResponse);*//*
+    assertEquals(updatedDocs, 1);*/
+    System.out.println("hi");
+  }
+
+  private ActionListener<BulkByScrollResponse> asyncUpdateByQueryListener(){
+    return new ActionListener<BulkByScrollResponse>() {
+      @Override
+      public void onResponse(BulkByScrollResponse bulkResponse) {
+        long updatedDocs = bulkResponse.getUpdated();
+        System.out.println("bulkResponse "+bulkResponse);
+      }
+
+      @Override
+      public void onFailure(Exception e) {
+        e.printStackTrace();
+      }
+    };
   }
 
   @Test
   public void bulkIndex() throws IOException {
-    List<Message> messages = getMessagesForXSessions(30);
+    List<Session> sessions = getSessions(30);
     BulkProcessor.Listener bulkListener = getBulkListener();
     BulkProcessor.Builder bulkProcessorBuilder = BulkProcessor.builder(
         (request, listener) ->
@@ -240,9 +278,9 @@ public class ElasticSearchIT {
     bulkProcessorBuilder.setBackoffPolicy(BackoffPolicy
         .constantBackoff(TimeValue.timeValueSeconds(1L), 3));
     BulkProcessor bulkProcessor = bulkProcessorBuilder.build();
-    for(Message message: messages) {
-      bulkProcessor.add(new IndexRequest("messages-01", "_doc")
-          .source(objectMapper.writeValueAsString(message), XContentType.JSON));
+    for(Session session: sessions) {
+      bulkProcessor.add(new IndexRequest("s_w", "_doc")
+          .source(objectMapper.writeValueAsString(session), XContentType.JSON));
     }
     try {
       boolean terminated = bulkProcessor.awaitClose(30L, TimeUnit.SECONDS);
@@ -282,102 +320,7 @@ public class ElasticSearchIT {
 
   @Test
   public void search() {
-    SearchSourceBuilder searchSourceBuilder = searchSourceBuilder();
-    SearchRequest searchRequest = new SearchRequest();
-    searchRequest.indices("messages_write");
-    searchRequest.source(searchSourceBuilder);
-    SearchResponse searchResponse = null;
-    try {
-      searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    if(searchResponse!=null) handleResponse(searchResponse);
-  }
-
-  private void handleResponse(SearchResponse searchResponse) {
-    RestStatus status = searchResponse.status();
-    TimeValue took = searchResponse.getTook();
-    SearchHits hits = searchResponse.getHits();
-    //long totalHits = hits.getTotalHits();
-    SearchHit[] searchHits = hits.getHits();
-    List<Message> messages = new ArrayList<>();
-    for (SearchHit hit : searchHits) {
-      String index = hit.getIndex();
-      String id = hit.getId();
-      float score = hit.getScore();
-      Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-      messages.add(objectMapper.convertValue(sourceAsMap, Message.class));
-    }
-    System.out.println("Total Messages Count "+messages.size());
-    System.out.println("Messages "+messages);
-    buildSessionSummaries(messages);
-  }
-
-  private void buildSessionSummaries(List<Message> messages) {
-    Map<String, SessionSummary> sessionSummaryMap = new LinkedHashMap<>();
-    for (Message message : messages) {
-      SessionSummary sessionSummary = sessionSummaryMap.get(message.getSessionId());
-      if (sessionSummary == null) {
-        Object intent = message.getTags().get("intent");
-        sessionSummary = new SessionSummary()
-            .setTenantId(message.getTenantId())
-            .setApplication(message.getApplication())
-            .setChannel(message.getChannel())
-            .setChannelUserId(message.getChannelUserId())
-            .setSessionId(message.getSessionId())
-            .setStartTime(message.getSentAt())
-            .setEndTime(message.getSentAt())
-            .setDuration(Duration.ZERO)
-            .setFirstMessage(message.getMessage())
-            .setIntents(intent != null ?
-                new HashSet<>(Arrays.asList(intent.toString())) : new HashSet<>())
-            .setMessageCount(1);
-        sessionSummaryMap.put(message.getSessionId(), sessionSummary);
-      } else {
-
-
-        if (message.getSentAt().isBefore(sessionSummary.getStartTime())) {
-          sessionSummary.setStartTime(message.getSentAt());
-          sessionSummary.setDuration(
-              Duration.between(sessionSummary.getStartTime(), sessionSummary.getEndTime()));
-          sessionSummary.setFirstMessage(message.getMessage());
-        } else if (message.getSentAt().isAfter(sessionSummary.getEndTime())) {
-          sessionSummary.setEndTime(message.getSentAt());
-          sessionSummary.setDuration(
-              Duration.between(sessionSummary.getStartTime(), sessionSummary.getEndTime()));
-        }
-
-
-
-
-
-
-        Object intent = message.getTags().get("intent");
-        if (intent != null) {
-          sessionSummary.getIntents().add(intent.toString());
-        }
-        sessionSummary.setMessageCount(sessionSummary.getMessageCount() + 1);
-        sessionSummaryMap.put(message.getSessionId(), sessionSummary);
-      }
-    }
-    List<SessionSummary> sessionSummaries = sessionSummaryMap.values().stream()
-        .sorted((Comparator.comparing(SessionSummary::getStartTime)).reversed())
-        .collect(Collectors.toList());
-    System.out.println("Total Sessions Count "+sessionSummaries.size());
-    System.out.println("Sessions "+sessionSummaries);
-  }
-
-  public Page<SessionSummary> getSessionsPaged(List<SessionSummary> sessions, Pageable pageable) {
-    int start = (int) pageable.getOffset();
-    int end = (start + pageable.getPageSize()) > sessions.size()
-        ? sessions.size() : (start + pageable.getPageSize());
-    return new PageImpl<>(sessions.subList(start, end), pageable,
-        sessions.size());
-  }
-
-  private SearchSourceBuilder searchSourceBuilder(){
-    String url = "?page=0&size=10";
+    String url = "?page=0&size=10&sort=sentAt,asc";
     List<NameValuePair> listOfParams = new ArrayList<>();
     try {
       listOfParams = URLEncodedUtils.parse(new URI(url), Charset.forName("UTF-8"));
@@ -385,44 +328,80 @@ public class ElasticSearchIT {
       e.printStackTrace();
     }
     Map<String, String> params = new HashMap<>();
+    Map<String, String> sortParams = new HashMap<>();
+    int pageNumber = 0;
+    int size = 10;
     for (NameValuePair param : listOfParams) {
-      params.put(param.getName(), param.getValue());
+      String paramKey = param.getName();
+      String paramValue = param.getValue();
+      if(paramKey.equals("sort")){
+        sortParams.put(paramValue.substring(0, paramValue.indexOf(",")), paramValue.substring(paramValue.indexOf(",")+1));
+      }else if(paginationFields().contains(paramKey)){
+        if(params.get("page") != null && !params.get("page").isEmpty()){
+          pageNumber = Integer.parseInt(params.get("page"));
+        }
+        if(params.get("size") != null && !params.get("size").isEmpty()){
+          size = Integer.parseInt(params.get("size"));
+        }
+      } else {
+        params.put("messages." + paramKey, paramValue);
+      }
     }
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder.from(Integer.parseInt(params.get("page")));
-    searchSourceBuilder.size(Integer.parseInt(params.get("size")));//fetch 100 messages for 10 sessions on the page. //but for messages endpoint; upper limit it to 1000
-    params.remove("page");params.remove("size");
+    addPaginationInfo(pageNumber, size, searchSourceBuilder);
+    addSortBuilders(sortParams, searchSourceBuilder);
+    addQueryBuilders(params, searchSourceBuilder);
+    SearchRequest searchRequest = new SearchRequest();
+    searchRequest.indices("s_w");
+    searchRequest.source(searchSourceBuilder);
+    SearchResponse searchResponse = null;
+    try {
+      System.out.println("searchRequest "+searchRequest);
+      searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+      System.out.println("searchResponse "+searchResponse);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    List<JsonNode> results = new ArrayList<>();
+    if(searchResponse!=null) {
+      results = handleResponse(searchResponse);
+    }
+    Page<JsonNode> resultsWithPageMeta = new PageImpl<>(results, new PageRequest(pageNumber, size),
+        results.size());
+    System.out.println(resultsWithPageMeta);
+  }
+
+  private void addPaginationInfo(int pageNumber, int size, SearchSourceBuilder searchSourceBuilder) {
+    searchSourceBuilder.from(pageNumber * size);
+    searchSourceBuilder.size(size);
+  }
+
+  private void addQueryBuilders(Map<String, String> params, SearchSourceBuilder searchSourceBuilder) {
     searchSourceBuilder.query(queryBuilder(params));
     searchSourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
-    System.out.println(searchSourceBuilder);
-    return searchSourceBuilder;
+  }
+
+  private void addSortBuilders(Map<String, String> sortParams, SearchSourceBuilder searchSourceBuilder) {
+    for(String sortKey: sortParams.keySet()){
+      if(sortParams.get(sortKey).equals("asc")){
+        searchSourceBuilder.sort(new FieldSortBuilder("messages." + sortKey).order(SortOrder.ASC));
+      }else if(sortParams.get(sortKey).equals("desc")){
+        searchSourceBuilder.sort(new FieldSortBuilder("messages." + sortKey).order(SortOrder.DESC));
+      }else{
+        searchSourceBuilder.sort(new FieldSortBuilder("messages." + sortKey));
+      }
+    }
   }
 
   private QueryBuilder queryBuilder(Map<String, String> params) {
     System.out.println(params);
     BoolQueryBuilder boolQueryBuilder = QueryBuilders
         .boolQuery();
-    RangeQueryBuilder dateRangeBuilder = QueryBuilders
-        .rangeQuery("sentAt");
-    if(params.containsKey("from") && !params.get("from").isEmpty()) {
-      dateRangeBuilder
-          .gte(ZonedDateTime.parse(params.get("from"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
-    }else {
-      dateRangeBuilder
-          .gte(ZonedDateTime.now(ZoneId.of("UTC")).minusDays(7).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
-    }
-    if(params.containsKey("to") && !params.get("to").isEmpty()) {
-      dateRangeBuilder
-          .lte(ZonedDateTime.parse(params.get("to"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
-    }else {
-      dateRangeBuilder
-          .gte(ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")));
-    }
-    boolQueryBuilder.filter(dateRangeBuilder);
+    boolQueryBuilder.filter(boolFilterQuerySentAt(params));
     for (String key : params.keySet()) {
       if(!params.get(key).isEmpty() && !dateRangeFields().contains(key)) {
-        if (fullTextQueryFields().contains(key))
-          boolQueryBuilder.must(QueryBuilders.matchQuery(key, params.get(key)));
+        if (fullTextQueryFields(params).contains(key))
+          boolQueryBuilder.should(QueryBuilders.matchQuery(key, params.get(key)));
         else
           boolQueryBuilder.filter(QueryBuilders.termQuery(key, params.get(key)));
       }
@@ -431,13 +410,105 @@ public class ElasticSearchIT {
     return boolQueryBuilder;
   }
 
-  private List<String> fullTextQueryFields(){
-    return Arrays.asList("message.text", "tags.intent");
+  private QueryBuilder boolFilterQuerySentAt(Map<String, String> params) {
+    BoolQueryBuilder boolQueryBuilder = QueryBuilders
+        .boolQuery();
+    RangeQueryBuilder dateRangeBuilder = QueryBuilders
+        .rangeQuery("messages.sentAt");
+    dateRangeQueryBuilder(params, dateRangeBuilder);
+    boolQueryBuilder.should(dateRangeBuilder);
+    return boolQueryBuilder;
+  }
+
+  private void dateRangeQueryBuilder(Map<String, String> params, RangeQueryBuilder dateRangeBuilder) {
+    if(params.containsKey("messages.from") && !params.get("messages.from").isEmpty()) {
+      dateRangeBuilder
+          .gte(ZonedDateTime.parse(params.get("messages.from"), dateTimeFormatter));
+    }else {
+      dateRangeBuilder
+          .gte(now.minusMonths(6).format(dateTimeFormatter));
+    }
+    if(params.containsKey("messages.to") && !params.get("messages.to").isEmpty()) {
+      dateRangeBuilder
+          .lte(ZonedDateTime.parse(params.get("messages.to"), dateTimeFormatter));
+    }else {
+      dateRangeBuilder
+          .lte(now.format(dateTimeFormatter));
+    }
+  }
+
+  private List<String> fullTextQueryFields(Map<String, String> params){
+    List<String> textQueryFields = new ArrayList<>();
+    if(!params.get("messages.text").isEmpty() && !params.containsKey("messages.text")){
+      textQueryFields.add("messages.text");
+    }
+    if(!params.get("messages.tags.intent").isEmpty() && !params.containsKey("messages.tags.intent")){
+      textQueryFields.add("messages.tags.intent");
+    }
+    if(!params.get("messages.events.eventDetails").isEmpty() && !params.containsKey("messages.events.eventDetails")){
+      textQueryFields.add("messages.events.eventDetails");
+    }
+    return textQueryFields;
   }
 
   private List<String> dateRangeFields(){
-    return Arrays.asList("from", "to");
+    return Arrays.asList("messages.from", "messages.to");
   }
 
+  private List<String> paginationFields(){
+    return Arrays.asList("page","size");
+  }
+
+  private List<JsonNode> handleResponse(SearchResponse searchResponse) {
+    RestStatus status = searchResponse.status();
+    TimeValue took = searchResponse.getTook();
+    SearchHits hits = searchResponse.getHits();
+    long totalHits = hits.getTotalHits();
+    SearchHit[] searchHits = hits.getHits();
+    List<JsonNode> results = new ArrayList<>();
+    for (SearchHit hit : searchHits) {
+      String index = hit.getIndex();
+      String id = hit.getId();
+      float score = hit.getScore();
+      Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+      if(sourceAsMap.containsKey("sessionId")) {
+        Session session = objectMapper.convertValue(sourceAsMap, Session.class);
+        SessionAggregate sessionAggregate = getSessionAggregate(session);
+        results.add(objectMapper.convertValue(sessionAggregate, JsonNode.class));
+      }else{
+        results.add(objectMapper.convertValue(sourceAsMap, JsonNode.class));
+      }
+    }
+    System.out.println("Total Results Count "+results.size());
+    System.out.println("Results "+results);
+    return results;
+  }
+
+  private SessionAggregate getSessionAggregate(Session session) {
+    SessionAggregate sessionAggregate = new SessionAggregate();
+    sessionAggregate.setSessionId(session.getSessionId());
+    List<Message> messages = session.getMessages();
+    List<String> intents = new ArrayList<>();
+    if(messages != null && !messages.isEmpty()) {
+      Message message = messages.get(0);
+      sessionAggregate.setTenantId(message.getTenantId());
+      sessionAggregate.setApplication(message.getApplication());
+      sessionAggregate.setChannel(message.getChannel());
+      sessionAggregate.setChannelUserId(message.getChannelUserId());
+      sessionAggregate.setFirstMessage(message);
+      sessionAggregate.setStartTime(message.getSentAt());
+      sessionAggregate.setMessageCount(messages.size());
+      sessionAggregate.setEndTime(messages.get(messages.size() - 1).getSentAt());
+      sessionAggregate.setDuration(
+          Duration.between(sessionAggregate.getStartTime(), sessionAggregate.getEndTime()));
+      for (Message msg : messages) {
+        if(msg.getIntent()!=null && !msg.getIntent().isEmpty()) {
+          intents.add(msg.getIntent());
+        }
+      }
+    }
+    sessionAggregate.setIntents(intents);
+    return sessionAggregate;
+  }
 
 }

@@ -13,7 +13,6 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class Message {
-  private String messageId;
   private String tenantId;
   private String channel;
   private String provider;
@@ -25,10 +24,12 @@ public class Message {
   private String direction;
   private String application;
   private ApplicationMeta applicationMeta;
+  private Map<String, Object> userMeta;
   private ZonedDateTime sentAt;
+  private String intent;
   private Map<String, Object> tags;
-  private boolean isSent;
+  private Boolean isSent;
   private String notSentReason;
-  private boolean resend;
+  private Boolean resend;
   private List<Event> events;
 }

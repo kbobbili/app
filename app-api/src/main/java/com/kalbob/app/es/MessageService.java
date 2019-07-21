@@ -7,6 +7,6 @@ import org.springframework.data.domain.Pageable;
 public interface MessageService {
 
   Page<Message> getMessages(Map<String, String> params, Pageable pageable);
-  Page<SessionSummary> getSessionSummaries(Map<String, String> params, Pageable pageable);
+  Page<SessionAggregate> getSessionSummaries(Map<String, String> params, Pageable pageable);
 
 }
