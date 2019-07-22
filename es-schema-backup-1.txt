@@ -415,16 +415,92 @@ GET s,m/_search
 }
 
 
+GET s/_search
+{
+  "sort": [
+    {
+      "messages.sentAt": {
+        "order": "asc"
+      }
+    },
+    "_score"
+  ],
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "bool": {
+            "should": [
+              {
+                "range": {
+                  "messages.sentAt": {
+                    "gte": "now-1M/d",
+                    "lte": "now"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
 POST s/_update_by_query?conflicts=proceed
 {
   "script": {
     "lang": "painless",
-    "source": """if (ctx._source.containsKey("messages")) {ctx._source.messages.add(params.message);} else {ctx._source.messages = [params.message]}""",
+    "source": """if (ctx._source.containsKey("paymentInfos")) {ctx._source.paymentInfos.add(params.paymentInfo);} else {ctx._source.paymentInfos = [params.paymentInfo]}""",
     "params": {
-      "message": {
+      "last": "gaudreau",
+      "nick": "donkey",
+      "paymentInfo": {
         "pid": "1",
         "amt": "10"
       }
     }
   }
 }
+
+POST s/_update_by_query?conflicts=proceed
+{
+  "query": {
+        "term": {
+            "sessionId": "SESSION-1"
+        }
+    },
+  "script": {
+    "lang": "painless",
+    "source": """if (ctx._source.containsKey("messages")) {ctx._source.messages.add(params.message);} else {ctx._source.messages = [params.message]}""",
+    "params": {
+      "message": {
+        "tenantId": "CCC"
+    
+      }
+    }
+  }
+}
+
+
+GET s/_update_by_query?conflicts=proceed
+{
+  "query": {
+    "term": {
+      "sessionId": "SESSION-1"
+    }
+  },
+  "script": {
+    "lang": "painless",
+    "source": "ctx._source.a=params.a",
+    "params": {
+      "a": "AB",
+      "message": {
+        "text": "1",
+        "type": "10"
+      }
+    }
+  }
+}
+
+GET s/_search

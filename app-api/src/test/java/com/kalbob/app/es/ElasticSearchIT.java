@@ -1,5 +1,6 @@
 package com.kalbob.app.es;
 
+import static org.elasticsearch.common.xcontent.NamedXContentRegistry.EMPTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -41,6 +42,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -49,6 +51,10 @@ import org.elasticsearch.common.Priority;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.DeprecationHandler;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -181,9 +187,9 @@ public class ElasticSearchIT {
           .setApplicationMeta(new ApplicationMeta().setVersion("v0").setEnvironment("dev"))
           .setIsSent(false)
           .setNotSentReason("failed due to x error")
-          .setResend(true)
-          .setTags(null)
-          .setEvents(Arrays.asList(new Event().setEventName("IN_PROGRESS").setTags(eventTags)));
+          .setResend(true);
+          //.setTags(null)
+          //.setEvents(Arrays.asList(new Event().setEventName("IN_PROGRESS").setTags(eventTags)));
       messages.add(message);
     }
     return messages;
@@ -226,26 +232,139 @@ public class ElasticSearchIT {
   }
 
   @Test
-  public void update() throws IOException {
-    UpdateByQueryRequest request = new UpdateByQueryRequest("s_w");
-    request.setQuery(new TermQueryBuilder("sessionId","SESSION-1"));
+  public void updateById() throws IOException {
+    UpdateRequest updateRequest = new UpdateRequest();
+    updateRequest.index("s");
+    updateRequest.type("_doc");
+    updateRequest.id("1");
     Map<String, Object> params = new HashMap<>();
-    Message message = getMessages(1).get(0);
-    System.out.println(objectMapper.writeValueAsString(message));
-    params.put("message", objectMapper.writeValueAsString(message));
-    Script inline = new Script(ScriptType.INLINE, "painless",
-        "if (ctx._source.containsKey(\"messages\")) {ctx._source.messages.add(params.message);} else {ctx._source.messages = [params.message];}",params);
-    request.setScript(inline);
-    request.setConflicts("proceed");
-    request.setRefresh(true);
-    request.setSize(1);
+    params.put("a","CodeUpdateById");
+    //params.put("b", "CodeUpdateById");
+    //String message = "{\"test\":\"test\"}";
+    params.put("message", new SmallMessage().setText("CodeUpdateById"));
+    String payload = objectMapper.writeValueAsString(params);
+    params.put("message", payload);
+    XContentBuilder b = XContentFactory.jsonBuilder().prettyPrint();
+    try (XContentParser p = XContentFactory.xContent(XContentType.JSON)
+        .createParser(EMPTY, DeprecationHandler.THROW_UNSUPPORTED_OPERATION, payload)) {
+      b.copyCurrentStructure(p);
+      /*updateRequest.doc(jsonBuilder()
+          .startObject()
+          .field("sessionId", "CodeUpdateById")
+          .array("arr", "a","b","c")
+          .endObject());*/
+      updateRequest.doc(b);
+      client.update(updateRequest, RequestOptions.DEFAULT);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void update() throws IOException {
+    Map<String, Object> params = new HashMap<>();
+    params.put("a","CodeUpdate1");
+    params.put("b", "CodeUpdate1");
+    //params.put("message", objectMapper.writeValueAsString(message));
+    //params.put("message", objectMapper.convertValue(message, JsonNode.class));
+    //params.put("message", objectMapper.writeValueAsString(objectMapper.convertValue(message, JsonNode.class)));
+    UpdateRequest request = new UpdateRequest("s","1");
+    //params.put("message", objectMapper.writeValueAsString(new SmallMessage().setText("CodeUpdate1")));//"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
+    params.put("message", new SmallMessage().setText("CodeUpdate1"));//cannot write xcontent for unknown value
+    request.script(
+        new Script(
+            ScriptType.INLINE, "painless",
+            //"if (ctx._source.containsKey(\"messages\")) {ctx._source.messages.add(params.message);ctx._source.b=params.b} else {ctx._source.messages = [params.message]}",
+            //"ctx._source.a=params.a",
+            //"ctx._source.messages[0]=params.message",
+            //"ctx._source.messages.add(params.message)",
+            //"ctx._source.messages[0].text=params.a",
+            //"ctx._source.a=\"CodeUpdate2\"",
+            //ctx._source.messages[0] = \"Console3\" //"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
+            //"ctx._source.messages[0]={\"text\":\"CodeUpdate1\"}", //special chars { exception
+            "ctx._source.messages.add(params.message)",
+            params));
     System.out.println(request);
-    //BulkByScrollResponse bulkResponse = client.updateByQuery(request, RequestOptions.DEFAULT);
-    client.updateByQueryAsync(request, RequestOptions.DEFAULT, asyncUpdateByQueryListener());
+    client.update(request, RequestOptions.DEFAULT);
+    //client.updateByQueryAsync(request, RequestOptions.DEFAULT, asyncUpdateByQueryListener());
     /*long updatedDocs = bulkResponse.getUpdated();
     System.out.println(bulkResponse);*//*
     assertEquals(updatedDocs, 1);*/
-    System.out.println("hi");
+    System.out.println("end");
+  }
+
+  @Test
+  public void updateByQuery() throws IOException {
+    UpdateByQueryRequest request = new UpdateByQueryRequest("s");
+    request.setQuery(new TermQueryBuilder("sessionId", "SESSION-1"));
+    Map<String, Object> params = new HashMap<>();
+    //params.put("a","CodeUpdateByQuery");
+    String msgText = objectMapper.writeValueAsString(new SmallMessage().setText("CodeUpdateByQuery"));
+    XContentBuilder message = XContentFactory.jsonBuilder().prettyPrint();
+    try (XContentParser p = XContentFactory.xContent(XContentType.JSON)
+        .createParser(EMPTY, DeprecationHandler.THROW_UNSUPPORTED_OPERATION, msgText)) {
+      message.copyCurrentStructure(p);
+    }
+    params.put("m", message.contentType());
+
+    request.setScript(
+        new Script(
+            ScriptType.INLINE, "painless",
+            //"if (ctx._source.containsKey(\"messages\")) {ctx._source.messages.add(params.message);ctx._source.b=params.b} else {ctx._source.messages = [params.message]}",
+            "ctx._source.x=params.m",
+            //"ctx._source.messages[0]=params.message",
+            //"ctx._source.messages.add(params.message)",
+            //"ctx._source.messages[0].text=params.a",
+            //"ctx._source.a=\"Code2\"",
+            //ctx._source.messages[0] = \"Console3\" //"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
+            //"ctx._source.messages[0]={\"text\":\"Code1\"}", //special chars { exception
+            //"ctx._source.messages.add(params.m)",
+            params));
+    request.setConflicts("proceed");
+    request.setSize(1);
+    request.setBatchSize(1);
+    request.setRefresh(true);
+    request.setScroll(TimeValue.timeValueMinutes(100));
+    client.updateByQuery(request, RequestOptions.DEFAULT);
+  }
+
+  @Test
+  public void updateByQuery2() throws IOException {
+    Map<String, Object> params = new HashMap<>();
+    //params.put("a","Code1");
+    //params.put("b", "Code1");
+    //params.put("message", objectMapper.writeValueAsString(message));
+    //params.put("message", objectMapper.convertValue(message, JsonNode.class));
+    //params.put("message", objectMapper.writeValueAsString(objectMapper.convertValue(message, JsonNode.class)));
+    UpdateByQueryRequest request = new UpdateByQueryRequest("s");
+    request.setQuery(new TermQueryBuilder("sessionId", "SESSION-1"));
+    //params.put("message", objectMapper.writeValueAsString(new SmallMessage().setText("Code1")));//"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
+    params.put("message", objectMapper.writeValueAsBytes(new SmallMessage().setText("Code1")));//cannot write xcontent for unknown value
+    request.setScript(
+        new Script(
+            ScriptType.INLINE, "painless",
+            //"if (ctx._source.containsKey(\"messages\")) {ctx._source.messages.add(params.message);ctx._source.b=params.b} else {ctx._source.messages = [params.message]}",
+            //"ctx._source.a=params.a",
+            "ctx._source.messages[0]=params.message",
+            //"ctx._source.messages.add(params.message)",
+            //"ctx._source.messages[0].text=params.a",
+            //"ctx._source.a=\"Code2\"",
+            //ctx._source.messages[0] = \"Console3\" //"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
+            //"ctx._source.messages[0]={\"text\":\"Code1\"}", //special chars { exception
+            //"ctx._source.messages.add(params.message)",
+            params));
+    request.setConflicts("proceed");
+    request.setSize(1);
+    request.setBatchSize(1);
+    request.setRefresh(true);
+    request.setScroll(TimeValue.timeValueMinutes(100));
+    System.out.println(request);
+    client.updateByQuery(request, RequestOptions.DEFAULT);
+    //client.updateByQueryAsync(request, RequestOptions.DEFAULT, asyncUpdateByQueryListener());
+    /*long updatedDocs = bulkResponse.getUpdated();
+    System.out.println(bulkResponse);*//*
+    assertEquals(updatedDocs, 1);*/
+    System.out.println("end");
   }
 
   private ActionListener<BulkByScrollResponse> asyncUpdateByQueryListener(){
@@ -463,7 +582,7 @@ public class ElasticSearchIT {
     RestStatus status = searchResponse.status();
     TimeValue took = searchResponse.getTook();
     SearchHits hits = searchResponse.getHits();
-    long totalHits = hits.getTotalHits();
+    //long totalHits = hits.getTotalHits();
     SearchHit[] searchHits = hits.getHits();
     List<JsonNode> results = new ArrayList<>();
     for (SearchHit hit : searchHits) {
