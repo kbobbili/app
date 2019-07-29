@@ -149,7 +149,7 @@ public class ElasticSearchIT {
   public void index() throws IOException {
     Session session = getSessions(1).get(0);
     String document = objectMapper.writeValueAsString(session);
-    IndexRequest request = new IndexRequest("s_w","_doc")
+    IndexRequest request = new IndexRequest("sessions_write","_doc")
         .source(document, XContentType.JSON);
     IndexResponse response = null;
     try {
@@ -172,18 +172,18 @@ public class ElasticSearchIT {
       eventTags.put("isAnswered", true);
       Message message = new Message()
           .setTenantId("ABC")
-          .setProvider("TROPO")
+          .setProvider(dataFactory.getItem(Arrays.asList("TROPO", "TWILIO")))
           .setProviderId("PROVIDER-" + i)
-          .setChannel(Arrays.asList("TWILIO","FACEBOOK","GOOGLE").get(dataFactory.getNumberUpTo(2)))
+          .setChannel(Arrays.asList("TWILIO","FACEBOOK","GOOGLE", "ALEXA", "TWITTER", "STUDIO").get(dataFactory.getNumberUpTo(5)))
           .setChannelUserId("USER-" + i)
           .setText(dataFactory.getItem(Arrays
               .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")))
           .setType("SMS")
           .setAdditionalPayload(new HashMap<>())
           .setUserMeta(userMeta)
-          .setDirection(dataFactory.getItem(Arrays.asList("OUT_BOUND")))
+          .setDirection(dataFactory.getItem(Arrays.asList("OUT_BOUND", "IN_BOUND")))
           .setSentAt(now.minusMinutes((count*10)-i))
-          .setApplication("SM")
+          .setApplication(dataFactory.getItem(Arrays.asList("IQ", "SM")))
           .setApplicationMeta(new ApplicationMeta().setVersion("v0").setEnvironment("dev"))
           .setIsSent(false)
           .setNotSentReason("failed due to x error")
@@ -210,18 +210,23 @@ public class ElasticSearchIT {
         tags.put("confidence", 1);
         Message message = new Message()
             .setTenantId("ABC")
-            .setChannel(
-                Arrays.asList("TWILIO", "FACEBOOK", "GOOGLE").get(dataFactory.getNumberUpTo(2)))
+            .setProvider(dataFactory.getItem(Arrays.asList("TROPO", "TWILIO")))
+            .setProviderId("PROVIDER-" + m)
+            .setChannel(Arrays.asList("TWILIO","FACEBOOK","GOOGLE", "ALEXA", "TWITTER", "STUDIO").get(dataFactory.getNumberUpTo(5)))
             .setChannelUserId("USER-" + m)
             .setText(dataFactory.getItem(Arrays
                 .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")))
             .setType("SMS")
+            .setMsgCount(dataFactory.getNumberUpTo(20))
             .setAdditionalPayload(new HashMap<>())
             .setUserMeta(userMeta)
-            .setDirection(dataFactory.getItem(Arrays.asList("OUT_BOUND")))
-            .setSentAt(now.minusMinutes((count * 10) - m))
-            .setApplication("SM")
+            .setDirection(dataFactory.getItem(Arrays.asList("OUT_BOUND", "IN_BOUND")))
+            .setSentAt(dataFactory.getItem(Arrays.asList(now.minusDays(2).minusMinutes((count*10)-m))))
+            .setApplication(dataFactory.getItem(Arrays.asList("IQ", "SM")))
             .setApplicationMeta(new ApplicationMeta().setVersion("v0").setEnvironment("dev"))
+            .setIsSent(false)
+            .setNotSentReason("failed due to x error")
+            .setResend(true)
             .setTags(tags);
         messages.add(message);
       }
@@ -398,11 +403,11 @@ public class ElasticSearchIT {
         .constantBackoff(TimeValue.timeValueSeconds(1L), 3));
     BulkProcessor bulkProcessor = bulkProcessorBuilder.build();
     for(Session session: sessions) {
-      bulkProcessor.add(new IndexRequest("s_w", "_doc")
+      bulkProcessor.add(new IndexRequest("sessions", "_doc")
           .source(objectMapper.writeValueAsString(session), XContentType.JSON));
     }
     try {
-      boolean terminated = bulkProcessor.awaitClose(30L, TimeUnit.SECONDS);
+      boolean terminated = bulkProcessor.awaitClose(100L, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

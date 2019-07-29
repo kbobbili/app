@@ -32,4 +32,5 @@ public class Message {
   private String notSentReason;
   private Boolean resend;
   private List<Event> events;
+  private int msgCount;
 }
