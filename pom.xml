@@ -4,15 +4,15 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.kalbob</groupId>
-  <artifactId>app</artifactId>
+  <artifactId>reactive</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>app</name>
-  <description>My Spring App</description>
+  <name>reactive</name>
+  <description>My Spring Reactive App</description>
 
   <modules>
-    <module>app-api</module>
-    <module>app-client</module>
+    <module>reactive-api</module>
+    <module>reactive-client</module>
   </modules>
 
   <properties>

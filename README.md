@@ -1,2 +1,2 @@
-# app
-Spring Boot App Playground
+# reactive app
+Spring Boot Reactive App Playground
