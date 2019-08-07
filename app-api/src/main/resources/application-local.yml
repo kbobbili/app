@@ -33,6 +33,11 @@ management:
     web:
       exposure:
         include: "*"
+com:
+  kalbob:
+    app:
+      es:
+        url: localhost:9200
 a:
   base
 ---

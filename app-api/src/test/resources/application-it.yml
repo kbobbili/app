@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: local, it_db
+    include: local #it_db, it_es
   test:
     database:
       replace: none
@@ -22,4 +22,8 @@ spring:
       ddl-auto: validate
 a:
   it_db
-
+---
+spring:
+  profiles: it_es
+a:
+  it_es
