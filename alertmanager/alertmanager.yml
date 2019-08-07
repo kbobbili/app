@@ -1,0 +1,14 @@
+route:
+  receiver: 'slack'
+  group_wait: 5s
+  group_interval: 5s
+  repeat_interval: 5s
+receivers:
+  - name: 'slack'
+    slack_configs:
+      - send_resolved: true
+        username: 'Prometheus'
+        channel: '#just-bot-testing-temp'
+        api_url: 'https://hooks.slack.com/services/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'
+        title: "{{ range .Alerts }}{{ .Annotations.summary }}\n{{ end }}"
+        text: "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}"

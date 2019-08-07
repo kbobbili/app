@@ -1,0 +1,32 @@
+# global config
+global:
+  scrape_interval:     15s # default 1 minute.
+  evaluation_interval: 15s # evaluate rules every 15 seconds. default 1 minute
+  scrape_timeout: 10s      # default 10s
+  external_labels:
+
+scrape_configs:
+    # job name is added as a label `job=<job_name>` to any time-series scraped from this config.
+  - job_name: 'actuator'
+    # scheme defaults to 'http'.
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 10s
+    scrape_timeout: 10s
+    static_configs:
+      - targets: ['127.0.0.1:8080','127.0.0.1:8081'] #More targets in dev env
+        labels:
+          application: 'app'
+          environment: 'dev'
+      - targets: ['127.0.0.1:8081'] #More targets in qa env
+        labels:
+          application: 'app'
+          environment: 'qa'
+
+rule_files:
+  #- "/etc/prometheus/prometheus_rules.yml"
+
+alerting:
+  alertmanagers:
+    - scheme: http
+      static_configs:
+        - targets: ['127.0.0.1:9093']

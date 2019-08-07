@@ -1,7 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/devDB?useSSL=false
-    username:
-    password:
-  flyway:
-    locations: classpath:db/migration

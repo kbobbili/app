@@ -1,19 +1,102 @@
-version: '3.3'
+version: '3.2'
 
 services:
-  db:
+
+  app-local-db:
+    container_name: app_local_db
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 'kpwd'
+      - MYSQL_ROOT_HOST=%
+      - MYSQL_ROOT_PASSWORD=kpwd
+      - MYSQL_DATABASE=app_local_db
     ports:
       # <Port exposed> : <MySQL Port running inside container>
-      - '3306:3306'
+      - '3307:3306'
     expose:
       # Opens port 3306 on the container
-      - '3306'
+      - '3307'
     volumes:
-      - dev_DB:/var/lib/mysql
+      - app_local_db:/var/lib/mysql
+    networks:
+      - app_local_network
+
+  app-local-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.0
+    container_name: elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    volumes:
+      - app_local_elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - app_local_network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.7.0
+    container_name: kibana
+    ports:
+      - 5601:5601
+    networks:
+      - app_local_network
+
+  prometheus:
+    container_name: app_prometheus
+    image: prom/prometheus:v2.10.0
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-lifecycle'
+    ports:
+      - '9090:9090'
+    network_mode: host
+
+  alertmanager:
+    container_name: app_alertmanager
+    image: prom/alertmanager:v0.17.0
+    volumes:
+      - ./alertmanager:/etc/alertmanager
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - '9093:9093'
+    network_mode: host
+
+  grafana:
+    container_name: app_grafana
+    image: grafana/grafana:6.2.5
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    network_mode: host
+
+  ngrok:
+    container_name: app_ngrok
+    image: gtriggiano/ngrok-tunnel
+    environment:
+      - TARGET_HOST=localhost
+      - TARGET_PORT=8080
+    ports:
+      - 4040:4040
+    network_mode: host
 
 volumes:
-  dev_DB:
+  app_local_db:
+  app_local_elasticsearch:
+    driver: local
+  prometheus_data: {}
+  alertmanager_data: {}
+  grafana_data: {}
+
+networks:
+  app_local_network:

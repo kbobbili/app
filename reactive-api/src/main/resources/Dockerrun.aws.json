@@ -1,0 +1,11 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "402850851130.dkr.ecr.@aws.region@.amazonaws.com/@project.artifactId@-@aws.environment@:@parent.version@"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "@docker.port@"
+    }
+  ]
+}

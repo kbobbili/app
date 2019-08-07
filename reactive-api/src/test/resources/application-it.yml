@@ -1,0 +1,25 @@
+spring:
+  profiles:
+    include: local, it_db
+  test:
+    database:
+      replace: none
+a:
+  it
+---
+spring:
+  profiles: it_db
+  flyway:
+    locations: classpath:db/migration
+    enabled: true
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+  datasource:
+    url: jdbc:mysql://${db.containerId:localhost}:3308/app_it_db?useSSL=false&allowPublicKeyRetrieval=true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+a:
+  it_db
+

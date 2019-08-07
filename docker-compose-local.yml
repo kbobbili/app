@@ -1,0 +1,11 @@
+version: '3.2'
+
+services:
+  app:
+    container_name: app
+    image: 402850851130.dkr.ecr.local.amazonaws.com/app-api-local:${TAG:-latest}
+    environment:
+      - spring.cloud.config.enabled=false
+      - spring.profiles.active=local
+      - aws.kms.enabled=false
+    network_mode: host
