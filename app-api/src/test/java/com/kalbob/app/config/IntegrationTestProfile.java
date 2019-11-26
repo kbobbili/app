@@ -1,6 +1,6 @@
-package com.kalbob.app.config;
+package com.kalbob.code.config;
 
-import com.kalbob.app.Application;
+import com.kalbob.code.Application;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

@@ -1,4 +1,4 @@
-package com.kalbob.app.project;
+package com.kalbob.code.project;
 
 import java.io.Serializable;
 import javax.persistence.Embeddable;

@@ -1,6 +1,6 @@
-package com.kalbob.app.project;
+package com.kalbob.code.project;
 
-import com.kalbob.app.employee.Employee;
+import com.kalbob.code.employee.Employee;
 import java.time.LocalDateTime;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;

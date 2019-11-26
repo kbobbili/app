@@ -1,4 +1,4 @@
-package com.kalbob.app.config.rest;
+package com.kalbob.code.config.rest;
 
 import org.springframework.context.annotation.Configuration;
 

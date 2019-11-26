@@ -1,4 +1,4 @@
-package com.kubra.iq.chronos.entity;
+package com.kalbob.app.es;
 
 import java.time.ZonedDateTime;
 import java.util.Map;

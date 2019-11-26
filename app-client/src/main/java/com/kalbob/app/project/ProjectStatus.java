@@ -1,4 +1,4 @@
-package com.kalbob.app.project;
+package com.kalbob.code.project;
 
 public enum ProjectStatus {
 

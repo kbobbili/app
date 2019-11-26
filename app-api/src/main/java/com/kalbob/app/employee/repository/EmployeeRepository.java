@@ -1,7 +1,7 @@
-package com.kalbob.app.employee.repository;
+package com.kalbob.code.employee.repository;
 
-import com.kalbob.app.department.DepartmentType;
-import com.kalbob.app.employee.Employee;
+import com.kalbob.code.department.DepartmentType;
+import com.kalbob.code.employee.Employee;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,6 +1,6 @@
-package com.kalbob.app.department;
+package com.kalbob.code.department;
 
-import com.kalbob.app.BaseEntity;
+import com.kalbob.code.BaseEntity;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

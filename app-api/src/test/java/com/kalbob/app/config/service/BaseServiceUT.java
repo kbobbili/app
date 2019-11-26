@@ -1,4 +1,4 @@
-package com.kalbob.app.config.service;
+package com.kalbob.code.config.service;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;

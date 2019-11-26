@@ -1,4 +1,4 @@
-package com.kalbob.app.config.rest;
+package com.kalbob.code.config.rest;
 
 import java.util.Arrays;
 import org.junit.jupiter.api.AfterAll;

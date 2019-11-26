@@ -1,6 +1,6 @@
-package com.kalbob.app;
+package com.kalbob.code;
 
-import com.kalbob.app.config.IntegrationTestProfile;
+import com.kalbob.code.config.IntegrationTestProfile;
 import java.util.Arrays;
 import java.util.Iterator;
 import org.junit.jupiter.api.Test;

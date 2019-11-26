@@ -1,8 +1,8 @@
-package com.kalbob.app.employee.service.impl;
+package com.kalbob.code.employee.service.impl;
 
-import com.kalbob.app.employee.Employee;
-import com.kalbob.app.employee.repository.EmployeeRepository;
-import com.kalbob.app.employee.service.EmployeeService;
+import com.kalbob.code.employee.Employee;
+import com.kalbob.code.employee.repository.EmployeeRepository;
+import com.kalbob.code.employee.service.EmployeeService;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

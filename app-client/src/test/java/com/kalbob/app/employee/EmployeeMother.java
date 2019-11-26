@@ -1,8 +1,8 @@
-package com.kalbob.app.employee;
+package com.kalbob.code.employee;
 
-import com.kalbob.app.ObjectMother;
-import com.kalbob.app.department.DepartmentMother;
-import com.kalbob.app.project.ProjectMother;
+import com.kalbob.code.ObjectMother;
+import com.kalbob.code.department.DepartmentMother;
+import com.kalbob.code.project.ProjectMother;
 import java.util.Arrays;
 
 public class EmployeeMother extends ObjectMother {

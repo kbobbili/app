@@ -1,4 +1,4 @@
-package com.kalbob.app.config.data;
+package com.kalbob.code.config.data;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +29,7 @@ import org.springframework.data.mapping.MappingException;
 @EqualsAndHashCode(callSuper = true)
 @Configuration
 @ConfigurationProperties(value = "com.kalbob.app.es", ignoreInvalidFields = true)
-@EnableElasticsearchRepositories(basePackages = {"com.kalbob.app.es"}, considerNestedRepositories = true)
+@EnableElasticsearchRepositories(basePackages = {"com.kalbob.code.es"}, considerNestedRepositories = true)
 public class ElasticSearchConfiguration extends AbstractElasticsearchConfiguration {
 
   private String url;

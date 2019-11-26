@@ -1,4 +1,4 @@
-package com.kalbob.app.department.repository;
+package com.kalbob.code.department.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.kalbob.app.config.data.BaseRepositoryIT;
-import com.kalbob.app.department.AddressMother;
-import com.kalbob.app.department.Department;
-import com.kalbob.app.department.DepartmentMother;
-import com.kalbob.app.employee.Employee;
-import com.kalbob.app.employee.EmployeeMother;
-import com.kalbob.app.employee.repository.EmployeeRepository;
+import com.kalbob.code.config.data.BaseRepositoryIT;
+import com.kalbob.code.department.AddressMother;
+import com.kalbob.code.department.Department;
+import com.kalbob.code.department.DepartmentMother;
+import com.kalbob.code.employee.Employee;
+import com.kalbob.code.employee.EmployeeMother;
+import com.kalbob.code.employee.repository.EmployeeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;

@@ -1,6 +1,6 @@
-package com.kalbob.app.employee.controller;
+package com.kalbob.code.employee.controller;
 
-import com.kalbob.app.config.rest.BaseRestIT;
+import com.kalbob.code.config.rest.BaseRestIT;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

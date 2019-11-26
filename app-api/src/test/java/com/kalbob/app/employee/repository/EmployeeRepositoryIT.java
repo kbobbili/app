@@ -1,4 +1,4 @@
-package com.kalbob.app.employee.repository;
+package com.kalbob.code.employee.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,14 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.kalbob.app.config.data.BaseRepositoryIT;
-import com.kalbob.app.department.Department;
-import com.kalbob.app.department.DepartmentMother;
-import com.kalbob.app.department.DepartmentType;
-import com.kalbob.app.employee.Employee;
-import com.kalbob.app.employee.EmployeeMother;
-import com.kalbob.app.project.Project;
-import com.kalbob.app.project.ProjectMother;
+import com.kalbob.code.config.data.BaseRepositoryIT;
+import com.kalbob.code.department.Department;
+import com.kalbob.code.department.DepartmentMother;
+import com.kalbob.code.department.DepartmentType;
+import com.kalbob.code.employee.Employee;
+import com.kalbob.code.employee.EmployeeMother;
+import com.kalbob.code.project.Project;
+import com.kalbob.code.project.ProjectMother;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;

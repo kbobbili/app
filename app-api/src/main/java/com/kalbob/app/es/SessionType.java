@@ -1,4 +1,4 @@
-package com.kubra.iq.chronos.entity;
+package com.kalbob.app.es;
 
 public enum SessionType {
   TWO_WAY("TWO_WAY"),

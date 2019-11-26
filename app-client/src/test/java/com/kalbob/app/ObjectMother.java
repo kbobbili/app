@@ -1,4 +1,4 @@
-package com.kalbob.app;
+package com.kalbob.code;
 
 import com.github.javafaker.Faker;
 import java.util.Locale;

@@ -1,4 +1,4 @@
-package com.kalbob.app.config.data;
+package com.kalbob.code.config.data;
 
 import java.util.Arrays;
 import java.util.List;

@@ -199,7 +199,7 @@ public class ElasticSearchIT {
     List<Session> sessions = new ArrayList<>();
     for(int s = 1; s <= count; s++) {
       Session session = new Session();
-      session.setSessionId("SESSION-" + s);
+      session.setId("SESSION-" + s);
       List<Message> messages = new ArrayList<>();
       for(int m = 1; m <= 10; m++) {
         Map<String, Object> userMeta = new HashMap<>();
@@ -217,7 +217,6 @@ public class ElasticSearchIT {
             .setText(dataFactory.getItem(Arrays
                 .asList("hello! how are you", "balance", "pay bill", "report outage", "thank you")))
             .setType("SMS")
-            .setMsgCount(dataFactory.getNumberUpTo(20))
             .setAdditionalPayload(new HashMap<>())
             .setUserMeta(userMeta)
             .setDirection(dataFactory.getItem(Arrays.asList("OUT_BOUND", "IN_BOUND")))
@@ -246,7 +245,7 @@ public class ElasticSearchIT {
     params.put("a","CodeUpdateById");
     //params.put("b", "CodeUpdateById");
     //String message = "{\"test\":\"test\"}";
-    params.put("message", new SmallMessage().setText("CodeUpdateById"));
+    params.put("message", new Message().setText("CodeUpdateById"));
     String payload = objectMapper.writeValueAsString(params);
     params.put("message", payload);
     XContentBuilder b = XContentFactory.jsonBuilder().prettyPrint();
@@ -273,9 +272,9 @@ public class ElasticSearchIT {
     //params.put("message", objectMapper.writeValueAsString(message));
     //params.put("message", objectMapper.convertValue(message, JsonNode.class));
     //params.put("message", objectMapper.writeValueAsString(objectMapper.convertValue(message, JsonNode.class)));
-    UpdateRequest request = new UpdateRequest("s","1");
-    //params.put("message", objectMapper.writeValueAsString(new SmallMessage().setText("CodeUpdate1")));//"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
-    params.put("message", new SmallMessage().setText("CodeUpdate1"));//cannot write xcontent for unknown value
+    UpdateRequest request = new UpdateRequest("s","_doc", "1");
+    //params.put("message", objectMapper.writeValueAsString(new Message().setText("CodeUpdate1")));//"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
+    params.put("message", new Message().setText("CodeUpdate1"));//cannot write xcontent for unknown value
     request.script(
         new Script(
             ScriptType.INLINE, "painless",
@@ -304,7 +303,7 @@ public class ElasticSearchIT {
     request.setQuery(new TermQueryBuilder("sessionId", "SESSION-1"));
     Map<String, Object> params = new HashMap<>();
     //params.put("a","CodeUpdateByQuery");
-    String msgText = objectMapper.writeValueAsString(new SmallMessage().setText("CodeUpdateByQuery"));
+    String msgText = objectMapper.writeValueAsString(new Message().setText("CodeUpdateByQuery"));
     XContentBuilder message = XContentFactory.jsonBuilder().prettyPrint();
     try (XContentParser p = XContentFactory.xContent(XContentType.JSON)
         .createParser(EMPTY, DeprecationHandler.THROW_UNSUPPORTED_OPERATION, msgText)) {
@@ -343,8 +342,8 @@ public class ElasticSearchIT {
     //params.put("message", objectMapper.writeValueAsString(objectMapper.convertValue(message, JsonNode.class)));
     UpdateByQueryRequest request = new UpdateByQueryRequest("s");
     request.setQuery(new TermQueryBuilder("sessionId", "SESSION-1"));
-    //params.put("message", objectMapper.writeValueAsString(new SmallMessage().setText("Code1")));//"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
-    params.put("message", objectMapper.writeValueAsBytes(new SmallMessage().setText("Code1")));//cannot write xcontent for unknown value
+    //params.put("message", objectMapper.writeValueAsString(new Message().setText("Code1")));//"mapper_parsing_exception object mapping for [messages] tried to parse field [null] as object, but found a concrete value
+    params.put("message", objectMapper.writeValueAsBytes(new Message().setText("Code1")));//cannot write xcontent for unknown value
     request.setScript(
         new Script(
             ScriptType.INLINE, "painless",
@@ -610,7 +609,7 @@ public class ElasticSearchIT {
 
   private SessionAggregate getSessionAggregate(Session session) {
     SessionAggregate sessionAggregate = new SessionAggregate();
-    sessionAggregate.setSessionId(session.getSessionId());
+    sessionAggregate.setSessionId(session.getId());
     List<Message> messages = session.getMessages();
     List<String> intents = new ArrayList<>();
     if(messages != null && !messages.isEmpty()) {

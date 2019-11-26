@@ -1,4 +1,4 @@
-package com.kalbob.app;
+package com.kalbob.code;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;

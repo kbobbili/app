@@ -1,7 +1,7 @@
-package com.kalbob.app.department;
+package com.kalbob.code.department;
 
-import com.kalbob.app.BaseEntity;
-import com.kalbob.app.employee.Employee;
+import com.kalbob.code.BaseEntity;
+import com.kalbob.code.employee.Employee;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;

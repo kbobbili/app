@@ -1,8 +1,5 @@
-package com.kubra.iq.chronos.service;
+package com.kalbob.app.es;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kubra.iq.chronos.entity.Message;
-import com.kubra.iq.chronos.entity.SessionType;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;

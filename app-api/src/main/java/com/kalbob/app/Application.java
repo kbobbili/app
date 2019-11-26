@@ -1,4 +1,4 @@
-package com.kalbob.app;
+package com.kalbob.code;
 
 import java.util.Arrays;
 import org.slf4j.Logger;

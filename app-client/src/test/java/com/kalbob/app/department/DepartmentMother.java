@@ -1,6 +1,6 @@
-package com.kalbob.app.department;
+package com.kalbob.code.department;
 
-import com.kalbob.app.ObjectMother;
+import com.kalbob.code.ObjectMother;
 import java.util.Arrays;
 
 public class DepartmentMother extends ObjectMother {

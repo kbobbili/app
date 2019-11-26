@@ -1,4 +1,4 @@
-package com.kubra.iq.chronos.entity;
+package com.kalbob.app.es;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

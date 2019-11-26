@@ -1,12 +1,12 @@
-package com.kalbob.app.project.repository;
+package com.kalbob.code.project.repository;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.kalbob.app.config.data.BaseRepositoryIT;
-import com.kalbob.app.project.Project;
-import com.kalbob.app.project.ProjectMother;
+import com.kalbob.code.config.data.BaseRepositoryIT;
+import com.kalbob.code.project.Project;
+import com.kalbob.code.project.ProjectMother;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;

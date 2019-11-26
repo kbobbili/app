@@ -1,4 +1,4 @@
-package com.kubra.iq.chronos.entity;
+package com.kalbob.app.es;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;

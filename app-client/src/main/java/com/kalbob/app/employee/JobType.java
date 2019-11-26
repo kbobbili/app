@@ -1,4 +1,4 @@
-package com.kalbob.app.employee;
+package com.kalbob.code.employee;
 
 public enum JobType {
   ANALYST,

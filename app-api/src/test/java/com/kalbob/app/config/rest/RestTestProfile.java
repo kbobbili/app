@@ -1,6 +1,6 @@
-package com.kalbob.app.config.rest;
+package com.kalbob.code.config.rest;
 
-import com.kalbob.app.config.IntegrationTestProfile;
+import com.kalbob.code.config.IntegrationTestProfile;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

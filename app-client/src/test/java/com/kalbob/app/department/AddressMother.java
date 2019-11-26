@@ -1,6 +1,6 @@
-package com.kalbob.app.department;
+package com.kalbob.code.department;
 
-import com.kalbob.app.ObjectMother;
+import com.kalbob.code.ObjectMother;
 
 public class AddressMother extends ObjectMother {
 

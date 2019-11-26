@@ -1,4 +1,4 @@
-package com.kalbob.app.config.service;
+package com.kalbob.code.config.service;
 
 import org.springframework.context.annotation.Configuration;
 

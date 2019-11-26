@@ -1,6 +1,6 @@
-package com.kalbob.app.project.repository;
+package com.kalbob.code.project.repository;
 
-import com.kalbob.app.project.Project;
+import com.kalbob.code.project.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

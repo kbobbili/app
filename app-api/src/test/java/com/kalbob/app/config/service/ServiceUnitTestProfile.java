@@ -1,6 +1,6 @@
-package com.kalbob.app.config.service;
+package com.kalbob.code.config.service;
 
-import com.kalbob.app.config.UnitTestProfile;
+import com.kalbob.code.config.UnitTestProfile;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

@@ -1,4 +1,4 @@
-package com.kalbob.app.department;
+package com.kalbob.code.department;
 
 public enum DepartmentType {
 

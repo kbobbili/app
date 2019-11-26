@@ -1,4 +1,4 @@
-package com.kalbob.app.es;
+package com.kalbob.code.es;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;

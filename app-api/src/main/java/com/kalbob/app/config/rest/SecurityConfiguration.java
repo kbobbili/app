@@ -28,8 +28,7 @@ class SecurityConfigurationDev extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/").permitAll()
         .and()
-        .authorizeRequests().antMatchers("/h2-console/**")
-        .permitAll();//For h2, disable CSRF, X-Frame-Options
+        .authorizeRequests().antMatchers("/h2-console/**").permitAll();//For h2, disable CSRF, X-Frame-Options
   }
 
 }

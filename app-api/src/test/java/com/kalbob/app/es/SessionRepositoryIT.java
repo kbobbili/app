@@ -2,7 +2,7 @@ package com.kalbob.app.es;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.kalbob.app.config.ApplicationProfile;
+import com.kalbob.app.config.IntegrationTestProfile;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-@ApplicationProfile
+@IntegrationTestProfile
 public class SessionRepositoryIT {
 
   @Autowired
@@ -34,8 +34,17 @@ public class SessionRepositoryIT {
   }
 
   @Test
+  public void saveSessions() {
+    for(Session session : getSessions(5)) {
+      session = sessionRepository.save(session);
+      assertNotNull(session.getId());
+      System.out.println(session);
+    }
+  }
+
+  @Test
   public void getSession() {
-    String id = "100";
+    String id = "1";
     Session session = sessionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Session with id: " + id + " is not found"));
     assertNotNull(session.getId());
     System.out.println(session);
