@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: base, local_db
+    include: base, h2_db
 a:
   local
 ---
