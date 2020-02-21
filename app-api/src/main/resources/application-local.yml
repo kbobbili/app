@@ -5,6 +5,8 @@ a:
   local
 ---
 spring:
+  main:
+    allow-bean-definition-overriding: true
   profiles: base
   devtools:
     restart:

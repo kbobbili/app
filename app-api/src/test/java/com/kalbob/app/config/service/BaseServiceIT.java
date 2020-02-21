@@ -1,5 +1,8 @@
-package com.kalbob.app.config.rest;
+package com.kalbob.app.config.service;
 
+import com.kalbob.app.employee.repository.EmployeeRepository;
+import com.kalbob.app.employee.service.EmployeeComponent;
+import com.kalbob.app.employee.service.EmployeeService;
 import java.util.Arrays;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -9,16 +12,17 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
-@WebMvcTest
-@Import(BaseRestITConfiguration.class)
+@ContextConfiguration(classes = {EmployeeComponent.class})
+//@Import(BaseServiceITConfiguration.class)
 @ActiveProfiles("it")
-public class BaseRestIT {
+public class BaseServiceIT {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -27,6 +31,9 @@ public class BaseRestIT {
 
   @Autowired
   private ConfigurableEnvironment environment;
+
+  @Autowired
+  private EmployeeComponent employeeComponent;
 
   @BeforeAll
   public static void beforeAll() {
@@ -37,16 +44,19 @@ public class BaseRestIT {
   }
 
   @BeforeEach
-  public void beforeEach() throws Exception {
+  public void beforeEach() {
   }
 
   @AfterEach
-  public void afterEach() throws Exception {
+  public void afterEach() {
   }
 
   @Test
   public void test() {
-    logger.info("[::::::BaseRestIT::::::");
+    System.out.println("hellooooo");
+    System.out.println(employeeComponent);
+    logger.debug("[::::::BaseServiceUT::::::");
+    logger.debug(employeeComponent.toString());
     logger.info("spring.cloud.config.uri: {}", environment.getProperty("spring.cloud.config.uri"));
     logger.info("spring.profiles.active: {}", environment.getProperty("spring.profiles.active"));
     logger.info("spring.profiles.include: {}", environment.getProperty("spring.profiles.include"));
@@ -57,7 +67,7 @@ public class BaseRestIT {
     String[] beans = applicationContext.getBeanDefinitionNames();
     logger.info("Total bean count: " + Arrays.stream(beans)
         .count());//164 DataJpaTest beans vs 517 SpringBootTest beans.
-    logger.info("::::::BaseRestIT::::::]");
+    logger.debug("::::::BaseServiceUT::::::]");
   }
 
 }

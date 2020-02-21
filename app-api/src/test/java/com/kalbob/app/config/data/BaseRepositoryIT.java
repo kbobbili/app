@@ -14,10 +14,17 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 
-@DataTestProfile
+@DataJpaTest
+@Rollback(false)
+@Import(BaseRepositoryITConfiguration.class)
+@ActiveProfiles("it")
 public class BaseRepositoryIT {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
