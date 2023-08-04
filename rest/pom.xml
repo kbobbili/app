@@ -10,7 +10,7 @@
 
   <parent>
     <groupId>com.kalbob</groupId>
-    <artifactId>app</artifactId>
+    <artifactId>app-old</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
